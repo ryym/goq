@@ -64,14 +64,17 @@ func prot() {
 	cols := []Column{
 		{"User", "Name"},
 	}
-	coll := NewCollector(cols)
+
+	users := []User{}
+	coll := NewCollector(cols, &users)
+	ptrs := make([]interface{}, len(cols))
 	for rows.Next() {
-		// coll.Next(rows)
-		ptrs := make([]interface{}, len(cols))
 		coll.Next(ptrs)
 		rows.Scan(ptrs...)
-		fmt.Println("user", coll.user)
+		coll.AfterScan()
 	}
+
+	fmt.Println("result", users)
 
 	err = rows.Err()
 	chk(err)
@@ -80,10 +83,12 @@ func prot() {
 type UserSliceCollector struct {
 	ut      reflect.Type
 	colToFl map[int]int
-	user    *User // XXX
+
+	users reflect.Value
+	user  reflect.Value
 }
 
-func NewCollector(cols []Column) *UserSliceCollector {
+func NewCollector(cols []Column, users interface{}) *UserSliceCollector {
 	ut := reflect.TypeOf(User{})
 
 	names := make([]string, ut.NumField())
@@ -105,19 +110,29 @@ func NewCollector(cols []Column) *UserSliceCollector {
 	return &UserSliceCollector{
 		ut:      ut,
 		colToFl: colToFl,
+		users:   reflect.ValueOf(users).Elem(),
 	}
 }
 
-// func (uc *UserSliceCollector) Next(rows *sql.Rows) {
 func (uc *UserSliceCollector) Next(ptrs []interface{}) {
 	user := reflect.New(uc.ut).Elem()
-	uc.user = user.Addr().Interface().(*User)
-
-	// rows.Scan(user.Field(0).Addr().Interface())
-	// uc.users = append(uc.users, user.Interface())
-	// fmt.Println(user.Interface())
+	uc.user = user.Addr()
 
 	for c, f := range uc.colToFl {
 		ptrs[c] = user.Field(f).Addr().Interface()
 	}
+}
+
+// XXX: AfterScan 的な処理はどうしても必要そう
+// 実際にはコレクタは複数いるから、rows のループ内で
+// コレクタのループを scan 前後に計2回も実行しないといけない...
+// モデルのポインタのスライスでよければ、`Next`内だけで作れる。
+// しかしモデルの実体のスライスは無理っぽい。
+// フィールドのポインタに値がセットされる前に`Elem`や`Interface`を
+// 呼ぶと空のモデルになっちゃう。
+// After ではなく Next の前に1つ前のループの後処理を行えばコレクタのループは
+// 1回で済むかも。
+func (uc *UserSliceCollector) AfterScan() {
+	uc.users.Set(reflect.Append(uc.users, uc.user.Elem()))
+	// fmt.Println(uc.users)
 }
