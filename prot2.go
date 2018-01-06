@@ -85,22 +85,28 @@ func prot2() {
 
 	prefs := []Pref{}
 	cities := []City{}
-	prefC := NewSliceCollector(cols, &prefs, reflect.TypeOf(Pref{}))
-	cityC := NewSliceCollector(cols, &cities, reflect.TypeOf(City{}))
+
+	colls := []Collector{
+		NewSliceCollector(cols, &prefs, reflect.TypeOf(Pref{})),
+		NewSliceCollector(cols, &cities, reflect.TypeOf(City{})),
+	}
+
 	ptrs := make([]interface{}, len(cols))
 	for rows.Next() {
-		prefC.Next(ptrs)
-		cityC.Next(ptrs)
+		for _, cl := range colls {
+			cl.Next(ptrs)
+		}
 		rows.Scan(ptrs...)
-		prefC.AfterScan()
-		cityC.AfterScan()
+		for _, cl := range colls {
+			cl.AfterScan()
+		}
 	}
 
 	fmt.Println(prefs)
 	fmt.Println(cities)
 
-	// err = rows.Err()
-	// chk(err)
+	err = rows.Err()
+	chk(err)
 }
 
 type SliceCollector struct {
@@ -109,6 +115,11 @@ type SliceCollector struct {
 
 	slice reflect.Value
 	item  reflect.Value
+}
+
+type Collector interface {
+	Next(ptrs []interface{})
+	AfterScan()
 }
 
 func NewSliceCollector(cols []Column, slice interface{}, itemType reflect.Type) *SliceCollector {
