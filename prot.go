@@ -21,7 +21,6 @@ type User struct {
 type Column struct {
 	StructName string
 	FieldName  string
-
 	// クエリ作成のためにこれらも必要
 	// TableName string
 	// ColumnName string
@@ -33,10 +32,6 @@ type UsersSchema struct {
 
 var Users = UsersSchema{
 	Name: Column{"users", "name"},
-}
-
-func main() {
-	prot()
 }
 
 func chk(err error) {
@@ -53,13 +48,6 @@ func prot() {
 	rows, err := db.Query("select * from users")
 	chk(err)
 	defer rows.Close()
-
-	// for rows.Next() {
-	// 	user := User{}
-	// 	err = rows.Scan(&user.Name)
-	// 	chk(err)
-	// 	// fmt.Println(user)
-	// }
 
 	cols := []Column{
 		{"User", "Name"},
