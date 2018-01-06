@@ -67,11 +67,17 @@ func prot2() {
 		, p.name
 		, c.id
 		, c.name
+		, t.id
+		, t.name
 	from
 		prefectures p
 	inner join cities c
 		on c.prefecture_id = p.id
-	limit 10
+	inner join towns t
+		on t.city_id = c.id
+	order by
+		c.name
+	limit 50
 	`)
 	chk(err)
 	defer rows.Close()
@@ -81,14 +87,23 @@ func prot2() {
 		{"Pref", "Name"},
 		{"City", "ID"},
 		{"City", "Name"},
+		{"Town", "ID"},
+		{"Town", "Name"},
 	}
 
 	prefs := []Pref{}
-	cities := []City{}
+	// cities := []City{}
+	// towns := []Town{}
+	cities := map[int][]City{}
+	towns := map[int][]Town{}
 
 	colls := []Collector{
 		NewSliceCollector(cols, &prefs, reflect.TypeOf(Pref{})),
-		NewSliceCollector(cols, &cities, reflect.TypeOf(City{})),
+		// NewSliceCollector(cols, &cities, reflect.TypeOf(City{})),
+		// NewSliceCollector(cols, &towns, reflect.TypeOf(Town{})),
+
+		NewMapCollector(cols, &cities, reflect.TypeOf(City{}), Column{"Pref", "ID"}),
+		NewMapCollector(cols, &towns, reflect.TypeOf(Town{}), Column{"City", "ID"}),
 	}
 
 	ptrs := make([]interface{}, len(cols))
@@ -98,12 +113,13 @@ func prot2() {
 		}
 		rows.Scan(ptrs...)
 		for _, cl := range colls {
-			cl.AfterScan()
+			cl.AfterScan(ptrs)
 		}
 	}
 
 	fmt.Println(prefs)
 	fmt.Println(cities)
+	fmt.Println(towns)
 
 	err = rows.Err()
 	chk(err)
@@ -119,7 +135,7 @@ type SliceCollector struct {
 
 type Collector interface {
 	Next(ptrs []interface{})
-	AfterScan()
+	AfterScan(ptrs []interface{})
 }
 
 func NewSliceCollector(cols []Column, slice interface{}, itemType reflect.Type) *SliceCollector {
@@ -155,6 +171,67 @@ func (sc *SliceCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (sc *SliceCollector) AfterScan() {
+func (sc *SliceCollector) AfterScan(ptrs []interface{}) {
 	sc.slice.Set(reflect.Append(sc.slice, sc.item.Elem()))
+}
+
+type MapCollector struct {
+	tp      reflect.Type
+	colToFl map[int]int
+	keyIdx  int
+	mp      reflect.Value
+	item    reflect.Value
+}
+
+func NewMapCollector(cols []Column, mp interface{}, itemType reflect.Type, keyCol Column) *MapCollector {
+	names := make([]string, itemType.NumField())
+	for i := 0; i < itemType.NumField(); i++ {
+		names[i] = itemType.Field(i).Name
+	}
+
+	keyIdx := -1
+	colToFl := map[int]int{}
+	for iC, c := range cols {
+		if c.StructName == itemType.Name() {
+			for iF, name := range names {
+				if name == c.FieldName {
+					colToFl[iC] = iF
+				}
+			}
+		}
+		if c == keyCol {
+			keyIdx = iC
+		}
+	}
+
+	if keyIdx == -1 {
+		panic("[NewMapCollector]: key is not in columns")
+	}
+
+	return &MapCollector{
+		tp:      itemType,
+		colToFl: colToFl,
+		keyIdx:  keyIdx,
+		mp:      reflect.ValueOf(mp).Elem(),
+	}
+}
+
+func (sc *MapCollector) Next(ptrs []interface{}) {
+	item := reflect.New(sc.tp).Elem()
+	sc.item = item.Addr()
+
+	for c, f := range sc.colToFl {
+		ptrs[c] = item.Field(f).Addr().Interface()
+	}
+}
+
+func (sc *MapCollector) AfterScan(ptrs []interface{}) {
+	key := reflect.ValueOf(ptrs[sc.keyIdx]).Elem()
+
+	sl := sc.mp.MapIndex(key)
+	if !sl.IsValid() {
+		sl = reflect.MakeSlice(reflect.SliceOf(sc.tp), 0, 0)
+	}
+	sl = reflect.Append(sl, sc.item.Elem())
+	sc.mp.SetMapIndex(key, sl)
 }
