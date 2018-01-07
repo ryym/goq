@@ -8,15 +8,22 @@ import (
 )
 
 type columnExpr struct {
-	name       string
 	tableName  string
+	tableAlias string
+	name       string
 	structName string
 	fieldName  string
 }
 
 func (c *columnExpr) ToQuery() q.Query {
+	var table string
+	if c.tableAlias != "" {
+		table = c.tableAlias
+	} else {
+		table = c.tableName
+	}
 	return q.Query{
-		fmt.Sprintf("%s.%s", c.tableName, c.name),
+		fmt.Sprintf("%s.%s", table, c.name),
 		[]interface{}{},
 	}
 }
@@ -25,6 +32,7 @@ func (c *columnExpr) ToSelectItem() q.SelectItem {
 	return q.SelectItem{
 		ColumnName: c.name,
 		TableName:  c.tableName,
+		TableAlias: c.tableAlias,
 		StructName: c.structName,
 		FieldName:  c.fieldName,
 	}

@@ -76,10 +76,10 @@ type QueryBuilder interface {
 	Coalesce(exp Expr, alt interface{}) Expr
 
 	// サブクエリも受け取れるべき
-	InnerJoin(table TableBase) Join
-	LeftJoin(table TableBase) Join
-	RightJoin(table TableBase) Join
-	FullJoin(table TableBase) Join
+	InnerJoin(table Table) Join
+	LeftJoin(table Table) Join
+	RightJoin(table Table) Join
+	FullJoin(table Table) Join
 }
 
 type LitExpr interface {
@@ -103,20 +103,23 @@ type ExprListExpr interface {
 	Queryables() []Queryable
 }
 
-type TableBase interface {
-	Name() string
-	All() ExprListExpr
-}
-
 type Table interface {
-	TableBase
-	As(alias string) TableAliased
+	TableName() string
+	Alias() string
+	All() ExprListExpr
+	// Columns()
 }
 
-type TableAliased interface {
-	TableBase
-	Alias() string
-}
+// As() の戻り値はテーブルごとに違うから interface にはできない
+// type Table interface {
+// 	Table
+// 	As(alias string) TableAliased
+// }
+
+// type TableAliased interface {
+// 	Table
+// 	Alias() string
+// }
 
 type QueryStmt interface {
 	Queryable
@@ -125,21 +128,23 @@ type QueryStmt interface {
 
 type SelectClause interface {
 	QueryStmt
-	From(table TableBase, tables ...TableBase) Clauses
+	From(table Table, tables ...Table) Clauses
 }
 
 type ExtraClauses interface {
 	QueryStmt
-	OrderBy(exps ...Expr) ExtraClauses
+	OrderBy(exps ...Queryable) ExtraClauses
 	Limit(n int) ExtraClauses
 	Offset(n int) ExtraClauses
 }
 
 type Clauses interface {
 	ExtraClauses
+
+	// Pred 限定だと Raw で直接条件を書けない
 	Where(exps ...PredExpr) Clauses
 	Joins(joins ...JoinOn) Clauses
-	GroupBy(exps ...Expr) GroupQuery
+	GroupBy(exps ...Queryable) GroupQuery
 }
 
 type GroupQuery interface {
@@ -152,7 +157,16 @@ type Join interface {
 	// Using
 }
 
-type JoinOn interface {
-	Queryable
-	joinOn()
+const (
+	JOIN_INNER = iota
+	JOIN_LEFT
+	JOIN_RIGHT
+	JOIN_FULL
+)
+
+type JoinKind int
+
+type JoinOn struct {
+	On   PredExpr
+	Kind JoinKind
 }

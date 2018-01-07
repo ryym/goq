@@ -17,7 +17,7 @@ func hello(
 		t.All(),
 	).From(
 		t,
-		t.As("test"),
+		// t.As("test"),
 	).Where(
 		v.Eq(v),
 		g.Or(

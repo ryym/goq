@@ -1,6 +1,7 @@
 package gnr
 
 import (
+	"fmt"
 	"strings"
 
 	q "github.com/ryym/goq/query"
@@ -10,8 +11,13 @@ type selectClause struct {
 	exps []q.Queryable
 }
 
-func (sc *selectClause) From(table q.TableBase, tables ...q.TableBase) q.Clauses {
-	return nil
+func (sc *selectClause) From(table q.Table, tables ...q.Table) q.Clauses {
+	froms := make([]q.Table, len(tables)+1)
+	froms[0] = table
+	for i, t := range tables {
+		froms[i+1] = t
+	}
+	return &clauses{selectCls: sc, froms: froms}
 }
 
 func (sc *selectClause) ToSelectItem() q.SelectItem { return q.SelectItem{} }
@@ -42,4 +48,73 @@ func (sc *selectClause) GetSelects() []q.SelectItem {
 		}
 	}
 	return items
+}
+
+type clauses struct {
+	selectCls *selectClause
+	froms     []q.Table
+	wheres    []q.Expr
+	joins     []q.JoinOn
+	orders    []q.Expr
+	limit     int
+	offset    int
+}
+
+func (cl *clauses) GetSelects() []q.SelectItem {
+	return cl.selectCls.GetSelects()
+}
+
+func (cl *clauses) ToQuery() q.Query {
+	qr := cl.selectCls.ToQuery()
+
+	qs := []string{}
+	qs = append(qs, qr.Query)
+
+	args := qr.Args[:]
+
+	// FROM
+	if len(cl.froms) > 0 {
+		ts := make([]string, len(cl.froms))
+		for i, t := range cl.froms {
+			ts[i] = t.TableName()
+			if alias := t.Alias(); alias != "" {
+				ts[i] += fmt.Sprintf(" AS %s", alias)
+			}
+		}
+		qs = append(qs, "FROM "+strings.Join(ts, ", "))
+	}
+
+	return q.Query{strings.Join(qs, " "), args}
+}
+
+func (cl *clauses) ToSelectItem() q.SelectItem {
+	return q.SelectItem{}
+}
+
+func (cl *clauses) Where(exps ...q.PredExpr) q.Clauses {
+	return nil
+}
+
+func (cl *clauses) Joins(joins ...q.JoinOn) q.Clauses {
+	return nil
+}
+
+func (cl *clauses) GroupBy(exps ...q.Queryable) q.GroupQuery {
+	return nil
+}
+
+func (cl *clauses) Having(exps ...q.PredExpr) q.GroupQuery {
+	return nil
+}
+
+func (cl *clauses) OrderBy(exps ...q.Queryable) q.ExtraClauses {
+	return nil
+}
+
+func (cl *clauses) Limit(n int) q.ExtraClauses {
+	return nil
+}
+
+func (cl *clauses) Offset(n int) q.ExtraClauses {
+	return nil
 }

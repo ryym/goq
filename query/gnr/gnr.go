@@ -17,18 +17,30 @@ func Play() {
 		g.Col("users", "name").Eq(g.Col("foo", "bar").Add(1)).ToQuery(),
 	)
 
+	Users := &UsersTable{
+		name: "users",
+		ID:   &Ops{&columnExpr{"users", "", "id", "UsersTable", "ID"}},
+		Name: &Ops{&columnExpr{"users", "", "name", "UsersTable", "Name"}},
+	}
+	u := Users.As("u")
+	// fmt.Println(Users.ID)
+	// fmt.Println(u.ID)
+
 	sl := g.Select(
 		g.Col("users", "name"),
 		g.Val(1),
 		g.Val(1).As("n"),
+		Users.ID,
+		u.ID,
+		u.ID.Add(Users.ID),
 		&exprListExpr{
 			qs: []query.Queryable{
-				g.Col("users", "id"),
-				g.Col("users", "name").As("name2"),
+				Users.ID,
+				Users.Name,
 			},
 		},
 		g.Col("posts", "id").Eq(1),
-	)
+	).From(Users, u)
 
 	fmt.Println(sl.ToQuery())
 	fmt.Println(sl.GetSelects())
