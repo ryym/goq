@@ -2,7 +2,7 @@ package query
 
 func Noop() {}
 
-var g Global
+var g QueryGlobal
 
 func hello(
 	s SelectClause,

@@ -1,29 +1,35 @@
 package query
 
+type Built struct {
+	Query string
+	Args  []interface{}
+}
+
 type ExprBase interface {
-	String() string
+	// String() string
+	Build() Built
 }
 
 type Expr interface {
 	ExprBase
 	As(alias string) ExprAliased
-	Alias() string // Name()?
 }
 
 type ExprAliased interface {
 	ExprBase
-	exprAliased()
+	Alias() string // Name()?
+	Expr() Expr
 }
 
 type PredExpr interface {
 	Expr
-	predExpr()
+	PredExpr()
 }
 
 // 集計関数など Predicate じゃない Expr を受け取りたい
 // 箇所もあるから、Expr = Predicate | Operation でもいいかも
 
-type Global interface {
+type QueryGlobal interface {
 	Case() PredExpr // take special stuff
 	Exists(q Query) PredExpr
 	In(exps ...Expr) PredExpr
@@ -46,20 +52,22 @@ type Global interface {
 	Raw(v interface{}) Expr // ?
 	Str(s string) Expr      // surround by quotes
 	// Date, DateTime?
+
+	Parens(exp Expr) Expr
 }
 
 type ValExpr interface {
 	Expr
 
-	Eq(exp Expr) PredExpr
-	Neq(exp Expr) PredExpr
-	Gt(exp Expr) PredExpr
-	Gte(exp Expr) PredExpr
-	Lt(exp Expr) PredExpr
-	Lte(exp Expr) PredExpr
+	Eq(exp interface{}) PredExpr
+	Neq(exp interface{}) PredExpr
+	Gt(exp interface{}) PredExpr
+	Gte(exp interface{}) PredExpr
+	Lt(exp interface{}) PredExpr
+	Lte(exp interface{}) PredExpr
 
-	Like(exp Expr) PredExpr
-	Between(from Expr, to Expr) PredExpr
+	Like(s string) PredExpr
+	Between(from interface{}, to interface{}) PredExpr
 	IsNull() PredExpr
 	IsNotNull() PredExpr
 
