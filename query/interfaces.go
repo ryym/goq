@@ -1,24 +1,46 @@
 package query
 
-type Built struct {
+type Query struct {
 	Query string
 	Args  []interface{}
 }
 
-type ExprBase interface {
-	// String() string
-	Build() Built
+// カラムでなくエイリアスもついてなければ全て空
+type SelectItem struct {
+	Alias      string
+	ColumnName string
+	TableName  string
+	TableAlias string
+	StructName string
+	FieldName  string
+}
+
+type Queryable interface {
+	ToQuery() Query
+	ToSelectItem() SelectItem
 }
 
 type Expr interface {
-	ExprBase
+	Queryable
 	As(alias string) ExprAliased
-}
 
-type ExprAliased interface {
-	ExprBase
-	Alias() string // Name()?
-	Expr() Expr
+	Eq(v interface{}) PredExpr
+	// Neq(v interface{}) PredExpr
+	// Gt(v interface{}) PredExpr
+	// Gte(v interface{}) PredExpr
+	// Lt(v interface{}) PredExpr
+	// Lte(v interface{}) PredExpr
+	// Like(s string) PredExpr
+	// Between(from interface{}, to interface{}) PredExpr
+	// IsNull() PredExpr
+	// IsNotNull() PredExpr
+
+	Add(v interface{}) Expr
+	// Sbt(v interface{}) Expr
+	Mlt(v interface{}) Expr
+	// Dvd(v interface{}) Expr
+	// Negate(v interface{}) Expr
+	// Concat(s interface{}) Expr
 }
 
 type PredExpr interface {
@@ -26,81 +48,64 @@ type PredExpr interface {
 	PredExpr()
 }
 
-// 集計関数など Predicate じゃない Expr を受け取りたい
-// 箇所もあるから、Expr = Predicate | Operation でもいいかも
+type ExprAliased interface {
+	Queryable
+	Alias() string
+}
 
-type QueryGlobal interface {
-	Case() PredExpr // take special stuff
+type QueryBuilder interface {
+	Select(exps ...Queryable) SelectClause
+
+	// Case() PredExpr // take special stuff
 	Exists(q Query) PredExpr
 	In(exps ...Expr) PredExpr
 	And(exps ...PredExpr) PredExpr
 	Or(exps ...PredExpr) PredExpr
 	Not(exp PredExpr) PredExpr
-	Func(name string, args ...Expr) FuncExpr
+	Func(name string, args ...Expr) Expr
 
-	Count(exp Expr) FuncExpr
-	Sum(exp Expr) FuncExpr
-	Min(exp Expr) FuncExpr
-	Max(exp Expr) FuncExpr
-	Avg(exp Expr) FuncExpr
+	Val(v interface{}) LitExpr
+	Raw(v interface{}) Expr
+	Parens(exp Expr) Expr
 
+	Count(exp Expr) Expr
+	Sum(exp Expr) Expr
+	Min(exp Expr) Expr
+	Max(exp Expr) Expr
+	Avg(exp Expr) Expr
+	Coalesce(exp Expr, alt interface{}) Expr
+
+	// サブクエリも受け取れるべき
 	InnerJoin(table TableBase) Join
 	LeftJoin(table TableBase) Join
 	RightJoin(table TableBase) Join
 	FullJoin(table TableBase) Join
-
-	Raw(v interface{}) Expr // ?
-	Str(s string) Expr      // surround by quotes
-	// Date, DateTime?
-
-	Parens(exp Expr) Expr
 }
 
-type ValExpr interface {
-	Expr
-
-	Eq(exp interface{}) PredExpr
-	Neq(exp interface{}) PredExpr
-	Gt(exp interface{}) PredExpr
-	Gte(exp interface{}) PredExpr
-	Lt(exp interface{}) PredExpr
-	Lte(exp interface{}) PredExpr
-
-	Like(s string) PredExpr
-	Between(from interface{}, to interface{}) PredExpr
-	IsNull() PredExpr
-	IsNotNull() PredExpr
-
-	Add(exp Expr) Expr
-	Sbt(exp Expr) Expr
-	Mlt(exp Expr) Expr
-	Dvd(exp Expr) Expr
-	Negate(exp Expr) Expr
-
-	Concat(s Expr) Expr
+type LitExpr interface {
+	Queryable
+	LitExpr()
 }
 
-type FuncExpr interface {
-	Expr
-	Name() string
-}
+// Select 時の情報は ToSelectItem として抽象されるから
+// これは不要..?
+// type ColumnExpr interface {
+// 	Queryable
+// 	ColumnName() string
+// 	TableName() string
+// 	StructName() string
+// 	FieldName() string
+// }
 
-type ColumnExpr interface {
-	ValExpr
-	ColumnName() string
-	TableName() string
-	StructName() string
-	FieldName() string
-}
-
-type ColumnListExpr interface {
-	Expr
-	Columns() []ColumnExpr
+// table.All() で必要
+type ExprListExpr interface {
+	Queryable
+	Queryables() []Queryable
 }
 
 type TableBase interface {
 	Name() string
-	All() ColumnListExpr
+	All() ExprListExpr
 }
 
 type Table interface {
@@ -113,38 +118,28 @@ type TableAliased interface {
 	Alias() string
 }
 
-type Query interface {
-	Expr // Query 自体も式になる
-	GetDetail() QueryData
+type QueryStmt interface {
+	Queryable
+	GetSelects() []SelectItem
 }
-type QueryData struct{}
 
 type SelectClause interface {
-	Select(exps ...ExprBase) FromClause
+	QueryStmt
+	From(table TableBase, tables ...TableBase) Clauses
 }
 
-type FromClause interface {
-	Query
-	From(table TableBase, tables ...TableBase) Clauses
+type ExtraClauses interface {
+	QueryStmt
+	OrderBy(exps ...Expr) ExtraClauses
+	Limit(n int) ExtraClauses
+	Offset(n int) ExtraClauses
 }
 
 type Clauses interface {
 	ExtraClauses
-
-	// Where や Joins だけ独立して定義したいケースもあるかも
 	Where(exps ...PredExpr) Clauses
 	Joins(joins ...JoinOn) Clauses
 	GroupBy(exps ...Expr) GroupQuery
-
-	Map(f func(q Clauses) Clauses) Clauses
-}
-
-type Join interface {
-	On(exp PredExpr) JoinOn
-}
-type JoinOn interface {
-	Expr
-	joinOn()
 }
 
 type GroupQuery interface {
@@ -152,9 +147,12 @@ type GroupQuery interface {
 	Having(exps ...PredExpr) GroupQuery
 }
 
-type ExtraClauses interface {
-	Query
-	OrderBy(exps ...Expr) ExtraClauses
-	Limit(n int) ExtraClauses
-	Offset(n int) ExtraClauses
+type Join interface {
+	On(exp PredExpr) JoinOn
+	// Using
+}
+
+type JoinOn interface {
+	Queryable
+	joinOn()
 }

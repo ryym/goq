@@ -2,16 +2,15 @@ package query
 
 func Noop() {}
 
-var g QueryGlobal
+var g QueryBuilder
 
 func hello(
-	s SelectClause,
 	p PredExpr,
-	v ValExpr,
-	c ColumnExpr,
+	v Expr,
+	c Expr,
 	t Table,
 ) {
-	s.Select(
+	g.Select(
 		p,
 		v,
 		v.Add(v).As("added"),
@@ -23,19 +22,19 @@ func hello(
 		v.Eq(v),
 		g.Or(
 			g.And(
-				v.Gte(g.Raw(30)),
+				v.Eq(30),
 				p,
 			),
 			g.And(
-				v.Lt(c.Mlt(c)),
-				v.Between(g.Raw(10), c),
+				v.Eq(c.Mlt(c)),
+				v.Eq(c),
 			),
 		),
 		p,
 		p,
 	).Joins(
 		g.InnerJoin(t).On(c.Eq(c)),
-		g.LeftJoin(t).On(c.Lt(c)),
+		g.LeftJoin(t).On(c.Eq(c)),
 	).GroupBy(
 		c,
 	).Having()
