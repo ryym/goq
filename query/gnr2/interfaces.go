@@ -165,3 +165,9 @@ type Column interface {
 	ColumnName() string
 	FieldName() string
 }
+
+type Collector interface {
+	Init(selects []SelectItem, colNames []string)
+	Next(ptrs []interface{})
+	AfterScan(ptrs []interface{})
+}

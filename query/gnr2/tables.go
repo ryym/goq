@@ -12,8 +12,10 @@ func (jd *Joinner) Inner() JoinOn {
 }
 
 type UsersTable struct {
-	name  string
-	alias string
+	*SliceCollectorMaker
+	empModel interface{}
+	name     string
+	alias    string
 
 	ID   Column
 	Name Column
@@ -58,7 +60,7 @@ func (t *UsersTable) As(alias string) *UsersTable {
 	t2.alias = alias
 	t2.ID = cols[0]
 	t2.Name = cols[1]
-	// t2.SliceCollectorMaker = NewSliceCollectorMaker(User{}, cols, alias)
+	t2.SliceCollectorMaker = NewSliceCollectorMaker(t.empModel, cols, alias)
 	return &t2
 }
 
