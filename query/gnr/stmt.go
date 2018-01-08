@@ -53,7 +53,7 @@ func (sc *selectClause) GetSelects() []q.SelectItem {
 type clauses struct {
 	selectCls *selectClause
 	froms     []q.Table
-	wheres    []q.Expr
+	wheres    []q.PredExpr
 	joins     []q.JoinOn
 	orders    []q.Expr
 	limit     int
@@ -100,6 +100,13 @@ func (cl *clauses) ToQuery() q.Query {
 		))
 	}
 
+	// WHERE
+	if len(cl.wheres) > 0 {
+		qr = (&logicalOp{"AND", cl.wheres}).ToQuery()
+		qs = append(qs, "WHERE "+qr.Query)
+		args = append(args, qr.Args...)
+	}
+
 	return q.Query{strings.Join(qs, " "), args}
 }
 
@@ -108,7 +115,8 @@ func (cl *clauses) ToSelectItem() q.SelectItem {
 }
 
 func (cl *clauses) Where(exps ...q.PredExpr) q.Clauses {
-	return nil
+	cl.wheres = append(cl.wheres, exps...)
+	return cl
 }
 
 func (cl *clauses) Joins(joins ...q.JoinOn) q.Clauses {

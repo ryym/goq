@@ -16,6 +16,10 @@ func (g *GoqGnr) Col(table string, name string) q.Expr {
 	return &Ops{&columnExpr{name: name, tableName: table}}
 }
 
+func (g *GoqGnr) And(exps ...q.PredExpr) q.PredExpr {
+	return &predExpr{&Ops{&logicalOp{"AND", exps}}}
+}
+
 func (g *GoqGnr) Parens(exp q.Expr) q.Expr {
 	return &Ops{&parensExpr{exp}}
 }

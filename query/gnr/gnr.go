@@ -15,6 +15,10 @@ func Play() {
 	fmt.Println(
 		g.Func("Abc", 1, 2, "test").ToQuery(),
 		g.Col("users", "name").Eq(g.Col("foo", "bar").Add(1)).ToQuery(),
+		g.And(
+			g.Col("users", "name").Eq("NAME"),
+			g.Col("users", "id").Eq(10),
+		).ToQuery(),
 	)
 
 	Users := &UsersTable{
@@ -53,6 +57,9 @@ func Play() {
 		g.InnerJoin(p).On(Users.ID.Eq(Posts.ID)),
 		Users.Posts(p).Inner(),
 		u.Posts(Posts).Inner(),
+	).Where(
+		Users.Name.Eq("wow"),
+		p.UserID.Eq(10),
 	)
 
 	fmt.Println(sl.ToQuery())

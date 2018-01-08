@@ -147,3 +147,35 @@ func (el *exprListExpr) ToSelectItem() q.SelectItem {
 func (el *exprListExpr) Queryables() []q.Queryable {
 	return el.qs
 }
+
+type logicalOp struct {
+	op   string
+	exps []q.PredExpr
+}
+
+func (l *logicalOp) PredExpr() {}
+
+func (l *logicalOp) ToQuery() q.Query {
+	if len(l.exps) == 0 {
+		return q.Query{"", []interface{}{}}
+	}
+
+	pred := l.exps[0]
+	for i := 1; i < len(l.exps); i++ {
+		pred = &predExpr{&Ops{&infixOp{
+			left:  pred,
+			right: l.exps[i],
+			op:    l.op,
+		}}}
+	}
+
+	qr := pred.ToQuery()
+	return q.Query{
+		fmt.Sprintf("(%s)", qr.Query),
+		qr.Args,
+	}
+}
+
+func (l *logicalOp) ToSelectItem() q.SelectItem {
+	return q.SelectItem{}
+}
