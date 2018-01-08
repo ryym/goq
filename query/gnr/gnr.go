@@ -26,6 +26,13 @@ func Play() {
 	// fmt.Println(Users.ID)
 	// fmt.Println(u.ID)
 
+	Posts := &PostsTable{
+		name:   "posts",
+		ID:     &Ops{&columnExpr{"posts", "", "id", "PostsTable", "ID"}},
+		UserID: &Ops{&columnExpr{"posts", "", "user_id", "PostsTable", "UserID"}},
+	}
+	p := Posts.As("p")
+
 	sl := g.Select(
 		g.Col("users", "name"),
 		g.Val(1),
@@ -40,7 +47,13 @@ func Play() {
 			},
 		},
 		g.Col("posts", "id").Eq(1),
-	).From(Users, u)
+	).From(
+		Users, u,
+	).Joins(
+		g.InnerJoin(p).On(Users.ID.Eq(Posts.ID)),
+		Users.Posts(p).Inner(),
+		u.Posts(Posts).Inner(),
+	)
 
 	fmt.Println(sl.ToQuery())
 	fmt.Println(sl.GetSelects())

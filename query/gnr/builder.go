@@ -27,3 +27,15 @@ func (g *GoqGnr) Func(name string, args ...interface{}) q.Expr {
 	}
 	return &Ops{&funcExpr{name, expArgs}}
 }
+
+func (g *GoqGnr) InnerJoin(table q.Table) *NormalJoinner {
+	return &NormalJoinner{table}
+}
+
+type NormalJoinner struct {
+	table q.Table
+}
+
+func (j *NormalJoinner) On(exp q.PredExpr) q.JoinOn {
+	return q.JoinOn{j.table, exp, q.JOIN_INNER}
+}

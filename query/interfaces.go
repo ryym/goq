@@ -158,15 +158,16 @@ type Join interface {
 }
 
 const (
-	JOIN_INNER = iota
-	JOIN_LEFT
-	JOIN_RIGHT
-	JOIN_FULL
+	JOIN_INNER = "INNER"
+	JOIN_LEFT  = "LEFT OUTER"
+	JOIN_RIGHT = "RIGHT OUTER"
+	JOIN_FULL  = "FULL OUTER"
 )
 
-type JoinKind int
+type JoinKind string
 
 type JoinOn struct {
-	On   PredExpr
-	Kind JoinKind
+	Table Table
+	On    PredExpr
+	Kind  JoinKind
 }

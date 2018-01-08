@@ -84,6 +84,22 @@ func (cl *clauses) ToQuery() q.Query {
 		qs = append(qs, "FROM "+strings.Join(ts, ", "))
 	}
 
+	// JOIN
+	for _, j := range cl.joins {
+		table := j.Table.TableName()
+		if alias := j.Table.Alias(); alias != "" {
+			table += fmt.Sprintf(" AS %s", alias)
+		}
+		jqr := j.On.ToQuery()
+		args = append(args, jqr.Args...)
+		qs = append(qs, fmt.Sprintf(
+			"%s JOIN %s ON %s",
+			j.Kind,
+			table,
+			jqr.Query,
+		))
+	}
+
 	return q.Query{strings.Join(qs, " "), args}
 }
 
@@ -96,7 +112,8 @@ func (cl *clauses) Where(exps ...q.PredExpr) q.Clauses {
 }
 
 func (cl *clauses) Joins(joins ...q.JoinOn) q.Clauses {
-	return nil
+	cl.joins = append(cl.joins, joins...)
+	return cl
 }
 
 func (cl *clauses) GroupBy(exps ...q.Queryable) q.GroupQuery {
