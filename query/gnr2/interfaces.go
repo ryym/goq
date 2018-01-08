@@ -21,7 +21,7 @@ type Querier interface {
 }
 
 type QueryBuilder interface {
-	Select(exps ...Expr) SelectClause
+	Select(exps ...Querier) SelectClause
 
 	// Case() PredExpr // take special stuff
 	Exists(q Query) PredExpr
@@ -167,7 +167,7 @@ type Column interface {
 }
 
 type Collector interface {
-	Init(selects []SelectItem, colNames []string)
+	Init(selects []SelectItem, colNames []string) (mappable bool)
 	Next(ptrs []interface{})
 	AfterScan(ptrs []interface{})
 }

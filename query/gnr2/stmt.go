@@ -6,7 +6,7 @@ import (
 )
 
 type selectClause struct {
-	exps []Expr
+	exps []Querier
 }
 
 func (sc *selectClause) From(table Table, tables ...Table) Clauses {
