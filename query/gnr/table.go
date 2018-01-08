@@ -1,6 +1,9 @@
 package gnr
 
-import q "github.com/ryym/goq/query"
+import (
+	_ "github.com/mattn/go-sqlite3"
+	q "github.com/ryym/goq/query"
+)
 
 // XXX: 面倒だけど、テーブルは個別に定義するしかなさそう。
 // columnExpr などは後々 Column などに変える。
@@ -15,6 +18,8 @@ func (jd *Joinner) Inner() q.JoinOn {
 }
 
 type UsersTable struct {
+	*SliceCollectorMaker
+
 	name  string
 	alias string
 
@@ -33,18 +38,29 @@ func (u *UsersTable) All() q.ExprListExpr {
 	return &exprListExpr{[]q.Queryable{u.ID, u.Name}}
 }
 
+func (u *UsersTable) Columns() []*columnExpr {
+	all := u.All().(*exprListExpr).qs
+	cols := make([]*columnExpr, len(all))
+	for i, a := range all {
+		cols[i] = a.(*Ops).Queryable.(*columnExpr)
+	}
+	return cols
+}
+
+// ちょっとコスト高すぎ..?
 func (u *UsersTable) As(alias string) *UsersTable {
 	origCols := u.All().(*exprListExpr).qs
-	cols := make([]columnExpr, len(origCols))
+	cols := make([]*columnExpr, len(origCols))
 	for i, c := range origCols {
-		// cols[i] = *c.(*columnExpr)
-		cols[i] = *c.(*Ops).Queryable.(*columnExpr)
+		col := *c.(*Ops).Queryable.(*columnExpr)
+		cols[i] = &col
 		cols[i].tableAlias = alias
 	}
 	u2 := *u
 	u2.alias = alias
-	u2.ID = &Ops{&cols[0]}
-	u2.Name = &Ops{&cols[1]}
+	u2.ID = &Ops{cols[0]}
+	u2.Name = &Ops{cols[1]}
+	u2.SliceCollectorMaker = NewSliceCollectorMaker(User{}, cols, alias)
 	return &u2
 }
 
