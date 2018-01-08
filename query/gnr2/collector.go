@@ -43,10 +43,10 @@ type SliceCollector struct {
 	current    reflect.Value
 }
 
-func (sc *SliceCollector) Init(selects []SelectItem, _names []string) {
+func (sc *SliceCollector) Init(selects []SelectItem, _names []string) bool {
 	colToFld := map[int]int{}
 	for iC, c := range selects {
-		if c.TableAlias == sc.tableAlias || c.StructName == sc.structName {
+		if c.TableAlias != "" && c.TableAlias == sc.tableAlias || c.StructName == sc.structName {
 			for iF, f := range sc.cols {
 				if c.FieldName == f.FieldName() {
 					colToFld[iC] = iF
@@ -55,6 +55,8 @@ func (sc *SliceCollector) Init(selects []SelectItem, _names []string) {
 		}
 	}
 	sc.colToFld = colToFld
+
+	return len(sc.colToFld) > 0
 }
 
 func (sc *SliceCollector) Next(ptrs []interface{}) {
