@@ -13,6 +13,18 @@ func (g *Goq) And(preds ...PredExpr) PredExpr {
 	}).init()}
 }
 
-func (g *Goq) Select(exps ...Expr) SelectClause {
+func (g *Goq) Select(exps ...Querier) SelectClause {
 	return &selectClause{exps}
+}
+
+func (g *Goq) InnerJoin(table Table) *Joinner {
+	return &Joinner{table}
+}
+
+type Joinner struct {
+	table Table
+}
+
+func (j *Joinner) On(exp PredExpr) JoinOn {
+	return JoinOn{j.table, exp, JOIN_INNER}
 }

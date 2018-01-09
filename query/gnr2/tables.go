@@ -4,12 +4,12 @@ import "reflect"
 
 // XXX: 面倒だけど、テーブルは個別に定義するしかなさそう。
 
-type Joinner struct {
+type JoinDef struct {
 	table Table
 	on    PredExpr
 }
 
-func (jd *Joinner) Inner() JoinOn {
+func (jd *JoinDef) Inner() JoinOn {
 	return JoinOn{jd.table, jd.on, JOIN_INNER}
 }
 
@@ -43,8 +43,8 @@ type UsersTable struct {
 	Name Column
 }
 
-func (t *UsersTable) Posts(t2 *PostsTable) *Joinner {
-	return &Joinner{t2, t.ID.Eq(t2.UserID)}
+func (t *UsersTable) Posts(t2 *PostsTable) *JoinDef {
+	return &JoinDef{t2, t.ID.Eq(t2.UserID)}
 }
 
 func (t *UsersTable) TableName() string  { return t.name }
@@ -115,5 +115,74 @@ func (t *PostsTable) As(alias string) *PostsTable {
 	t2.ID = cols[0]
 	t2.UserID = cols[1]
 	// t2.SliceCollectorMaker = NewSliceCollectorMaker(User{}, cols, alias)
+	return &t2
+}
+
+type PrefsTable struct {
+	*SliceCollectorMaker
+	empModel interface{}
+	name     string
+	alias    string
+
+	ID   Column
+	Name Column
+}
+
+func (t *PrefsTable) TableName() string  { return t.name }
+func (t *PrefsTable) TableAlias() string { return t.alias }
+
+func (t *PrefsTable) All() ExprListExpr {
+	cols := t.Columns()
+	exps := make([]Expr, len(cols))
+	for i, c := range cols {
+		exps[i] = c
+	}
+	return &exprListExpr{exps}
+}
+
+func (t *PrefsTable) Columns() []Column {
+	return []Column{t.ID, t.Name}
+}
+
+func (t *PrefsTable) As(alias string) *PrefsTable {
+	t2 := *t
+	t2.alias = alias
+	t2.SliceCollectorMaker = NewSliceCollectorMaker(t.empModel, t2.Columns(), alias)
+	copyTableAs(alias, t, &t2)
+	return &t2
+}
+
+type CitiesTable struct {
+	*SliceCollectorMaker
+	empModel interface{}
+	name     string
+	alias    string
+
+	ID     Column
+	Name   Column
+	PrefID Column
+}
+
+func (t *CitiesTable) TableName() string  { return t.name }
+func (t *CitiesTable) TableAlias() string { return t.alias }
+
+func (t *CitiesTable) All() ExprListExpr {
+	cols := t.Columns()
+	exps := make([]Expr, len(cols))
+	for i, c := range cols {
+		exps[i] = c
+	}
+	return &exprListExpr{exps}
+}
+
+func (t *CitiesTable) Columns() []Column {
+	return []Column{t.ID, t.Name, t.PrefID}
+}
+
+func (t *CitiesTable) As(alias string) *CitiesTable {
+	t2 := *t
+	t2.alias = alias
+	t2.SliceCollectorMaker = NewSliceCollectorMaker(t.empModel, t2.Columns(), alias)
+	copyTableAs(alias, t, &t2)
 	return &t2
 }

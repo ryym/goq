@@ -12,6 +12,17 @@ type User struct {
 	Name string
 }
 
+type Pref struct {
+	ID   int
+	Name string
+}
+
+type City struct {
+	ID     int
+	Name   string
+	PrefID string
+}
+
 var g = &Goq{}
 
 func Play() {
@@ -19,20 +30,42 @@ func Play() {
 	Users := &UsersTable{
 		empModel: User{},
 		name:     "users",
-		ID:       cm.New("id", "ID"),
-		Name:     cm.New("name", "Name"),
+		ID:       cm.Col("ID", "id"),
+		Name:     cm.Col("Name", "name"),
 	}
 	Users.SliceCollectorMaker = NewSliceCollectorMaker(Users.empModel, Users.Columns(), "")
 
 	cm = ColumnMaker{"posts", "", "Post"}
 	Posts := &PostsTable{
 		name:   "posts",
-		ID:     cm.New("id", "ID"),
-		UserID: cm.New("user_id", "UserID"),
+		ID:     cm.Col("ID", "id"),
+		UserID: cm.Col("UserID", "user_id"),
 	}
 
+	cm = ColumnMaker{"prefectures", "", "Pref"}
+	Prefs := &PrefsTable{
+		empModel: Pref{},
+		name:     "prefectures",
+		ID:       cm.Col("ID", "id"),
+		Name:     cm.Col("Name", "name"),
+	}
+	Prefs.SliceCollectorMaker = NewSliceCollectorMaker(Prefs.empModel, Prefs.Columns(), "")
+
+	cm = ColumnMaker{"cities", "", "City"}
+	Cities := &CitiesTable{
+		empModel: City{},
+		name:     "cities",
+		ID:       cm.Col("ID", "id"),
+		Name:     cm.Col("Name", "name"),
+		PrefID:   cm.Col("PrefID", "prefecture_id"),
+	}
+	Cities.SliceCollectorMaker = NewSliceCollectorMaker(Cities.empModel, Cities.Columns(), "")
+
+	dest := *Users
+	copyTableAs("uu", Users, &dest)
+
 	fmt.Println(
-		Users.Name.Add(1),
+		Users.Name.Add(1).Query(),
 		Users.ID.As("test").Query(),
 		Users.Name.Eq("hello").Query(),
 		g.Parens(Users.Name.Eq("hello")).As("f").Query(),
@@ -57,38 +90,33 @@ func Play() {
 
 	fmt.Println("-------------------------")
 
-	db, err := sql.Open("sqlite3", "prot/prot.db")
+	goDb, err := sql.Open("sqlite3", "prot/prot.db")
 	chk(err)
-	defer db.Close()
+	defer goDb.Close()
 
-	query = g.Select(Users.Name).From(Users)
-	qr := query.Query()
-	rows, err := db.Query(qr.Query, qr.Args...)
-	chk(err)
-	defer rows.Close()
+	db := &DB{goDb}
 
-	selects := query.GetSelects()
-	rowsCols, err := rows.Columns()
-	chk(err)
-
-	if len(rowsCols) != len(selects) {
-		panic(fmt.Sprintf("rowsCols: %d, selects: %d", len(rowsCols), len(selects)))
-	}
+	query = g.Select(Prefs.All()).From(Prefs)
 
 	var users []User
-	var collector Collector = Users.ToSlice(&users)
-	collector.Init(selects, rowsCols)
+	var prefs []Pref
+	db.Query(query).Collect(
+		Prefs.ToSlice(&prefs),
+		Users.ToSlice(&users),
+	)
+	fmt.Println("RET", len(prefs), users)
 
-	ptrs := make([]interface{}, len(rowsCols))
-	for rows.Next() {
-
-		collector.Next(ptrs)
-		rows.Scan(ptrs...)
-		collector.AfterScan(ptrs)
-
-	}
-
-	fmt.Println("RET", users)
+	query = g.Select(Prefs.All(), Cities.All()).From(Prefs).Joins(
+		g.InnerJoin(Cities).On(Cities.PrefID.Eq(Prefs.ID)),
+	)
+	var cities []City
+	db.Query(query).Collect(
+		Prefs.ToUniqSlice(&prefs),
+		Cities.ToSlice(&cities),
+	)
+	fmt.Println(len(prefs), len(cities))
+	fmt.Println(prefs)
+	fmt.Println(cities[0:5], cities[1000:1010])
 }
 
 func chk(err error) {

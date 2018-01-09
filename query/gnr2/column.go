@@ -8,7 +8,7 @@ type ColumnMaker struct {
 	structName string
 }
 
-func (m ColumnMaker) New(name, fieldName string) *column {
+func (m ColumnMaker) Col(fieldName, name string) *column {
 	col := column{
 		tableName:  m.tableName,
 		tableAlias: m.tableAlias,
