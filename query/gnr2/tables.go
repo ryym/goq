@@ -34,7 +34,7 @@ func copyTableAs(alias string, src Table, dest Table) {
 }
 
 type UsersTable struct {
-	*SliceCollectorMaker
+	*CollectorMaker
 	empModel interface{}
 	name     string
 	alias    string
@@ -67,7 +67,7 @@ func (t *UsersTable) Columns() []Column {
 func (t *UsersTable) As(alias string) *UsersTable {
 	t2 := *t
 	t2.alias = alias
-	t2.SliceCollectorMaker = NewSliceCollectorMaker(t.empModel, t2.Columns(), alias)
+	t2.CollectorMaker = NewCollectorMaker(t.empModel, t2.Columns(), alias)
 	copyTableAs(alias, t, &t2)
 	return &t2
 }
@@ -114,12 +114,12 @@ func (t *PostsTable) As(alias string) *PostsTable {
 	t2.alias = alias
 	t2.ID = cols[0]
 	t2.UserID = cols[1]
-	// t2.SliceCollectorMaker = NewSliceCollectorMaker(User{}, cols, alias)
+	// t2.CollectorMaker = NewCollectorMaker(User{}, cols, alias)
 	return &t2
 }
 
 type PrefsTable struct {
-	*SliceCollectorMaker
+	*CollectorMaker
 	empModel interface{}
 	name     string
 	alias    string
@@ -147,13 +147,13 @@ func (t *PrefsTable) Columns() []Column {
 func (t *PrefsTable) As(alias string) *PrefsTable {
 	t2 := *t
 	t2.alias = alias
-	t2.SliceCollectorMaker = NewSliceCollectorMaker(t.empModel, t2.Columns(), alias)
+	t2.CollectorMaker = NewCollectorMaker(t.empModel, t2.Columns(), alias)
 	copyTableAs(alias, t, &t2)
 	return &t2
 }
 
 type CitiesTable struct {
-	*SliceCollectorMaker
+	*CollectorMaker
 	empModel interface{}
 	name     string
 	alias    string
@@ -182,7 +182,7 @@ func (t *CitiesTable) Columns() []Column {
 func (t *CitiesTable) As(alias string) *CitiesTable {
 	t2 := *t
 	t2.alias = alias
-	t2.SliceCollectorMaker = NewSliceCollectorMaker(t.empModel, t2.Columns(), alias)
+	t2.CollectorMaker = NewCollectorMaker(t.empModel, t2.Columns(), alias)
 	copyTableAs(alias, t, &t2)
 	return &t2
 }

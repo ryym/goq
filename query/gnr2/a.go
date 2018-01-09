@@ -33,7 +33,7 @@ func Play() {
 		ID:       cm.Col("ID", "id"),
 		Name:     cm.Col("Name", "name"),
 	}
-	Users.SliceCollectorMaker = NewSliceCollectorMaker(Users.empModel, Users.Columns(), "")
+	Users.CollectorMaker = NewCollectorMaker(Users.empModel, Users.Columns(), "")
 
 	cm = ColumnMaker{"posts", "", "Post"}
 	Posts := &PostsTable{
@@ -49,7 +49,7 @@ func Play() {
 		ID:       cm.Col("ID", "id"),
 		Name:     cm.Col("Name", "name"),
 	}
-	Prefs.SliceCollectorMaker = NewSliceCollectorMaker(Prefs.empModel, Prefs.Columns(), "")
+	Prefs.CollectorMaker = NewCollectorMaker(Prefs.empModel, Prefs.Columns(), "")
 
 	cm = ColumnMaker{"cities", "", "City"}
 	Cities := &CitiesTable{
@@ -59,7 +59,7 @@ func Play() {
 		Name:     cm.Col("Name", "name"),
 		PrefID:   cm.Col("PrefID", "prefecture_id"),
 	}
-	Cities.SliceCollectorMaker = NewSliceCollectorMaker(Cities.empModel, Cities.Columns(), "")
+	Cities.CollectorMaker = NewCollectorMaker(Cities.empModel, Cities.Columns(), "")
 
 	dest := *Users
 	copyTableAs("uu", Users, &dest)
@@ -109,14 +109,19 @@ func Play() {
 	query = g.Select(Prefs.All(), Cities.All()).From(Prefs).Joins(
 		g.InnerJoin(Cities).On(Cities.PrefID.Eq(Prefs.ID)),
 	)
-	var cities []City
+
+	// var cities []City
+	var citiesM map[int][]City
+
 	db.Query(query).Collect(
 		Prefs.ToUniqSlice(&prefs),
-		Cities.ToSlice(&cities),
+		// Cities.ToSlice(&cities),
+		Cities.ToSliceMapBy(Prefs.ID, &citiesM),
 	)
-	fmt.Println(len(prefs), len(cities))
-	fmt.Println(prefs)
-	fmt.Println(cities[0:5], cities[1000:1010])
+	fmt.Println(prefs[10], citiesM[prefs[10].ID])
+	// fmt.Println(len(prefs), len(cities))
+	// fmt.Println(prefs)
+	// fmt.Println(cities[0:5], cities[1000:1010])
 }
 
 func chk(err error) {

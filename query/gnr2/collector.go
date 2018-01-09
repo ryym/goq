@@ -4,16 +4,16 @@ import "reflect"
 
 // ひとまずモデル専用の slice collector
 
-type SliceCollectorMaker struct {
+type CollectorMaker struct {
 	itemType   reflect.Type
 	structName string
 	tableAlias string
 	cols       []Column
 }
 
-func NewSliceCollectorMaker(model interface{}, cols []Column, alias string) *SliceCollectorMaker {
+func NewCollectorMaker(model interface{}, cols []Column, alias string) *CollectorMaker {
 	itemType := reflect.TypeOf(model)
-	return &SliceCollectorMaker{
+	return &CollectorMaker{
 		itemType:   itemType,
 		structName: itemType.Name(),
 		tableAlias: alias,
@@ -21,7 +21,7 @@ func NewSliceCollectorMaker(model interface{}, cols []Column, alias string) *Sli
 	}
 }
 
-func (m *SliceCollectorMaker) ToSlice(slice interface{}) *SliceCollector {
+func (m *CollectorMaker) ToSlice(slice interface{}) *SliceCollector {
 	return &SliceCollector{
 		itemType:   m.itemType,
 		structName: m.structName,
@@ -31,7 +31,7 @@ func (m *SliceCollectorMaker) ToSlice(slice interface{}) *SliceCollector {
 	}
 }
 
-func (m *SliceCollectorMaker) ToUniqSlice(slice interface{}) *UniqSliceCollector {
+func (m *CollectorMaker) ToUniqSlice(slice interface{}) *UniqSliceCollector {
 	return &UniqSliceCollector{
 		itemType:   m.itemType,
 		structName: m.structName,
@@ -41,6 +41,17 @@ func (m *SliceCollectorMaker) ToUniqSlice(slice interface{}) *UniqSliceCollector
 
 		// XXX: 実際には Maker に持たせるか、itemType から抽出する。
 		pkFieldName: "ID",
+	}
+}
+
+func (m *CollectorMaker) ToSliceMapBy(key Querier, mp interface{}) *SliceMapCollector {
+	return &SliceMapCollector{
+		itemType:   m.itemType,
+		structName: m.structName,
+		tableAlias: m.tableAlias,
+		mp:         reflect.ValueOf(mp).Elem(),
+		cols:       m.cols,
+		key:        key,
 	}
 }
 
@@ -152,4 +163,63 @@ func (sc *UniqSliceCollector) AfterScan(ptrs []interface{}) {
 
 	sc.slice.Set(reflect.Append(sc.slice, copy))
 	sc.pks[pk] = true
+}
+
+type SliceMapCollector struct {
+	itemType   reflect.Type
+	cols       []Column
+	structName string
+	tableAlias string
+	colToFld   map[int]int
+	key        Querier
+	keyIdx     int
+	mp         reflect.Value
+	current    reflect.Value
+}
+
+func (sc *SliceMapCollector) Init(selects []SelectItem, _names []string) bool {
+	sc.colToFld = map[int]int{}
+	key := sc.key.SelectItem()
+	sc.keyIdx = -1
+
+	for iC, c := range selects {
+		if c.TableAlias != "" && c.TableAlias == sc.tableAlias || c.StructName == sc.structName {
+			for iF, f := range sc.cols {
+				if c.FieldName == f.FieldName() {
+					sc.colToFld[iC] = iF
+				}
+			}
+		}
+
+		// XXX: 実際にはテーブルエイリアスも考慮
+		if c.Alias != "" && c.Alias == key.Alias || c.StructName == key.StructName && c.FieldName == key.FieldName {
+			sc.keyIdx = iC
+		}
+	}
+
+	if sc.keyIdx == -1 {
+		panic("[SliceMapCollector] key not found")
+	}
+
+	mapType := sc.mp.Type()
+	sc.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), mapType.Elem())))
+	return len(sc.colToFld) > 0
+}
+
+func (sc *SliceMapCollector) Next(ptrs []interface{}) {
+	current := reflect.New(sc.itemType).Elem()
+	sc.current = current.Addr()
+	for c, f := range sc.colToFld {
+		ptrs[c] = current.Field(f).Addr().Interface()
+	}
+}
+
+func (sc *SliceMapCollector) AfterScan(ptrs []interface{}) {
+	key := reflect.ValueOf(ptrs[sc.keyIdx]).Elem()
+	slice := sc.mp.MapIndex(key)
+	if !slice.IsValid() {
+		slice = reflect.MakeSlice(reflect.SliceOf(sc.itemType), 0, 0)
+	}
+	slice = reflect.Append(slice, sc.current.Elem())
+	sc.mp.SetMapIndex(key, slice)
 }
