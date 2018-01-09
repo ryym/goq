@@ -13,7 +13,7 @@ type User struct {
 }
 
 type Pref struct {
-	ID   int
+	ID   int `goq:"pk"`
 	Name string
 }
 

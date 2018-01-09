@@ -32,15 +32,22 @@ func (m *CollectorMaker) ToSlice(slice interface{}) *SliceCollector {
 }
 
 func (m *CollectorMaker) ToUniqSlice(slice interface{}) *UniqSliceCollector {
-	return &UniqSliceCollector{
-		itemType:   m.itemType,
-		structName: m.structName,
-		tableAlias: m.tableAlias,
-		slice:      reflect.ValueOf(slice).Elem(),
-		cols:       m.cols,
+	// 予め取得して Table に持たせといてもいい
+	var pkFieldName string
+	for i := 0; i < m.itemType.NumField(); i++ {
+		field := m.itemType.Field(i)
+		if field.Tag.Get("goq") == "pk" {
+			pkFieldName = field.Name
+		}
+	}
 
-		// XXX: 実際には Maker に持たせるか、itemType から抽出する。
-		pkFieldName: "ID",
+	return &UniqSliceCollector{
+		itemType:    m.itemType,
+		structName:  m.structName,
+		tableAlias:  m.tableAlias,
+		slice:       reflect.ValueOf(slice).Elem(),
+		cols:        m.cols,
+		pkFieldName: pkFieldName,
 	}
 }
 
@@ -111,6 +118,10 @@ type UniqSliceCollector struct {
 }
 
 func (sc *UniqSliceCollector) Init(selects []SelectItem, _names []string) bool {
+	if sc.pkFieldName == "" {
+		panic("[UniqSliceCollector] primary key not defined")
+	}
+
 	sc.colToFld = map[int]*fieldWithIdx{}
 	sc.keyIdx = -1
 
