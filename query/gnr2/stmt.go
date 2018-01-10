@@ -105,6 +105,11 @@ func (cl *clauses) Query() Query {
 		args = append(args, qr.Args...)
 	}
 
+	// LIMIT
+	if cl.limit > 0 {
+		qs = append(qs, fmt.Sprintf("LIMIT %d", cl.limit))
+	}
+
 	return Query{strings.Join(qs, " "), args}
 }
 
@@ -135,7 +140,8 @@ func (cl *clauses) OrderBy(exps ...Expr) ExtraClauses {
 }
 
 func (cl *clauses) Limit(n int) ExtraClauses {
-	return nil
+	cl.limit = n
+	return cl
 }
 
 func (cl *clauses) Offset(n int) ExtraClauses {
