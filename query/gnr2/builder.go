@@ -1,5 +1,7 @@
 package gnr2
 
+import "reflect"
+
 type Goq struct{}
 
 func (g *Goq) Parens(exp Expr) Expr {
@@ -27,4 +29,12 @@ type Joinner struct {
 
 func (j *Joinner) On(exp PredExpr) JoinOn {
 	return JoinOn{j.table, exp, JOIN_INNER}
+}
+
+func (g *Goq) ToSlice(slice interface{}) *GSliceCollector {
+	sliceV := reflect.ValueOf(slice).Elem()
+	return &GSliceCollector{
+		itemType: sliceV.Type().Elem(),
+		slice:    sliceV,
+	}
 }

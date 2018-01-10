@@ -86,10 +86,27 @@ func Play() {
 		// z.Cities.ToSlice(&cities),
 		z.Cities.ToSliceMapBy(z.Prefs.ID, &citiesM),
 	)
-	fmt.Println(prefs[10], citiesM[prefs[10].ID])
+	// fmt.Println(prefs[10], citiesM[prefs[10].ID])
 	// fmt.Println(len(prefs), len(cities))
 	// fmt.Println(prefs)
 	// fmt.Println(cities[0:5], cities[1000:1010])
+
+	var foos []Foo
+	db.Query(
+		z.Select(
+			z.Prefs.ID.As("Ab"),
+			z.Prefs.Name.As("Cd"),
+		).From(z.Prefs).Limit(5),
+	).Collect(
+		z.ToSlice(&foos),
+	)
+
+	fmt.Printf("%+v\n", foos)
+}
+
+type Foo struct {
+	Ab int
+	Cd string
 }
 
 func chk(err error) {

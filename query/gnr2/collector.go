@@ -234,3 +234,43 @@ func (sc *SliceMapCollector) AfterScan(ptrs []interface{}) {
 	slice = reflect.Append(slice, sc.current.Elem())
 	sc.mp.SetMapIndex(key, slice)
 }
+
+// 任意の struct へマッピングするコレクタ
+
+type GSliceCollector struct {
+	itemType reflect.Type
+	colToFld map[int]int
+	slice    reflect.Value
+	current  reflect.Value
+}
+
+func (sc *GSliceCollector) Init(selects []SelectItem, names []string) bool {
+	fields := make([]string, sc.itemType.NumField())
+	for i := 0; i < sc.itemType.NumField(); i++ {
+		fields[i] = sc.itemType.Field(i).Name
+	}
+
+	sc.colToFld = map[int]int{}
+	for iC, c := range names {
+		for iF, f := range fields {
+			// XXX: 実際には名前の変換が必要 (snake <-> camel)
+			if c == f {
+				sc.colToFld[iC] = iF
+			}
+		}
+	}
+	sc.slice.Set(reflect.MakeSlice(reflect.SliceOf(sc.itemType), 0, 0))
+	return len(sc.colToFld) > 0
+}
+
+func (sc *GSliceCollector) Next(ptrs []interface{}) {
+	current := reflect.New(sc.itemType).Elem()
+	sc.current = current.Addr()
+	for c, f := range sc.colToFld {
+		ptrs[c] = current.Field(f).Addr().Interface()
+	}
+}
+
+func (sc *GSliceCollector) AfterScan(_ptrs []interface{}) {
+	sc.slice.Set(reflect.Append(sc.slice, sc.current.Elem()))
+}
