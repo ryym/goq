@@ -12,6 +12,11 @@ type User struct {
 	Name string
 }
 
+type Post struct {
+	ID     int
+	UserID int
+}
+
 type Pref struct {
 	ID   int `goq:"pk"`
 	Name string
@@ -23,67 +28,30 @@ type City struct {
 	PrefID string
 }
 
-var g = &Goq{}
-
 func Play() {
-	cm := ColumnMaker{"users", "", "User"}
-	Users := &UsersTable{
-		empModel: User{},
-		name:     "users",
-		ID:       cm.Col("ID", "id"),
-		Name:     cm.Col("Name", "name"),
-	}
-	Users.CollectorMaker = NewCollectorMaker(Users.empModel, Users.Columns(), "")
-
-	cm = ColumnMaker{"posts", "", "Post"}
-	Posts := &PostsTable{
-		name:   "posts",
-		ID:     cm.Col("ID", "id"),
-		UserID: cm.Col("UserID", "user_id"),
-	}
-
-	cm = ColumnMaker{"prefectures", "", "Pref"}
-	Prefs := &PrefsTable{
-		empModel: Pref{},
-		name:     "prefectures",
-		ID:       cm.Col("ID", "id"),
-		Name:     cm.Col("Name", "name"),
-	}
-	Prefs.CollectorMaker = NewCollectorMaker(Prefs.empModel, Prefs.Columns(), "")
-
-	cm = ColumnMaker{"cities", "", "City"}
-	Cities := &CitiesTable{
-		empModel: City{},
-		name:     "cities",
-		ID:       cm.Col("ID", "id"),
-		Name:     cm.Col("Name", "name"),
-		PrefID:   cm.Col("PrefID", "prefecture_id"),
-	}
-	Cities.CollectorMaker = NewCollectorMaker(Cities.empModel, Cities.Columns(), "")
-
-	dest := *Users
-	copyTableAs("uu", Users, &dest)
+	z := NewGQL()
+	fmt.Println(z)
 
 	fmt.Println(
-		Users.Name.Add(1).Query(),
-		Users.ID.As("test").Query(),
-		Users.Name.Eq("hello").Query(),
-		g.Parens(Users.Name.Eq("hello")).As("f").Query(),
+		z.Users.Name.Add(1).Query(),
+		z.Users.ID.As("test").Query(),
+		z.Users.Name.Eq("hello").Query(),
+		z.Parens(z.Users.Name.Eq("hello")).As("f").Query(),
 	)
 
-	u := Users.As("u")
-	p := Posts.As("p")
-	query := g.Select(
-		Users.ID,
+	u := z.Users.As("u")
+	p := z.Posts.As("p")
+	query := z.Select(
+		z.Users.ID,
 		u.Name,
 	).From(
-		Users,
+		z.Users,
 		u,
 	).Where(
 		u.ID.Eq(30),
 		u.Name.Eq(40),
 	).Joins(
-		Users.Posts(p).Inner(),
+		z.Users.Posts(p).Inner(),
 	)
 
 	fmt.Println(query.Query())
@@ -96,27 +64,27 @@ func Play() {
 
 	db := &DB{goDb}
 
-	query = g.Select(Prefs.All()).From(Prefs)
+	query = z.Select(z.Prefs.All()).From(z.Prefs)
 
 	var users []User
 	var prefs []Pref
 	db.Query(query).Collect(
-		Prefs.ToSlice(&prefs),
-		Users.ToSlice(&users),
+		z.Prefs.ToSlice(&prefs),
+		z.Users.ToSlice(&users),
 	)
 	fmt.Println("RET", len(prefs), users)
 
-	query = g.Select(Prefs.All(), Cities.All()).From(Prefs).Joins(
-		g.InnerJoin(Cities).On(Cities.PrefID.Eq(Prefs.ID)),
+	query = z.Select(z.Prefs.All(), z.Cities.All()).From(z.Prefs).Joins(
+		z.InnerJoin(z.Cities).On(z.Cities.PrefID.Eq(z.Prefs.ID)),
 	)
 
 	// var cities []City
 	var citiesM map[int][]City
 
 	db.Query(query).Collect(
-		Prefs.ToUniqSlice(&prefs),
-		// Cities.ToSlice(&cities),
-		Cities.ToSliceMapBy(Prefs.ID, &citiesM),
+		z.Prefs.ToUniqSlice(&prefs),
+		// z.Cities.ToSlice(&cities),
+		z.Cities.ToSliceMapBy(z.Prefs.ID, &citiesM),
 	)
 	fmt.Println(prefs[10], citiesM[prefs[10].ID])
 	// fmt.Println(len(prefs), len(cities))
