@@ -33,5 +33,7 @@ func main() {
 		)).Query(),
 
 		q.Func("foo", 1, 2).Add(3).Query(),
+		q.Count(q.Var(10)).Query(),
+		q.Coalesce(q.Var(5), q.Var(20)).Query(),
 	)
 }

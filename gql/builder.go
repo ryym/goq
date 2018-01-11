@@ -35,3 +35,27 @@ func (b *Builder) Func(name string, args ...interface{}) Expr {
 	}
 	return (&funcExpr{name: name, args: expArgs}).init()
 }
+
+func (b *Builder) Count(exp Expr) Expr {
+	return b.Func("COUNT", exp)
+}
+
+func (b *Builder) Sum(exp Expr) Expr {
+	return b.Func("SUM", exp)
+}
+
+func (b *Builder) Min(exp Expr) Expr {
+	return b.Func("MIN", exp)
+}
+
+func (b *Builder) Max(exp Expr) Expr {
+	return b.Func("MAX", exp)
+}
+
+func (b *Builder) Avg(exp Expr) Expr {
+	return b.Func("AVG", exp)
+}
+
+func (b *Builder) Coalesce(exp Expr, alt interface{}) Expr {
+	return b.Func("COALESCE", exp, lift(alt))
+}
