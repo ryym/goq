@@ -41,3 +41,39 @@ type predExpr struct {
 }
 
 func (p *predExpr) ImplPredExpr() {}
+
+type rawExpr struct {
+	sql string
+	ops
+}
+
+func (r *rawExpr) init() *rawExpr {
+	r.ops = ops{r}
+	return r
+}
+
+func (r *rawExpr) Query() Query {
+	return Query{r.sql, []interface{}{}}
+}
+
+func (r *rawExpr) Selection() Selection { return Selection{} }
+
+type parensExpr struct {
+	exp Expr
+	ops
+}
+
+func (p *parensExpr) init() *parensExpr {
+	p.ops = ops{p}
+	return p
+}
+
+func (p *parensExpr) Query() Query {
+	qr := p.exp.Query()
+	return Query{
+		fmt.Sprintf("(%s)", qr.Query),
+		qr.Args,
+	}
+}
+
+func (p *parensExpr) Selection() Selection { return p.exp.Selection() }

@@ -18,5 +18,8 @@ func main() {
 		q.Var(5).Add(3).Sbt(2).Query(),
 		q.Var(8).Mlt(2).Eq(16).Query(),
 		q.Var("hello").Concat(q.Var("hello")).Query(),
+
+		q.Raw("now()").Sbt(1).Query(),
+		q.Parens(q.Var(1).Add(2)).Mlt(3).Query(),
 	)
 }
