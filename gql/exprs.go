@@ -18,3 +18,20 @@ func (a *aliased) Query() Query {
 }
 
 func (a *aliased) Selection() Selection { return Selection{} }
+
+type litExpr struct {
+	val interface{}
+	ops
+}
+
+func (l *litExpr) init() *litExpr {
+	l.ops = ops{l}
+	return l
+}
+
+// TODO: Add no placeholder version
+func (l *litExpr) Query() Query {
+	return Query{"?", []interface{}{l.val}}
+}
+
+func (l *litExpr) Selection() Selection { return Selection{} }

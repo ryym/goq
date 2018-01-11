@@ -1,8 +1,12 @@
 package main
 
-import "github.com/ryym/goq/prot"
-import _ "github.com/ryym/goq/gql"
+import (
+	"fmt"
+
+	"github.com/ryym/goq/gql"
+)
 
 func main() {
-	prot.Play()
+	q := gql.NewBuilder()
+	fmt.Println(q.Var(10).Query())
 }
