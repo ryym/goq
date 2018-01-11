@@ -1,6 +1,9 @@
 package gql
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type aliased struct {
 	expr  Expr
@@ -77,3 +80,31 @@ func (p *parensExpr) Query() Query {
 }
 
 func (p *parensExpr) Selection() Selection { return p.exp.Selection() }
+
+type funcExpr struct {
+	name string
+	args []Expr
+	ops
+}
+
+func (f *funcExpr) init() *funcExpr {
+	f.ops = ops{f}
+	return f
+}
+
+func (f *funcExpr) Query() Query {
+	qs := make([]string, len(f.args))
+	var args []interface{}
+	for i, a := range f.args {
+		qr := a.Query()
+		qs[i] = qr.Query
+		args = append(args, qr.Args...)
+	}
+
+	return Query{
+		fmt.Sprintf("%s(%s)", f.name, strings.Join(qs, ", ")),
+		args,
+	}
+}
+
+func (f *funcExpr) Selection() Selection { return Selection{} }

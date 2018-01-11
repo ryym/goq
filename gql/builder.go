@@ -27,3 +27,11 @@ func (b *Builder) Not(pred PredExpr) PredExpr {
 		op: "NOT ", val: pred,
 	}).init()}
 }
+
+func (b *Builder) Func(name string, args ...interface{}) Expr {
+	expArgs := make([]Expr, len(args))
+	for i, a := range args {
+		expArgs[i] = lift(a)
+	}
+	return (&funcExpr{name: name, args: expArgs}).init()
+}

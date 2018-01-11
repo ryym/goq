@@ -31,5 +31,7 @@ func main() {
 			q.Var(1).Eq(1),
 			q.Var(1).Eq(1),
 		)).Query(),
+
+		q.Func("foo", 1, 2).Add(3).Query(),
 	)
 }
