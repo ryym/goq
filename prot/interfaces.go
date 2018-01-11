@@ -1,4 +1,4 @@
-package gnr2
+package prot
 
 type Query struct {
 	Query string

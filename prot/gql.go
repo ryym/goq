@@ -1,4 +1,4 @@
-package gnr2
+package prot
 
 // こういう感じのコードを generate する。
 

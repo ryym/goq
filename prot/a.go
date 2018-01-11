@@ -1,4 +1,4 @@
-package gnr2
+package prot
 
 import (
 	"database/sql"
@@ -62,7 +62,7 @@ func Play() {
 
 	fmt.Println("-------------------------")
 
-	goDb, err := sql.Open("sqlite3", "prot/prot.db")
+	goDb, err := sql.Open("sqlite3", "prot/schema/prot.db")
 	chk(err)
 	defer goDb.Close()
 

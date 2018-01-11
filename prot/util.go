@@ -1,4 +1,4 @@
-package gnr2
+package prot
 
 func lift(v interface{}) Expr {
 	exp, ok := v.(Expr)

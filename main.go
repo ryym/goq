@@ -1,7 +1,7 @@
 package main
 
-import "github.com/ryym/goq/query/gnr2"
+import "github.com/ryym/goq/prot"
 
 func main() {
-	gnr2.Play()
+	prot.Play()
 }
