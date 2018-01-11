@@ -4,7 +4,7 @@ import "reflect"
 
 type Goq struct{}
 
-func (g *Goq) Parens(exp Expr) Expr {
+func (g *Goq) Parens(exp Querier) Expr {
 	return (&parensExpr{exp: exp}).init()
 }
 

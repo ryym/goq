@@ -37,6 +37,10 @@ func Play() {
 		z.Users.ID.As("test").Query(),
 		z.Users.Name.Eq("hello").Query(),
 		z.Parens(z.Users.Name.Eq("hello")).As("f").Query(),
+		z.Select(
+			z.Parens(z.Select(z.Users.ID.Eq(2))),
+			z.Users.ID,
+		).Query(),
 	)
 
 	u := z.Users.As("u")

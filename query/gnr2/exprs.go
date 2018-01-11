@@ -66,7 +66,7 @@ func (e *exprAliased) Query() Query {
 }
 
 type parensExpr struct {
-	exp Expr
+	exp Querier
 	Ops
 }
 
