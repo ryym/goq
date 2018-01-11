@@ -35,3 +35,9 @@ func (l *litExpr) Query() Query {
 }
 
 func (l *litExpr) Selection() Selection { return Selection{} }
+
+type predExpr struct {
+	Expr
+}
+
+func (p *predExpr) ImplPredExpr() {}

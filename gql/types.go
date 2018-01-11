@@ -27,5 +27,23 @@ type Aliased interface {
 type Expr interface {
 	Querier
 	As(alias string) Aliased
+
+	Eq(v interface{}) PredExpr
+	Neq(v interface{}) PredExpr
+	Gt(v interface{}) PredExpr
+	Gte(v interface{}) PredExpr
+	Lt(v interface{}) PredExpr
+	Lte(v interface{}) PredExpr
+	Like(s string) PredExpr
+	Between(start interface{}, end interface{}) PredExpr
+	IsNull() PredExpr
+	IsNotNull() PredExpr
+
 	// TODO: More operators
+}
+
+// predExpr represents this expression is a predicate.
+type PredExpr interface {
+	Expr
+	ImplPredExpr()
 }
