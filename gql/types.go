@@ -51,3 +51,12 @@ type PredExpr interface {
 	Expr
 	ImplPredExpr()
 }
+
+type Column interface {
+	Expr
+	TableName() string
+	TableAlias() string
+	StructName() string
+	ColumnName() string
+	FieldName() string
+}
