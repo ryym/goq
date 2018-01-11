@@ -13,13 +13,14 @@ func (jd *JoinDef) Inner() JoinOn {
 	return JoinOn{jd.table, jd.on, JOIN_INNER}
 }
 
-func copyTableAs(alias string, src Table, dest Table) {
+func copyTableAs(alias string, src Table, dest Table, model interface{}) {
 	srcV := reflect.ValueOf(src).Elem()
 	srcT := srcV.Type()
 	destV := reflect.ValueOf(dest).Elem()
 	for i := 0; i < srcT.NumField(); i++ {
 		f := srcT.Field(i)
-		if f.Type.Name() == "Column" {
+		switch f.Type.Name() {
+		case "Column":
 			orig := srcV.Field(i).Interface().(Column)
 			copy := column{
 				tableAlias: alias,
@@ -29,6 +30,9 @@ func copyTableAs(alias string, src Table, dest Table) {
 				fieldName:  orig.FieldName(),
 			}.init()
 			destV.Field(i).Set(reflect.ValueOf(&copy))
+		case "CollectorMaker":
+			cm := NewCollectorMaker(model, dest.Columns(), alias)
+			destV.Field(i).Set(reflect.ValueOf(cm))
 		}
 	}
 }
