@@ -100,7 +100,7 @@ type ExprListExpr interface {
 }
 
 type QueryStmt interface {
-	Querier
+	Querier // XXX: Exprを実装する必要あり!
 	GetSelects() []SelectItem
 }
 
