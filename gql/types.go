@@ -39,7 +39,11 @@ type Expr interface {
 	IsNull() PredExpr
 	IsNotNull() PredExpr
 
-	// TODO: More operators
+	Add(v interface{}) Expr
+	Sbt(v interface{}) Expr
+	Mlt(v interface{}) Expr
+	Dvd(v interface{}) Expr
+	Concat(s interface{}) Expr
 }
 
 // predExpr represents this expression is a predicate.

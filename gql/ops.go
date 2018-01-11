@@ -92,3 +92,43 @@ func (o *ops) IsNotNull() PredExpr {
 		op:  "IS NOT NULL",
 	})}
 }
+
+func (o *ops) Add(v interface{}) Expr {
+	return (&infixOp{
+		left:  o.expr,
+		right: lift(v),
+		op:    "+",
+	}).init()
+}
+
+func (o *ops) Sbt(v interface{}) Expr {
+	return (&infixOp{
+		left:  o.expr,
+		right: lift(v),
+		op:    "-",
+	}).init()
+}
+
+func (o *ops) Mlt(v interface{}) Expr {
+	return (&infixOp{
+		left:  o.expr,
+		right: lift(v),
+		op:    "*",
+	}).init()
+}
+
+func (o *ops) Dvd(v interface{}) Expr {
+	return (&infixOp{
+		left:  o.expr,
+		right: lift(v),
+		op:    "/",
+	}).init()
+}
+
+func (o *ops) Concat(v interface{}) Expr {
+	return (&infixOp{
+		left:  o.expr,
+		right: lift(v),
+		op:    "||",
+	}).init()
+}
