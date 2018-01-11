@@ -13,3 +13,17 @@ func (b *Builder) Raw(sql string) Expr {
 func (b *Builder) Parens(exp Expr) Expr {
 	return (&parensExpr{exp: exp}).init()
 }
+
+func (b *Builder) And(preds ...PredExpr) PredExpr {
+	return (&logicalOp{op: "AND", preds: preds}).init()
+}
+
+func (b *Builder) Or(preds ...PredExpr) PredExpr {
+	return (&logicalOp{op: "OR", preds: preds}).init()
+}
+
+func (b *Builder) Not(pred PredExpr) PredExpr {
+	return &predExpr{(&prefixOp{
+		op: "NOT ", val: pred,
+	}).init()}
+}

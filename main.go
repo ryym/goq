@@ -21,5 +21,15 @@ func main() {
 
 		q.Raw("now()").Sbt(1).Query(),
 		q.Parens(q.Var(1).Add(2)).Mlt(3).Query(),
+
+		q.And(
+			q.Var(1).Eq(1),
+			q.Or(q.Var(1).Gte(3), q.Var(1).Lt(0)),
+			q.Var(1).Eq(1),
+		).Query(),
+		q.Not(q.Or(
+			q.Var(1).Eq(1),
+			q.Var(1).Eq(1),
+		)).Query(),
 	)
 }

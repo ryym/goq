@@ -25,6 +25,27 @@ func (o *infixOp) Query() Query {
 
 func (o *infixOp) Selection() Selection { return Selection{} }
 
+type prefixOp struct {
+	val Querier
+	op  string
+	ops
+}
+
+func (o *prefixOp) init() *prefixOp {
+	o.ops = ops{o}
+	return o
+}
+
+func (o *prefixOp) Query() Query {
+	qr := o.val.Query()
+	return Query{
+		fmt.Sprintf("%s%s", o.op, qr.Query),
+		qr.Args,
+	}
+}
+
+func (o *prefixOp) Selection() Selection { return Selection{} }
+
 type sufixOp struct {
 	val Querier
 	op  string
