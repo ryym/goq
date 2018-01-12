@@ -46,7 +46,7 @@ type Expr interface {
 	Concat(s interface{}) Expr
 }
 
-// predExpr represents this expression is a predicate.
+// PredExpr represents this expression is a predicate.
 type PredExpr interface {
 	Expr
 	ImplPredExpr()
