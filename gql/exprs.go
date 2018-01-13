@@ -96,3 +96,26 @@ func (f *funcExpr) Apply(q *Query, ctx DBContext) {
 }
 
 func (f *funcExpr) Selection() Selection { return Selection{} }
+
+type exprListExpr struct {
+	exps []Expr
+}
+
+func (el *exprListExpr) Apply(q *Query, ctx DBContext) {
+	if len(el.exps) == 0 {
+		return
+	}
+	el.exps[0].Apply(q, ctx)
+	for i := 1; i < len(el.exps); i++ {
+		q.query = append(q.query, ", ")
+		el.exps[i].Apply(q, ctx)
+	}
+}
+
+func (el *exprListExpr) Selection() Selection {
+	panic("[INVALID] exprListExpr.Selection is called")
+}
+
+func (el *exprListExpr) Exprs() []Expr {
+	return el.exps
+}

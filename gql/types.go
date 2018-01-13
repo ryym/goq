@@ -66,6 +66,18 @@ type PredExpr interface {
 	ImplPredExpr()
 }
 
+type ExprListExpr interface {
+	Querier
+	Exprs() []Expr
+}
+
+type Table interface {
+	TableName() string
+	TableAlias() string
+	All() ExprListExpr
+	Columns() []Column
+}
+
 type Column interface {
 	Expr
 	TableName() string
