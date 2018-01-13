@@ -1,8 +1,9 @@
 package gql
 
 type queryExpr struct {
-	exps  []Querier
-	froms []Table
+	exps   []Querier
+	froms  []Table
+	wheres []PredExpr
 	ops
 }
 
@@ -39,6 +40,12 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 			}
 		}
 	}
+
+	// WHERE
+	if len(qe.wheres) > 0 {
+		q.query = append(q.query, " WHERE ")
+		(&logicalOp{op: "AND", preds: qe.wheres}).Apply(q, ctx)
+	}
 }
 
 func (qe *queryExpr) Selections() []Selection {
@@ -58,5 +65,10 @@ func (qe *queryExpr) Selections() []Selection {
 func (qe *queryExpr) From(table Table, tables ...Table) Clauses {
 	qe.froms = append(qe.froms, table)
 	qe.froms = append(qe.froms, tables...)
+	return qe
+}
+
+func (qe *queryExpr) Where(preds ...PredExpr) Clauses {
+	qe.wheres = append(qe.wheres, preds...)
 	return qe
 }

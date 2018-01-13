@@ -69,6 +69,10 @@ func main() {
 
 		q.Select(id, name, q.Var(1).Add(id).As("test")),
 		q.Select(id, Users.All(), q.Var(1)).From(Users),
+		q.Select(Users.All()).From(Users).Where(
+			Users.ID.Gte(3),
+			Users.Name.Like("%bob"),
+		),
 	}
 
 	for _, qr := range qs {

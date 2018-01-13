@@ -99,4 +99,5 @@ type SelectClause interface {
 
 type Clauses interface {
 	QueryExpr
+	Where(preds ...PredExpr) Clauses
 }
