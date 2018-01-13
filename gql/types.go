@@ -53,6 +53,8 @@ type Expr interface {
 	IsNull() PredExpr
 	IsNotNull() PredExpr
 
+	In(vals ...interface{}) PredExpr
+
 	Add(v interface{}) Expr
 	Sbt(v interface{}) Expr
 	Mlt(v interface{}) Expr

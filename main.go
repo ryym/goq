@@ -82,6 +82,8 @@ func main() {
 		).OrderBy(
 			Users.ID,
 		).Limit(10).Offset(20),
+
+		q.Select(Users.ID).From(Users).Where(Users.ID.In(1, 2, 3)),
 	}
 
 	for _, qr := range qs {

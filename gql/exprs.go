@@ -72,6 +72,32 @@ func (p *parensExpr) Apply(q *Query, ctx DBContext) {
 
 func (p *parensExpr) Selection() Selection { return p.exp.Selection() }
 
+type inExpr struct {
+	val  Expr
+	exps []Expr
+	ops
+}
+
+func (ie *inExpr) init() *inExpr {
+	ie.ops = ops{ie}
+	return ie
+}
+
+func (ie *inExpr) Apply(q *Query, ctx DBContext) {
+	ie.val.Apply(q, ctx)
+	q.query = append(q.query, " IN (")
+	if len(ie.exps) > 0 {
+		ie.exps[0].Apply(q, ctx)
+		for i := 1; i < len(ie.exps); i++ {
+			q.query = append(q.query, ", ")
+			ie.exps[i].Apply(q, ctx)
+		}
+	}
+	q.query = append(q.query, ")")
+}
+
+func (ie *inExpr) Selection() Selection { return Selection{} }
+
 type funcExpr struct {
 	name string
 	args []Expr

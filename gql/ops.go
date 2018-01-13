@@ -132,3 +132,14 @@ func (o *ops) Concat(v interface{}) Expr {
 		op:    "||",
 	}).init()
 }
+
+func (o *ops) In(vals ...interface{}) PredExpr {
+	exps := make([]Expr, len(vals))
+	for i, v := range vals {
+		exps[i] = lift(v)
+	}
+	return &predExpr{(&inExpr{
+		val:  o.expr,
+		exps: exps,
+	}).init()}
+}
