@@ -1,6 +1,9 @@
 package gql
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type queryExpr struct {
 	exps    []Querier
@@ -9,6 +12,9 @@ type queryExpr struct {
 	wheres  []PredExpr
 	groups  []Expr
 	havings []PredExpr
+	orders  []Expr
+	limit   int
+	offset  int
 	ops
 }
 
@@ -77,6 +83,26 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 		q.query = append(q.query, " HAVING ")
 		(&logicalOp{op: "AND", preds: qe.havings}).Apply(q, ctx)
 	}
+
+	// ORDER BY
+	if len(qe.orders) > 0 {
+		q.query = append(q.query, " ORDER BY ")
+		qe.orders[0].Apply(q, ctx)
+		for i := 1; i < len(qe.orders); i++ {
+			q.query = append(q.query, ", ")
+			qe.orders[i].Apply(q, ctx)
+		}
+	}
+
+	// LIMIT
+	if qe.limit > 0 {
+		q.query = append(q.query, " LIMIT ", strconv.Itoa(qe.limit))
+	}
+
+	// OFFSET
+	if qe.offset > 0 {
+		q.query = append(q.query, " OFFSET ", strconv.Itoa(qe.offset))
+	}
 }
 
 func (qe *queryExpr) Selections() []Selection {
@@ -116,5 +142,20 @@ func (qe *queryExpr) GroupBy(exps ...Expr) GroupByClause {
 
 func (qe *queryExpr) Having(preds ...PredExpr) GroupByClause {
 	qe.havings = append(qe.havings, preds...)
+	return qe
+}
+
+func (qe *queryExpr) OrderBy(exps ...Expr) ExtraClauses {
+	qe.orders = append(qe.orders, exps...)
+	return qe
+}
+
+func (qe *queryExpr) Limit(n int) ExtraClauses {
+	qe.limit = n
+	return qe
+}
+
+func (qe *queryExpr) Offset(n int) ExtraClauses {
+	qe.offset = n
 	return qe
 }

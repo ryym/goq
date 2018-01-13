@@ -98,15 +98,22 @@ type SelectClause interface {
 }
 
 type Clauses interface {
-	QueryExpr
+	ExtraClauses
 	Joins(joins ...JoinOn) Clauses
 	Where(preds ...PredExpr) Clauses
 	GroupBy(exps ...Expr) GroupByClause
 }
 
 type GroupByClause interface {
-	QueryExpr
+	ExtraClauses
 	Having(preds ...PredExpr) GroupByClause
+}
+
+type ExtraClauses interface {
+	QueryExpr
+	OrderBy(exps ...Expr) ExtraClauses
+	Limit(n int) ExtraClauses
+	Offset(n int) ExtraClauses
 }
 
 type JoinClause struct {

@@ -79,7 +79,9 @@ func main() {
 			Users.Name,
 		).Having(
 			q.Count(Users.ID).Lt(100),
-		),
+		).OrderBy(
+			Users.ID,
+		).Limit(10).Offset(20),
 	}
 
 	for _, qr := range qs {
