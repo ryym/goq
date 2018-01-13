@@ -67,6 +67,10 @@ func (b *Builder) Coalesce(exp Expr, alt interface{}) Expr {
 	return b.Func("COALESCE", exp, lift(alt))
 }
 
+func (b *Builder) Concat(exps ...interface{}) Expr {
+	return b.Func("CONCAT", exps...)
+}
+
 func (b *Builder) Select(exps ...Querier) SelectClause {
 	return (&queryExpr{exps: exps}).init()
 }

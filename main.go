@@ -49,6 +49,7 @@ func main() {
 		q.Var(5).Add(id).Sbt(2),
 		q.Var(8).Mlt(2).Eq(id),
 		name.Concat(q.Var("hello")),
+		q.Concat(name, "test", "hello"),
 
 		q.Raw("now()").Sbt(1),
 		q.Parens(q.Var(1).Add(2)).Mlt(3),
