@@ -77,6 +77,8 @@ func main() {
 		).GroupBy(
 			Users.ID,
 			Users.Name,
+		).Having(
+			q.Count(Users.ID).Lt(100),
 		),
 	}
 

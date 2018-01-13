@@ -3,11 +3,12 @@ package gql
 import "fmt"
 
 type queryExpr struct {
-	exps   []Querier
-	froms  []Table
-	joins  []JoinOn
-	wheres []PredExpr
-	groups []Expr
+	exps    []Querier
+	froms   []Table
+	joins   []JoinOn
+	wheres  []PredExpr
+	groups  []Expr
+	havings []PredExpr
 	ops
 }
 
@@ -70,6 +71,12 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 			qe.groups[i].Apply(q, ctx)
 		}
 	}
+
+	// HAVING
+	if len(qe.havings) > 0 {
+		q.query = append(q.query, " HAVING ")
+		(&logicalOp{op: "AND", preds: qe.havings}).Apply(q, ctx)
+	}
 }
 
 func (qe *queryExpr) Selections() []Selection {
@@ -104,5 +111,10 @@ func (qe *queryExpr) Where(preds ...PredExpr) Clauses {
 
 func (qe *queryExpr) GroupBy(exps ...Expr) GroupByClause {
 	qe.groups = append(qe.groups, exps...)
+	return qe
+}
+
+func (qe *queryExpr) Having(preds ...PredExpr) GroupByClause {
+	qe.havings = append(qe.havings, preds...)
 	return qe
 }

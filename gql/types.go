@@ -106,6 +106,7 @@ type Clauses interface {
 
 type GroupByClause interface {
 	QueryExpr
+	Having(preds ...PredExpr) GroupByClause
 }
 
 type JoinClause struct {
