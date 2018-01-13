@@ -101,6 +101,11 @@ type Clauses interface {
 	QueryExpr
 	Joins(joins ...JoinOn) Clauses
 	Where(preds ...PredExpr) Clauses
+	GroupBy(exps ...Expr) GroupByClause
+}
+
+type GroupByClause interface {
+	QueryExpr
 }
 
 type JoinClause struct {

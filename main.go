@@ -74,6 +74,9 @@ func main() {
 		).Where(
 			Users.ID.Gte(3),
 			Users.Name.Like("%bob"),
+		).GroupBy(
+			Users.ID,
+			Users.Name,
 		),
 	}
 

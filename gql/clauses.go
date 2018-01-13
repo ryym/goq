@@ -7,6 +7,7 @@ type queryExpr struct {
 	froms  []Table
 	joins  []JoinOn
 	wheres []PredExpr
+	groups []Expr
 	ops
 }
 
@@ -59,6 +60,16 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 		q.query = append(q.query, " WHERE ")
 		(&logicalOp{op: "AND", preds: qe.wheres}).Apply(q, ctx)
 	}
+
+	// GROUP BY
+	if len(qe.groups) > 0 {
+		q.query = append(q.query, " GROUP BY ")
+		qe.groups[0].Apply(q, ctx)
+		for i := 1; i < len(qe.groups); i++ {
+			q.query = append(q.query, ", ")
+			qe.groups[i].Apply(q, ctx)
+		}
+	}
 }
 
 func (qe *queryExpr) Selections() []Selection {
@@ -88,5 +99,10 @@ func (qe *queryExpr) Joins(joins ...JoinOn) Clauses {
 
 func (qe *queryExpr) Where(preds ...PredExpr) Clauses {
 	qe.wheres = append(qe.wheres, preds...)
+	return qe
+}
+
+func (qe *queryExpr) GroupBy(exps ...Expr) GroupByClause {
+	qe.groups = append(qe.groups, exps...)
 	return qe
 }
