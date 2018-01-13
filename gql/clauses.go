@@ -1,8 +1,11 @@
 package gql
 
+import "fmt"
+
 type queryExpr struct {
 	exps   []Querier
 	froms  []Table
+	joins  []JoinOn
 	wheres []PredExpr
 	ops
 }
@@ -30,15 +33,25 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 		q.query = append(q.query, " FROM ")
 		lastIdx := len(qe.froms) - 1
 		for i, t := range qe.froms {
-			name := t.TableName()
+			table := t.TableName()
 			if alias := t.TableAlias(); alias != "" {
-				name += " AS " + alias
+				table += " AS " + alias
 			}
-			q.query = append(q.query, name)
+			q.query = append(q.query, table)
 			if i < lastIdx {
 				q.query = append(q.query, ", ")
 			}
 		}
+	}
+
+	// JOIN
+	for _, j := range qe.joins {
+		table := j.Table.TableName()
+		if alias := j.Table.TableAlias(); alias != "" {
+			table += " AS " + alias
+		}
+		q.query = append(q.query, fmt.Sprintf(" %s JOIN %s ON ", j.Type, table))
+		j.On.Apply(q, ctx)
 	}
 
 	// WHERE
@@ -65,6 +78,11 @@ func (qe *queryExpr) Selections() []Selection {
 func (qe *queryExpr) From(table Table, tables ...Table) Clauses {
 	qe.froms = append(qe.froms, table)
 	qe.froms = append(qe.froms, tables...)
+	return qe
+}
+
+func (qe *queryExpr) Joins(joins ...JoinOn) Clauses {
+	qe.joins = append(qe.joins, joins...)
 	return qe
 }
 

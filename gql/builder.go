@@ -70,3 +70,20 @@ func (b *Builder) Coalesce(exp Expr, alt interface{}) Expr {
 func (b *Builder) Select(exps ...Querier) SelectClause {
 	return (&queryExpr{exps: exps}).init()
 }
+
+// TODO: Accept a sub query.
+func (b *Builder) InnerJoin(table Table) *JoinClause {
+	return &JoinClause{JOIN_INNER, table}
+}
+
+func (b *Builder) LeftJoin(table Table) *JoinClause {
+	return &JoinClause{JOIN_LEFT, table}
+}
+
+func (b *Builder) RightJoin(table Table) *JoinClause {
+	return &JoinClause{JOIN_RIGHT, table}
+}
+
+func (b *Builder) FullJoin(table Table) *JoinClause {
+	return &JoinClause{JOIN_FULL, table}
+}

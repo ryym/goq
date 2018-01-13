@@ -69,7 +69,9 @@ func main() {
 
 		q.Select(id, name, q.Var(1).Add(id).As("test")),
 		q.Select(id, Users.All(), q.Var(1)).From(Users),
-		q.Select(Users.All()).From(Users).Where(
+		q.Select(Users.All()).From(Users).Joins(
+			q.LeftJoin(Users).On(Users.Name.Eq("bob")),
+		).Where(
 			Users.ID.Gte(3),
 			Users.Name.Like("%bob"),
 		),

@@ -99,5 +99,30 @@ type SelectClause interface {
 
 type Clauses interface {
 	QueryExpr
+	Joins(joins ...JoinOn) Clauses
 	Where(preds ...PredExpr) Clauses
+}
+
+type JoinClause struct {
+	joinType JoinType
+	table    Table
+}
+
+func (jc *JoinClause) On(pred PredExpr) JoinOn {
+	return JoinOn{jc.table, pred, jc.joinType}
+}
+
+const (
+	JOIN_INNER = "INNER"
+	JOIN_LEFT  = "LEFT OUTER"
+	JOIN_RIGHT = "RIGHT OUTER"
+	JOIN_FULL  = "FULL OUTER"
+)
+
+type JoinType string
+
+type JoinOn struct {
+	Table Table
+	On    PredExpr
+	Type  JoinType
 }
