@@ -1,7 +1,5 @@
 package gql
 
-import "fmt"
-
 type logicalOp struct {
 	op    string
 	preds []PredExpr
@@ -15,9 +13,9 @@ func (l *logicalOp) init() *logicalOp {
 	return l
 }
 
-func (l *logicalOp) Query() Query {
+func (l *logicalOp) Apply(q *Query, ctx DBContext) {
 	if len(l.preds) == 0 {
-		return Query{"", []interface{}{}}
+		return
 	}
 
 	pred := l.preds[0]
@@ -29,11 +27,9 @@ func (l *logicalOp) Query() Query {
 		}).init()}
 	}
 
-	qr := pred.Query()
-	return Query{
-		fmt.Sprintf("(%s)", qr.Query),
-		qr.Args,
-	}
+	q.query = append(q.query, "(")
+	pred.Apply(q, ctx)
+	q.query = append(q.query, ")")
 }
 
 func (l *logicalOp) Selection() Selection { return Selection{} }

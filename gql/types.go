@@ -1,8 +1,17 @@
 package gql
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Query struct {
-	Query string
-	Args  []interface{}
+	query []string
+	args  []interface{}
+}
+
+func (q Query) String() string {
+	return fmt.Sprintf("%s %v", strings.Join(q.query, ""), q.args)
 }
 
 type Selection struct {
@@ -14,8 +23,13 @@ type Selection struct {
 	FieldName  string
 }
 
+type DBContext interface {
+	Placeholder(prevArgs []interface{}) string
+	QuoteIdent(v string) string
+}
+
 type Querier interface {
-	Query() Query
+	Apply(q *Query, ctx DBContext)
 	Selection() Selection
 }
 

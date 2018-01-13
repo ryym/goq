@@ -1,23 +1,15 @@
 package gql
 
-import (
-	"fmt"
-	"strings"
-)
-
 type aliased struct {
-	expr  Expr
+	exp   Expr
 	alias string
 }
 
 func (a *aliased) Alias() string { return a.alias }
 
-func (a *aliased) Query() Query {
-	qr := a.expr.Query()
-	return Query{
-		fmt.Sprintf("%s AS %s", qr.Query, a.alias),
-		qr.Args,
-	}
+func (a *aliased) Apply(q *Query, ctx DBContext) {
+	a.exp.Apply(q, ctx)
+	q.query = append(q.query, " AS ", a.alias)
 }
 
 func (a *aliased) Selection() Selection { return Selection{} }
@@ -32,9 +24,10 @@ func (l *litExpr) init() *litExpr {
 	return l
 }
 
-// TODO: Add no placeholder version
-func (l *litExpr) Query() Query {
-	return Query{"?", []interface{}{l.val}}
+// TODO: Add no placeholder version?
+func (l *litExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, ctx.Placeholder(q.args))
+	q.args = append(q.args, l.val)
 }
 
 func (l *litExpr) Selection() Selection { return Selection{} }
@@ -55,8 +48,8 @@ func (r *rawExpr) init() *rawExpr {
 	return r
 }
 
-func (r *rawExpr) Query() Query {
-	return Query{r.sql, []interface{}{}}
+func (r *rawExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, r.sql)
 }
 
 func (r *rawExpr) Selection() Selection { return Selection{} }
@@ -71,12 +64,10 @@ func (p *parensExpr) init() *parensExpr {
 	return p
 }
 
-func (p *parensExpr) Query() Query {
-	qr := p.exp.Query()
-	return Query{
-		fmt.Sprintf("(%s)", qr.Query),
-		qr.Args,
-	}
+func (p *parensExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, "(")
+	p.exp.Apply(q, ctx)
+	q.query = append(q.query, ")")
 }
 
 func (p *parensExpr) Selection() Selection { return p.exp.Selection() }
@@ -92,19 +83,16 @@ func (f *funcExpr) init() *funcExpr {
 	return f
 }
 
-func (f *funcExpr) Query() Query {
-	qs := make([]string, len(f.args))
-	var args []interface{}
+func (f *funcExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, f.name+"(")
+	lastIdx := len(f.args) - 1
 	for i, a := range f.args {
-		qr := a.Query()
-		qs[i] = qr.Query
-		args = append(args, qr.Args...)
+		a.Apply(q, ctx)
+		if i < lastIdx {
+			q.query = append(q.query, ", ")
+		}
 	}
-
-	return Query{
-		fmt.Sprintf("%s(%s)", f.name, strings.Join(qs, ", ")),
-		args,
-	}
+	q.query = append(q.query, ")")
 }
 
 func (f *funcExpr) Selection() Selection { return Selection{} }

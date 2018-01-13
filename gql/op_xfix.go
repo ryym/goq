@@ -1,7 +1,5 @@
 package gql
 
-import "fmt"
-
 type infixOp struct {
 	left  Querier
 	right Querier
@@ -14,13 +12,10 @@ func (o *infixOp) init() *infixOp {
 	return o
 }
 
-func (o *infixOp) Query() Query {
-	l := o.left.Query()
-	r := o.right.Query()
-	return Query{
-		fmt.Sprintf("%s %s %s", l.Query, o.op, r.Query),
-		append(l.Args, r.Args...),
-	}
+func (o *infixOp) Apply(q *Query, ctx DBContext) {
+	o.left.Apply(q, ctx)
+	q.query = append(q.query, " ", o.op, " ")
+	o.right.Apply(q, ctx)
 }
 
 func (o *infixOp) Selection() Selection { return Selection{} }
@@ -36,12 +31,9 @@ func (o *prefixOp) init() *prefixOp {
 	return o
 }
 
-func (o *prefixOp) Query() Query {
-	qr := o.val.Query()
-	return Query{
-		fmt.Sprintf("%s%s", o.op, qr.Query),
-		qr.Args,
-	}
+func (o *prefixOp) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, o.op, " ")
+	o.val.Apply(q, ctx)
 }
 
 func (o *prefixOp) Selection() Selection { return Selection{} }
@@ -57,12 +49,9 @@ func (o *sufixOp) init() *sufixOp {
 	return o
 }
 
-func (o *sufixOp) Query() Query {
-	qr := o.val.Query()
-	return Query{
-		fmt.Sprintf("%s %s", qr.Query, o.op),
-		qr.Args,
-	}
+func (o *sufixOp) Apply(q *Query, ctx DBContext) {
+	o.val.Apply(q, ctx)
+	q.query = append(q.query, " ", o.op)
 }
 
 func (o *sufixOp) Selection() Selection { return Selection{} }

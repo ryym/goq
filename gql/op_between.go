@@ -1,7 +1,5 @@
 package gql
 
-import "fmt"
-
 type betweenOp struct {
 	start Querier
 	end   Querier
@@ -13,13 +11,11 @@ func (o *betweenOp) init() *betweenOp {
 	return o
 }
 
-func (o *betweenOp) Query() Query {
-	s := o.start.Query()
-	e := o.end.Query()
-	return Query{
-		fmt.Sprintf("BETWEEN %s AND %s", s.Query, e.Query),
-		append(s.Args, s.Args...),
-	}
+func (o *betweenOp) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, "BETWEEN ")
+	o.start.Apply(q, ctx)
+	q.query = append(q.query, " AND ")
+	o.end.Apply(q, ctx)
 }
 
 func (o *betweenOp) Selection() Selection { return Selection{} }

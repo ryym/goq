@@ -2,6 +2,13 @@ package gql
 
 type Builder struct{}
 
+func (b *Builder) Query(exp Querier) Query {
+	ctx := &postgresCtx{} // TODO: Change dynamically.
+	q := Query{}
+	exp.Apply(&q, ctx)
+	return q
+}
+
 func (b *Builder) Var(v interface{}) Expr {
 	return (&litExpr{val: v}).init()
 }
@@ -24,7 +31,7 @@ func (b *Builder) Or(preds ...PredExpr) PredExpr {
 
 func (b *Builder) Not(pred PredExpr) PredExpr {
 	return &predExpr{(&prefixOp{
-		op: "NOT ", val: pred,
+		op: "NOT", val: pred,
 	}).init()}
 }
 

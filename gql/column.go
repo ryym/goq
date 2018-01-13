@@ -1,7 +1,5 @@
 package gql
 
-import "fmt"
-
 func NewColumnMaker(tableName, structName string) ColumnMaker {
 	return ColumnMaker{tableName, structName}
 }
@@ -42,15 +40,17 @@ func (c *column) StructName() string { return c.structName }
 func (c *column) ColumnName() string { return c.name }
 func (c *column) FieldName() string  { return c.fieldName }
 
-func (c *column) Query() Query {
+func (c *column) Apply(q *Query, ctx DBContext) {
 	table := c.tableAlias
 	if table == "" {
 		table = c.tableName
 	}
-	return Query{
-		fmt.Sprintf("%s.%s", table, c.name),
-		[]interface{}{},
-	}
+	q.query = append(
+		q.query,
+		ctx.QuoteIdent(table),
+		".",
+		ctx.QuoteIdent(c.name),
+	)
 }
 
 func (c *column) Selection() Selection {
