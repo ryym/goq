@@ -95,3 +95,19 @@ func (b *Builder) RightJoin(table Table) *JoinClause {
 func (b *Builder) FullJoin(table Table) *JoinClause {
 	return &JoinClause{JOIN_FULL, table}
 }
+
+func (b *Builder) Case(cases ...*WhenExpr) *CaseExpr {
+	return (&CaseExpr{cases: cases}).init()
+}
+
+type CaseOfExpr func(cases ...*WhenExpr) *CaseExpr
+
+func (b *Builder) CaseOf(val Expr) CaseOfExpr {
+	return func(cases ...*WhenExpr) *CaseExpr {
+		return (&CaseExpr{val: val, cases: cases}).init()
+	}
+}
+
+func (b *Builder) When(when interface{}) *WhenExpr {
+	return &WhenExpr{when: lift(when)}
+}

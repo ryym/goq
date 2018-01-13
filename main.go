@@ -88,6 +88,15 @@ func main() {
 			Users.ID.In(1, 2, 3),
 			q.Exists(q.Select(Users.ID)),
 		),
+
+		q.Case(
+			q.When(Users.ID.Eq(1)).Then(2),
+			q.When(Users.ID.Eq(2)).Then(3),
+		).Else(4).Add(1),
+		q.CaseOf(Users.ID)(
+			q.When(1).Then(2),
+			q.When(2).Then(3),
+		).Else(4).As("casewhen"),
 	}
 
 	for _, qr := range qs {
