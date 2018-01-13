@@ -67,6 +67,6 @@ func (b *Builder) Coalesce(exp Expr, alt interface{}) Expr {
 	return b.Func("COALESCE", exp, lift(alt))
 }
 
-func (b *Builder) Select(exps ...Querier) Expr {
+func (b *Builder) Select(exps ...Querier) SelectClause {
 	return (&queryExpr{exps: exps}).init()
 }

@@ -6,11 +6,35 @@ import (
 	"github.com/ryym/goq/gql"
 )
 
+type UsersTable struct {
+	name  string
+	alias string
+	ID    gql.Column
+	Name  gql.Column
+}
+
+func (t *UsersTable) TableName() string     { return t.name }
+func (t *UsersTable) TableAlias() string    { return t.alias }
+func (t *UsersTable) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
+func (t *UsersTable) Columns() []gql.Column { return []gql.Column{t.ID, t.Name} }
+func (t *UsersTable) As(alias string) *UsersTable {
+	t2 := *t
+	t2.alias = alias
+	gql.CopyTableAs(alias, t, &t2)
+	return &t2
+}
+
 func main() {
 	q := gql.NewBuilder()
 	cm := gql.NewColumnMaker("users", "User")
 	id := cm.Col("ID", "id")
 	name := cm.Col("Name", "name")
+	Users := &UsersTable{
+		name:  "users",
+		alias: "",
+		ID:    id,
+		Name:  name,
+	}
 
 	qs := []gql.Querier{
 		q.Var(1).Eq(2),
@@ -42,6 +66,9 @@ func main() {
 		q.Func("foo", 1, 2).Add(3),
 		q.Count(q.Var(10)),
 		q.Coalesce(name, q.Var(20)),
+
+		q.Select(id, name, q.Var(1).Add(id).As("test")),
+		q.Select(id, Users.All(), q.Var(1)).From(Users),
 	}
 
 	for _, qr := range qs {

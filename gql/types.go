@@ -86,3 +86,17 @@ type Column interface {
 	ColumnName() string
 	FieldName() string
 }
+
+type QueryExpr interface {
+	Expr
+	Selections() []Selection
+}
+
+type SelectClause interface {
+	QueryExpr
+	From(table Table, tables ...Table) Clauses
+}
+
+type Clauses interface {
+	QueryExpr
+}
