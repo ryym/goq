@@ -66,3 +66,7 @@ func (b *Builder) Avg(exp Expr) Expr {
 func (b *Builder) Coalesce(exp Expr, alt interface{}) Expr {
 	return b.Func("COALESCE", exp, lift(alt))
 }
+
+func (b *Builder) Select(exps ...Querier) Expr {
+	return (&queryExpr{exps: exps}).init()
+}
