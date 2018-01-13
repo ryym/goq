@@ -145,3 +145,21 @@ func (el *exprListExpr) Selection() Selection {
 func (el *exprListExpr) Exprs() []Expr {
 	return el.exps
 }
+
+type existsExpr struct {
+	query QueryExpr
+	ops
+}
+
+func (e *existsExpr) init() *existsExpr {
+	e.ops = ops{e}
+	return e
+}
+
+func (e *existsExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, "EXISTS (")
+	e.query.Apply(q, ctx)
+	q.query = append(q.query, ")")
+}
+
+func (e *existsExpr) Selection() Selection { return Selection{} }

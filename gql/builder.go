@@ -71,6 +71,10 @@ func (b *Builder) Concat(exps ...interface{}) Expr {
 	return b.Func("CONCAT", exps...)
 }
 
+func (b *Builder) Exists(query QueryExpr) PredExpr {
+	return &predExpr{(&existsExpr{query: query}).init()}
+}
+
 func (b *Builder) Select(exps ...Querier) SelectClause {
 	return (&queryExpr{exps: exps}).init()
 }
