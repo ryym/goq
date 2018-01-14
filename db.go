@@ -53,8 +53,24 @@ func (cl *Collectable) Rows() (*sql.Rows, error) {
 	return cl.db.Query(q.Query(), q.Args()...)
 }
 
-func (cl *Collectable) Collect(collectors ...cllct.Collector) error {
-	q := cl.query.Construct()
+func (cl *Collectable) First(collectors ...cllct.SingleCollector) error {
+	clls := make([]cllct.Collector, len(collectors))
+	for i, c := range collectors {
+		clls[i] = c
+	}
+	return cl.collect(cl.query.Limit(1), clls...)
+}
+
+func (cl *Collectable) Collect(collectors ...cllct.ListCollector) error {
+	clls := make([]cllct.Collector, len(collectors))
+	for i, c := range collectors {
+		clls[i] = c
+	}
+	return cl.collect(cl.query, clls...)
+}
+
+func (cl *Collectable) collect(query gql.QueryExpr, collectors ...cllct.Collector) error {
+	q := query.Construct()
 
 	// TODO: remove debug code.
 	fmt.Printf("[LOG] %s %v\n", q.Query(), q.Args())

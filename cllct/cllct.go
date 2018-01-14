@@ -7,3 +7,13 @@ type Collector interface {
 	Next(ptrs []interface{})
 	AfterScan(ptrs []interface{})
 }
+
+type ListCollector interface {
+	Collector
+	ImplListCollector()
+}
+
+type SingleCollector interface {
+	Collector
+	ImplSingleCollector()
+}
