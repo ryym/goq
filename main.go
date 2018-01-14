@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gql"
 )
@@ -108,5 +109,29 @@ func main() {
 
 	for _, qr := range qs {
 		fmt.Println(q.Query(qr))
+	}
+
+	fmt.Println("------------------------------------")
+
+	db, err := Open("sqlite3", "prot/prot.db")
+	if err != nil {
+		panic(err)
+	}
+	q = db.QueryBuilder()
+
+	rows, err := db.Query(q.Select(Users.Name).From(Users)).Rows()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var name string
+		rows.Scan(&name)
+		fmt.Println(name)
+	}
+	err = rows.Err()
+	if err != nil {
+		panic(err)
 	}
 }

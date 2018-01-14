@@ -10,8 +10,16 @@ type Query struct {
 	args  []interface{}
 }
 
+func (q *Query) Query() string {
+	return strings.Join(q.query, "")
+}
+
+func (q *Query) Args() []interface{} {
+	return q.args
+}
+
 func (q Query) String() string {
-	return fmt.Sprintf("%s %v", strings.Join(q.query, ""), q.args)
+	return fmt.Sprintf("%s %v", q.Query(), q.args)
 }
 
 type Selection struct {
