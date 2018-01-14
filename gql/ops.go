@@ -72,8 +72,9 @@ func (o *ops) Like(s string) PredExpr {
 	}).init()}
 }
 
-func (p *ops) Between(start interface{}, end interface{}) PredExpr {
+func (o *ops) Between(start interface{}, end interface{}) PredExpr {
 	return &predExpr{(&betweenOp{
+		val:   o.expr,
 		start: lift(start),
 		end:   lift(end),
 	})}
