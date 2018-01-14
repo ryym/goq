@@ -152,17 +152,17 @@ func (qe *queryExpr) Having(preds ...PredExpr) GroupByClause {
 	return qe
 }
 
-func (qe *queryExpr) OrderBy(exps ...Expr) ExtraClauses {
+func (qe *queryExpr) OrderBy(exps ...Expr) QueryExpr {
 	qe.orders = append(qe.orders, exps...)
 	return qe
 }
 
-func (qe *queryExpr) Limit(n int) ExtraClauses {
+func (qe *queryExpr) Limit(n int) QueryExpr {
 	qe.limit = n
 	return qe
 }
 
-func (qe *queryExpr) Offset(n int) ExtraClauses {
+func (qe *queryExpr) Offset(n int) QueryExpr {
 	qe.offset = n
 	return qe
 }

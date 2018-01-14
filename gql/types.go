@@ -101,30 +101,26 @@ type QueryExpr interface {
 	Expr
 	Selections() []Selection
 	Construct() Query
+	OrderBy(exps ...Expr) QueryExpr
+	Limit(n int) QueryExpr
+	Offset(n int) QueryExpr
 }
 
 type SelectClause interface {
-	ExtraClauses
+	QueryExpr
 	From(table Table, tables ...Table) Clauses
 }
 
 type Clauses interface {
-	ExtraClauses
+	QueryExpr
 	Joins(joins ...JoinOn) Clauses
 	Where(preds ...PredExpr) Clauses
 	GroupBy(exps ...Expr) GroupByClause
 }
 
 type GroupByClause interface {
-	ExtraClauses
-	Having(preds ...PredExpr) GroupByClause
-}
-
-type ExtraClauses interface {
 	QueryExpr
-	OrderBy(exps ...Expr) ExtraClauses
-	Limit(n int) ExtraClauses
-	Offset(n int) ExtraClauses
+	Having(preds ...PredExpr) GroupByClause
 }
 
 type JoinClause struct {
