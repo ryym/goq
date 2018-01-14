@@ -141,4 +141,8 @@ func main() {
 		z.ToRowMapSlice(&mps),
 	)
 	fmt.Println(mps)
+
+	var mp map[string]interface{}
+	db.Query(z.Select(Users.Name).From(Users)).First(z.ToRowMap(&mp))
+	fmt.Println(mp)
 }
