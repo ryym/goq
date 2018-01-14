@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gql"
 )
@@ -24,6 +25,11 @@ func (t *UsersTable) As(alias string) *UsersTable {
 	t2.alias = alias
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
+}
+
+type User struct {
+	ID   int
+	Name string
 }
 
 func main() {
@@ -145,4 +151,15 @@ func main() {
 	var mp map[string]interface{}
 	db.Query(z.Select(Users.Name).From(Users)).First(z.ToRowMap(&mp))
 	fmt.Println(mp)
+
+	var users []User
+	userCllct := cllct.NewModelCollectorMaker(
+		User{},
+		[]gql.Column{id, name},
+		"",
+	)
+	db.Query(
+		z.Select(Users.ID, Users.Name).From(Users),
+	).Collect(userCllct.ToSlice(&users))
+	fmt.Println(users)
 }
