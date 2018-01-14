@@ -92,6 +92,7 @@ type Column interface {
 type QueryExpr interface {
 	Expr
 	Selections() []Selection
+	Construct() Query
 }
 
 type SelectClause interface {

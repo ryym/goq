@@ -15,6 +15,7 @@ type queryExpr struct {
 	orders  []Expr
 	limit   int
 	offset  int
+	ctx     DBContext
 	ops
 }
 
@@ -23,7 +24,13 @@ func (qe *queryExpr) init() *queryExpr {
 	return qe
 }
 
-func (q *queryExpr) Selection() Selection { return Selection{} }
+func (qe *queryExpr) Selection() Selection { return Selection{} }
+
+func (qe *queryExpr) Construct() Query {
+	q := Query{}
+	qe.Apply(&q, qe.ctx)
+	return q
+}
 
 func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 	q.query = append(q.query, "SELECT ")

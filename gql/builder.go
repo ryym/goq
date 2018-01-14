@@ -83,7 +83,7 @@ func (b *Builder) Exists(query QueryExpr) PredExpr {
 }
 
 func (b *Builder) Select(exps ...Querier) SelectClause {
-	return (&queryExpr{exps: exps}).init()
+	return (&queryExpr{exps: exps, ctx: b.ctx}).init()
 }
 
 // TODO: Accept a sub query.
