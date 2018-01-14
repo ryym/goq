@@ -135,4 +135,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	var mps []map[string]interface{}
+	db.Query(z.Select(Users.Name).From(Users)).Collect(
+		z.ToRowMapSlice(&mps),
+	)
+	fmt.Println(mps)
 }

@@ -37,18 +37,64 @@ func (d *DB) QueryBuilder() *Builder {
 }
 
 func (d *DB) Query(query gql.QueryExpr) *Collectable {
-	q := query.Construct()
-	return &Collectable{d.DB, q.Query(), q.Args()}
+	return &Collectable{d.DB, query}
 }
 
 type Collectable struct {
 	db    *sql.DB
-	query string
-	args  []interface{}
+	query gql.QueryExpr
 }
 
 func (cl *Collectable) Rows() (*sql.Rows, error) {
+	q := cl.query.Construct()
+
 	// TODO: remove debug code.
-	fmt.Printf("[LOG] %s %v\n", cl.query, cl.args)
-	return cl.db.Query(cl.query, cl.args...)
+	fmt.Printf("[LOG] %s %v\n", q.Query(), q.Args())
+	return cl.db.Query(q.Query(), q.Args()...)
+}
+
+func (cl *Collectable) Collect(collectors ...cllct.Collector) error {
+	q := cl.query.Construct()
+
+	// TODO: remove debug code.
+	fmt.Printf("[LOG] %s %v\n", q.Query(), q.Args())
+	rows, err := cl.db.Query(q.Query(), q.Args()...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	selects := cl.query.Selections()
+	colNames, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	if len(colNames) != len(selects) {
+		return fmt.Errorf(
+			"[goq] selections mismatch: colNames: %d, selects: %d",
+			len(colNames),
+			len(selects),
+		)
+	}
+
+	clls := make([]cllct.Collector, 0, len(collectors))
+	for _, cl := range collectors {
+		if cl.Init(selects, colNames) {
+			clls = append(clls, cl)
+		}
+	}
+
+	ptrs := make([]interface{}, len(colNames))
+	for rows.Next() {
+		for _, cl := range clls {
+			cl.Next(ptrs)
+		}
+		rows.Scan(ptrs...)
+		for _, cl := range clls {
+			cl.AfterScan(ptrs)
+		}
+	}
+
+	return rows.Err()
 }
