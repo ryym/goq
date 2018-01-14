@@ -1,11 +1,18 @@
 package gql
 
-type Builder struct{}
+import "github.com/ryym/goq/dialect"
+
+func NewBuilder(dl dialect.Dialect) *Builder {
+	return &Builder{dl}
+}
+
+type Builder struct {
+	ctx DBContext
+}
 
 func (b *Builder) Query(exp Querier) Query {
-	ctx := &postgresCtx{} // TODO: Change dynamically.
 	q := Query{}
-	exp.Apply(&q, ctx)
+	exp.Apply(&q, b.ctx)
 	return q
 }
 

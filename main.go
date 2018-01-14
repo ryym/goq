@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gql"
 )
 
@@ -25,7 +26,12 @@ func (t *UsersTable) As(alias string) *UsersTable {
 }
 
 func main() {
-	q := gql.NewBuilder()
+	dl, err := dialect.New("postgres")
+	if err != nil {
+		panic(err)
+	}
+	q := gql.NewBuilder(dl)
+
 	cm := gql.NewColumnMaker("users", "User")
 	id := cm.Col("ID", "id")
 	name := cm.Col("Name", "name")
