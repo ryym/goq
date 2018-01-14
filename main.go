@@ -69,6 +69,7 @@ func main() {
 		q.Coalesce(name, q.Var(20)),
 
 		q.Select(id, name, q.Var(1).Add(id).As("test")),
+		q.Select(id).Limit(3).OrderBy(id),
 		q.Select(id, Users.All(), q.Var(1)).From(Users),
 		q.Select(Users.All()).From(Users).Joins(
 			q.LeftJoin(Users).On(Users.Name.Eq("bob")),

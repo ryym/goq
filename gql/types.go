@@ -95,7 +95,7 @@ type QueryExpr interface {
 }
 
 type SelectClause interface {
-	QueryExpr
+	ExtraClauses
 	From(table Table, tables ...Table) Clauses
 }
 
