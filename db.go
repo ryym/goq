@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gql"
 )
@@ -28,8 +29,11 @@ type DB struct {
 	dialect dialect.Dialect
 }
 
-func (d *DB) QueryBuilder() *gql.Builder {
-	return gql.NewBuilder(d.dialect)
+func (d *DB) QueryBuilder() *Builder {
+	return &Builder{
+		Builder:        gql.NewBuilder(d.dialect),
+		CollectorMaker: cllct.NewMaker(),
+	}
 }
 
 func (d *DB) Query(query gql.QueryExpr) *Collectable {

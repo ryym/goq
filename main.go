@@ -117,9 +117,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	q = db.QueryBuilder()
+	defer db.Close()
+	z := db.QueryBuilder()
 
-	rows, err := db.Query(q.Select(Users.Name).From(Users)).Rows()
+	rows, err := db.Query(z.Select(Users.Name).From(Users)).Rows()
 	if err != nil {
 		panic(err)
 	}
