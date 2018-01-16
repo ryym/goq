@@ -1,7 +1,9 @@
 package gen
 
 import (
+	"bytes"
 	"fmt"
+	"go/format"
 	"io"
 	"text/template"
 
@@ -9,19 +11,24 @@ import (
 )
 
 func writeTemplate(w io.Writer, pkgName string, helpers []*helper) error {
-	tableT := template.Must(template.New("table").Parse(tableTmpl))
+	buf := new(bytes.Buffer)
+	fmt.Fprintf(buf, "package %s\n\nimport \"github.com/ryym/goq/gql\"\n", pkgName)
 
-	fmt.Fprintf(w, "package %s\n\nimport \"github.com/ryym/goq/gql\"\n", pkgName)
+	tableT := template.Must(template.New("table").Parse(tableTmpl))
 
 	var err error
 	for _, h := range helpers {
-		err = tableT.Execute(w, h)
+		err = tableT.Execute(buf, h)
 		if err != nil {
 			return errors.Wrapf(err, "failed to create template of %s", h.Name)
 		}
 	}
 
-	// TODO: Need to apply `gofmt` to the generated Go file.
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	w.Write(src)
 
 	return nil
 }
@@ -32,7 +39,7 @@ type {{.Name}} struct {
 	name  string
 	alias string
 	{{range .Fields}}
-	{{.Name}} gql.Column {{end}}
+	{{.Name}} gql.Column{{end}}
 }
 
 func New{{.Name}}() *{{.Name}} {
@@ -57,5 +64,4 @@ func (t *{{.Name}}) As(alias string) *{{.Name}} {
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }
-
 `
