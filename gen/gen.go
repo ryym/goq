@@ -6,7 +6,6 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -14,8 +13,7 @@ import (
 )
 
 type Opts struct {
-	DestDir          string
-	ModelsDir        string
+	OutFile          string
 	TablesStructName string
 }
 
@@ -41,7 +39,9 @@ type field struct {
 
 func GenerateTableHelpers(opts Opts) error {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, opts.ModelsDir, exceptTests, 0)
+
+	// TODO: Support models in other packages.
+	pkgs, err := parser.ParseDir(fset, ".", exceptTests, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -79,19 +79,7 @@ func GenerateTableHelpers(opts Opts) error {
 		}
 	}
 
-	// dirStat, err := os.Stat("gql")
-	// if err != nil {
-	// 	if os.IsNotExist(err) {
-	// 		err = os.Mkdir("gql", 0766)
-	// 	}
-	// 	if err != nil {
-	// 		return errors.Wrap("failed to create sub package", err)
-	// 	}
-	// } else if !dirStat.IsDir() {
-	// 	return errors.New("gql exists but is not a directory")
-	// }
-
-	outPath := filepath.Join("gql.go")
+	outPath := opts.OutFile
 	if _, err := os.Stat(outPath); err == nil {
 		err = os.Remove(outPath)
 		if err != nil {
