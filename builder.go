@@ -1,4 +1,4 @@
-package main
+package goq
 
 import (
 	"github.com/ryym/goq/cllct"
