@@ -1,15 +1,12 @@
 package sample
 
+import "github.com/ryym/goq/gen/sample/models"
+
 //go:generate go run "../../main.go"
 
 type Tables struct {
-	users  User
+	users  models.User
 	cities City
-}
-
-type User struct {
-	ID   int `goq:"pk"`
-	Name string
 }
 
 type City struct {

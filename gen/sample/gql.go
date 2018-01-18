@@ -1,9 +1,12 @@
 package sample
 
-import "github.com/ryym/goq/gql"
+import (
+	"github.com/ryym/goq/gen/sample/models"
+	"github.com/ryym/goq/gql"
+)
 
 type Users struct {
-	model User
+	model models.User
 	name  string
 	alias string
 
@@ -14,7 +17,7 @@ type Users struct {
 func NewUsers() *Users {
 	cm := gql.NewColumnMaker("users", "User")
 	return &Users{
-		model: User{},
+		model: models.User{},
 		name:  "users",
 
 		ID:   cm.Col("ID", "id"),

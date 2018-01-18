@@ -5,15 +5,22 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"sort"
 	"text/template"
 
 	"github.com/pkg/errors"
 )
 
-func writeTemplate(w io.Writer, pkgName string, helpers []*helper) error {
+func writeTemplate(
+	w io.Writer,
+	pkgName string,
+	helpers []*helper,
+	modelPkgs map[string]bool,
+) error {
 	buf := new(bytes.Buffer)
-	fmt.Fprintf(buf, "package %s\n\nimport \"github.com/ryym/goq/gql\"\n", pkgName)
+	buf.Write([]byte(fmt.Sprintf("package %s\n\n", pkgName)))
 
+	writeImports(buf, modelPkgs)
 	tableT := template.Must(template.New("table").Parse(tableTmpl))
 
 	var err error
@@ -33,9 +40,32 @@ func writeTemplate(w io.Writer, pkgName string, helpers []*helper) error {
 	return nil
 }
 
+func writeImports(buf io.Writer, modelPkgs map[string]bool) {
+	if len(modelPkgs) == 0 {
+		buf.Write([]byte("\n\nimport \"github.com/ryym/goq/gql\"\n"))
+	} else {
+		buf.Write([]byte("import (\n"))
+
+		paths := make([]string, len(modelPkgs)+1)
+		paths[0] = "github.com/ryym/goq/gql"
+		i := 1
+		for path, _ := range modelPkgs {
+			paths[i] = path
+			i++
+		}
+		sort.Strings(paths)
+		for _, path := range paths {
+			fmt.Fprintf(buf, "\"%s\"\n", path)
+		}
+
+		buf.Write([]byte(")\n"))
+	}
+
+}
+
 const tableTmpl = `
 type {{.Name}} struct {
-	model {{.ModelName}}
+	model {{.ModelFullName}}
 	name  string
 	alias string
 	{{range .Fields}}
@@ -45,7 +75,7 @@ type {{.Name}} struct {
 func New{{.Name}}() *{{.Name}} {
 	cm := gql.NewColumnMaker("{{.TableName}}", "{{.ModelName}}")
 	return &{{.Name}}{
-		model: {{.ModelName}}{},
+		model: {{.ModelFullName}}{},
 		name:  "{{.TableName}}",
 		{{range .Fields}}
 		{{.Name}}: cm.Col("{{.Name}}", "{{.Column}}"),{{end}}

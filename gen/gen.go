@@ -2,26 +2,34 @@ package gen
 
 import (
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/token"
+	"go/types"
 	"os"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/ryym/goq/util"
+	"golang.org/x/tools/go/loader"
 )
 
 type Opts struct {
+	Pkg              string
 	OutFile          string
 	TablesStructName string
 }
 
 type helper struct {
-	Name      string
-	TableName string
-	ModelName string
-	Fields    []*field
+	Name         string
+	TableName    string
+	ModelPkgName string
+	ModelName    string
+	Fields       []*field
+}
+
+func (h *helper) ModelFullName() string {
+	if h.ModelPkgName != "" {
+		return fmt.Sprintf("%s.%s", h.ModelPkgName, h.ModelName)
+	}
+	return h.ModelName
 }
 
 func (h *helper) JoinFields(alias string) string {
@@ -38,62 +46,69 @@ type field struct {
 }
 
 func GenerateTableHelpers(opts Opts) error {
-	fset := token.NewFileSet()
-
-	// TODO: Support models in other packages.
-	pkgs, err := parser.ParseDir(fset, ".", exceptTests, 0)
+	conf := loader.Config{}
+	conf.Import(opts.Pkg)
+	prg, err := conf.Load()
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
-	var pkgName string
-	for name, _ := range pkgs {
-		pkgName = name
-		break
+	pkg := prg.Package(opts.Pkg)
+	if pkg == nil {
+		return fmt.Errorf("package %s not found", opts.Pkg)
 	}
 
-	structs := findAllStructs(pkgs)
+	tablesPkg := pkg.Pkg
+	tables := tablesPkg.Scope().Lookup(opts.TablesStructName)
+	if tables == nil {
+		return fmt.Errorf("struct %s not found", opts.TablesStructName)
+	}
 
-	tableList, ok := structs[opts.TablesStructName]
+	tablesT, ok := tables.Type().Underlying().(*types.Struct)
 	if !ok {
-		return errors.New("Tables struct not found")
+		return errors.Wrapf(err, "%s is not struct", opts.TablesStructName)
 	}
 
-	helpers := make([]*helper, len(tableList.Fields.List))
-	for i, table := range tableList.Fields.List {
-		if len(table.Names) == 0 {
-			continue // TODO: Support embedded structs.
+	helpers := make([]*helper, tablesT.NumFields())
+	modelPkgs := map[string]bool{}
+
+	for i := 0; i < tablesT.NumFields(); i++ {
+		fld := tablesT.Field(i)
+		tableName := fld.Name()
+		fldVar := fld.Type().(*types.Named)
+		fldT, ok := fldVar.Underlying().(*types.Struct)
+		if !ok {
+			return fmt.Errorf(
+				"%s contains non struct field %s",
+				opts.TablesStructName,
+				tableName,
+			)
 		}
 
-		tableName := table.Names[0].Name
-		modelName := table.Type.(*ast.Ident).Name
-		if _, ok := structs[modelName]; !ok {
-			return fmt.Errorf("model %s not found", modelName)
+		modelPkgName := ""
+		modelPkg := fldVar.Obj().Pkg()
+		if modelPkg.Name() != tablesPkg.Name() {
+			modelPkgName = modelPkg.Name()
+			modelPkgs[modelPkg.Path()] = true
 		}
 
 		helpers[i] = &helper{
-			Name:      util.ColToFld(tableName),
-			TableName: tableName,
-			ModelName: modelName,
-			Fields:    listColumnFields(structs[modelName]),
+			Name:         util.ColToFld(tableName),
+			TableName:    tableName,
+			ModelPkgName: modelPkgName,
+			ModelName:    fldVar.Obj().Name(),
+			Fields:       listColumnFields(fldT),
 		}
+
 	}
 
-	outPath := opts.OutFile
-	if _, err := os.Stat(outPath); err == nil {
-		err = os.Remove(outPath)
-		if err != nil {
-			return fmt.Errorf("failed to remove %s", outPath)
-		}
-	}
-
-	file, err := os.Create(outPath)
+	file, err := createOutFile(opts.OutFile)
 	if err != nil {
-		return fmt.Errorf("failed to create %s", outPath)
+		return err
 	}
-	defer file.Close()
+	defer file.Close() // TODO: Remove file on error
 
-	err = writeTemplate(file, pkgName, helpers)
+	err = writeTemplate(file, tablesPkg.Name(), helpers, modelPkgs)
 	if err != nil {
 		return err
 	}
@@ -101,41 +116,32 @@ func GenerateTableHelpers(opts Opts) error {
 	return nil
 }
 
-func exceptTests(f os.FileInfo) bool {
-	return !strings.HasSuffix(f.Name(), "_test.go")
-}
-
-func findAllStructs(pkgs map[string]*ast.Package) map[string]*ast.StructType {
-	structs := map[string]*ast.StructType{}
-	for _, pkg := range pkgs {
-		for _, file := range pkg.Files {
-			for _, dcl := range file.Decls {
-				if d, ok := dcl.(*ast.GenDecl); ok && d.Tok == token.TYPE {
-					for _, sp := range d.Specs {
-						tsp := sp.(*ast.TypeSpec)
-						if ast.IsExported(tsp.Name.Name) {
-							if st, ok := tsp.Type.(*ast.StructType); ok {
-								structs[tsp.Name.Name] = st
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return structs
-}
-
-func listColumnFields(model *ast.StructType) []*field {
+func listColumnFields(modelT *types.Struct) []*field {
+	// TODO: Support struct embedding.
 	var fields []*field
-	for _, fld := range model.Fields.List {
-		fldName := fld.Names[0].Name
-		if ast.IsExported(fldName) {
+	for i := 0; i < modelT.NumFields(); i++ {
+		fld := modelT.Field(i)
+		if fld.Exported() {
 			fields = append(fields, &field{
-				Name:   fldName,
-				Column: util.FldToCol(fldName),
+				Name:   fld.Name(),
+				Column: util.FldToCol(fld.Name()),
 			})
 		}
 	}
 	return fields
+}
+
+func createOutFile(outPath string) (*os.File, error) {
+	if _, err := os.Stat(outPath); err == nil {
+		err = os.Remove(outPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to remove %s", outPath)
+		}
+	}
+
+	file, err := os.Create(outPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create %s", outPath)
+	}
+	return file, nil
 }
