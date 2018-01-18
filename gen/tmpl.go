@@ -15,20 +15,32 @@ func writeTemplate(
 	w io.Writer,
 	pkgName string,
 	helpers []*helper,
-	modelPkgs map[string]bool,
+	pkgs map[string]bool,
 ) error {
 	buf := new(bytes.Buffer)
 	buf.Write([]byte(fmt.Sprintf("package %s\n\n", pkgName)))
 
-	writeImports(buf, modelPkgs)
+	writeImports(buf, pkgs)
 	tableT := template.Must(template.New("table").Parse(tableTmpl))
 
 	var err error
 	for _, h := range helpers {
 		err = tableT.Execute(buf, h)
 		if err != nil {
-			return errors.Wrapf(err, "failed to create template of %s", h.Name)
+			return errors.Wrapf(err, "failed to execute template of %s", h.Name)
 		}
+	}
+
+	gqlStructT := template.Must(template.New("gqlStruct").Parse(gqlStructTmpl))
+	err = gqlStructT.Execute(buf, helpers)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute Builder struct template")
+	}
+
+	newBuilderT := template.Must(template.New("newBuilder").Parse(newBuilderTmpl))
+	err = newBuilderT.Execute(buf, helpers)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute NewBuilder() template")
 	}
 
 	src, err := format.Source(buf.Bytes())
@@ -40,27 +52,23 @@ func writeTemplate(
 	return nil
 }
 
-func writeImports(buf io.Writer, modelPkgs map[string]bool) {
-	if len(modelPkgs) == 0 {
-		buf.Write([]byte("\n\nimport \"github.com/ryym/goq/gql\"\n"))
-	} else {
-		buf.Write([]byte("import (\n"))
+func writeImports(buf io.Writer, pkgs map[string]bool) {
+	buf.Write([]byte("import (\n"))
 
-		paths := make([]string, len(modelPkgs)+1)
-		paths[0] = "github.com/ryym/goq/gql"
-		i := 1
-		for path, _ := range modelPkgs {
-			paths[i] = path
-			i++
-		}
-		sort.Strings(paths)
-		for _, path := range paths {
-			fmt.Fprintf(buf, "\"%s\"\n", path)
-		}
-
-		buf.Write([]byte(")\n"))
+	paths := []string{
+		"github.com/ryym/goq",
+		"github.com/ryym/goq/dialect",
+		"github.com/ryym/goq/gql",
+	}
+	for path, _ := range pkgs {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+	for _, path := range paths {
+		fmt.Fprintf(buf, "\"%s\"\n", path)
 	}
 
+	buf.Write([]byte(")\n"))
 }
 
 const tableTmpl = `
@@ -95,3 +103,20 @@ func (t *{{.Name}}) As(alias string) *{{.Name}} {
 	return &t2
 }
 `
+
+const gqlStructTmpl = `
+type Builder struct {
+	*goq.Builder
+	{{range .}}
+	{{.Name}} *{{.Name}}{{end}}
+}
+`
+
+const newBuilderTmpl = `
+func NewBuilder(dl dialect.Dialect) *Builder {
+	return &Builder{
+		Builder: goq.NewBuilder(dl),
+		{{range .}}
+		{{.Name}}: New{{.Name}}(),{{end}}
+	}
+}`

@@ -29,11 +29,8 @@ type DB struct {
 	dialect dialect.Dialect
 }
 
-func (d *DB) QueryBuilder() *Builder {
-	return &Builder{
-		Builder:        gql.NewBuilder(d.dialect),
-		CollectorMaker: cllct.NewMaker(),
-	}
+func (d *DB) Dialect() dialect.Dialect {
+	return d.dialect
 }
 
 func (d *DB) Query(query gql.QueryExpr) *Collectable {

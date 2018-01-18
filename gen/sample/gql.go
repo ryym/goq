@@ -1,6 +1,8 @@
 package sample
 
 import (
+	"github.com/ryym/goq"
+	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gen/sample/models"
 	"github.com/ryym/goq/gql"
 )
@@ -71,4 +73,20 @@ func (t *Cities) As(alias string) *Cities {
 	t2.alias = alias
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
+}
+
+type Builder struct {
+	*goq.Builder
+
+	Users  *Users
+	Cities *Cities
+}
+
+func NewBuilder(dl dialect.Dialect) *Builder {
+	return &Builder{
+		Builder: goq.NewBuilder(dl),
+
+		Users:  NewUsers(),
+		Cities: NewCities(),
+	}
 }
