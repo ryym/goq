@@ -19,14 +19,14 @@ func CopyTableAs(alias string, src Table, dest Table) {
 		switch f.Type.Name() {
 		case "Column":
 			orig := srcV.Field(i).Interface().(Column)
-			copy := column{
+			copy := (&column{
 				tableAlias: alias,
 				tableName:  orig.TableName(),
 				structName: orig.StructName(),
 				name:       orig.ColumnName(),
 				fieldName:  orig.FieldName(),
-			}.init()
-			destV.Field(i).Set(reflect.ValueOf(&copy))
+			}).init()
+			destV.Field(i).Set(reflect.ValueOf(copy))
 		}
 	}
 }

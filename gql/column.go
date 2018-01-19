@@ -10,14 +10,13 @@ type ColumnMaker struct {
 }
 
 func (m *ColumnMaker) Col(fieldName, name string) *column {
-	col := column{
+	return (&column{
 		tableName:  m.tableName,
 		tableAlias: "",
 		structName: m.structName,
 		name:       name,
 		fieldName:  fieldName,
-	}.init()
-	return &col
+	}).init()
 }
 
 type column struct {
@@ -29,8 +28,8 @@ type column struct {
 	ops
 }
 
-func (c column) init() column {
-	c.ops = ops{&c}
+func (c *column) init() *column {
+	c.ops = ops{c}
 	return c
 }
 
