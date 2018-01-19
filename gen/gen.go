@@ -117,11 +117,17 @@ func GenerateTableHelpers(opts Opts) error {
 }
 
 func listColumnFields(modelT *types.Struct) []*field {
-	// TODO: Support struct embedding.
 	var fields []*field
 	for i := 0; i < modelT.NumFields(); i++ {
 		fld := modelT.Field(i)
-		if fld.Exported() {
+		if !fld.Exported() {
+			continue
+		}
+		if fld.Anonymous() { // Embedded struct
+			if ebdT, ok := fld.Type().Underlying().(*types.Struct); ok {
+				fields = append(fields, listColumnFields(ebdT)...)
+			}
+		} else {
 			fields = append(fields, &field{
 				Name:   fld.Name(),
 				Column: util.FldToCol(fld.Name()),

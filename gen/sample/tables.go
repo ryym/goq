@@ -9,8 +9,12 @@ type Tables struct {
 	cities City
 }
 
+type Common struct {
+	ID int
+}
+
 type City struct {
-	ID           int
+	Common
 	Name         string
 	PrefectureID int
 }
