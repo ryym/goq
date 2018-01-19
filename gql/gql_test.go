@@ -131,6 +131,11 @@ func TestBasicExprs(t *testing.T) {
 				"ORDER BY users.id LIMIT 10 OFFSET 20",
 			args: []interface{}{"bob", 3, "%bob", 100},
 		},
+		{
+			gql:  z.Select(z.Select(z.Var(1)).As("subquery")),
+			sql:  "SELECT (SELECT $1) AS subquery",
+			args: []interface{}{1},
+		},
 	}
 
 	for i, test := range tests {
