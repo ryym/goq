@@ -14,11 +14,11 @@ func Open(driver, source string) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	dl, err := dialect.New(driver)
+	dl := dialect.New(driver)
 
 	// TODO: Use generic dialect.
-	if err != nil {
-		return nil, err
+	if dl == nil {
+		return nil, fmt.Errorf("No dialect found for %s", driver)
 	}
 
 	return &DB{db, dl}, nil

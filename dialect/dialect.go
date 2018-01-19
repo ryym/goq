@@ -7,14 +7,14 @@ type Dialect interface {
 	QuoteIdent(v string) string
 }
 
-func New(driver string) (Dialect, error) {
+func New(driver string) Dialect {
 	switch driver {
 	case "postgres":
-		return &Postgres{}, nil
+		return &Postgres{}
 	case "sqlite3":
-		return &Sqlite{}, nil
+		return &Sqlite{}
 	}
-	return nil, fmt.Errorf("[goq]: %s driver is not supported", driver)
+	return nil
 }
 
 type Postgres struct{}
