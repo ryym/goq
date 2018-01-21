@@ -95,7 +95,7 @@ type QueryTable interface {
 	TableLike
 }
 
-type Table interface {
+type SchemaTable interface {
 	TableLike
 	TableName() string
 	TableAlias() string

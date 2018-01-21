@@ -18,7 +18,7 @@ func (d *testDialect) QuoteIdent(v string) string {
 }
 
 type usersTable struct {
-	TableHelper
+	Table
 	name  string
 	alias string
 	ID    Column
@@ -36,9 +36,9 @@ func TestBasicExprs(t *testing.T) {
 	ID := cm.Col("ID", "id")
 	Name := cm.Col("Name", "name")
 	Users := &usersTable{
-		TableHelper: TableHelper{"users", ""},
-		ID:          ID,
-		Name:        Name,
+		Table: Table{"users", ""},
+		ID:    ID,
+		Name:  Name,
 	}
 
 	var tests = []struct {

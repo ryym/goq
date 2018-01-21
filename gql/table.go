@@ -10,7 +10,7 @@ func AllCols(cols []Column) ExprListExpr {
 	return &exprListExpr{exps}
 }
 
-func CopyTableAs(alias string, src Table, dest Table) {
+func CopyTableAs(alias string, src SchemaTable, dest SchemaTable) {
 	srcV := reflect.ValueOf(src).Elem()
 	srcT := srcV.Type()
 	destV := reflect.ValueOf(dest).Elem()
@@ -31,19 +31,19 @@ func CopyTableAs(alias string, src Table, dest Table) {
 	}
 }
 
-type TableHelper struct {
+type Table struct {
 	name  string
 	alias string
 }
 
-func NewTableHelper(name, alias string) TableHelper {
-	return TableHelper{name, alias}
+func NewTableHelper(name, alias string) Table {
+	return Table{name, alias}
 }
 
-func (t *TableHelper) TableName() string  { return t.name }
-func (t *TableHelper) TableAlias() string { return t.alias }
+func (t *Table) TableName() string  { return t.name }
+func (t *Table) TableAlias() string { return t.alias }
 
-func (t *TableHelper) ApplyTable(q *Query, ctx DBContext) {
+func (t *Table) ApplyTable(q *Query, ctx DBContext) {
 	q.query = append(q.query, ctx.QuoteIdent(t.name))
 	if t.alias != "" {
 		q.query = append(q.query, " AS ", ctx.QuoteIdent(t.alias))

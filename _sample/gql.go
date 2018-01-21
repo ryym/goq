@@ -8,7 +8,7 @@ import (
 )
 
 type Users struct {
-	gql.TableHelper
+	gql.Table
 	model models.User
 
 	ID   gql.Column
@@ -18,8 +18,8 @@ type Users struct {
 func NewUsers() *Users {
 	cm := gql.NewColumnMaker("User", "users")
 	return &Users{
-		TableHelper: gql.NewTableHelper("users", ""),
-		model:       models.User{},
+		Table: gql.NewTableHelper("users", ""),
+		model: models.User{},
 
 		ID:   cm.Col("ID", "id"),
 		Name: cm.Col("Name", "name"),
@@ -32,13 +32,13 @@ func (t *Users) Columns() []gql.Column {
 }
 func (t *Users) As(alias string) *Users {
 	t2 := *t
-	t2.TableHelper = gql.NewTableHelper(t.TableHelper.TableName(), alias)
+	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }
 
 type Cities struct {
-	gql.TableHelper
+	gql.Table
 	model City
 
 	ID           gql.Column
@@ -49,8 +49,8 @@ type Cities struct {
 func NewCities() *Cities {
 	cm := gql.NewColumnMaker("City", "cities")
 	return &Cities{
-		TableHelper: gql.NewTableHelper("cities", ""),
-		model:       City{},
+		Table: gql.NewTableHelper("cities", ""),
+		model: City{},
 
 		ID:           cm.Col("ID", "id"),
 		Name:         cm.Col("Name", "name"),
@@ -64,7 +64,7 @@ func (t *Cities) Columns() []gql.Column {
 }
 func (t *Cities) As(alias string) *Cities {
 	t2 := *t
-	t2.TableHelper = gql.NewTableHelper(t.TableHelper.TableName(), alias)
+	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }

@@ -14,7 +14,7 @@ type user struct {
 }
 
 type Users struct {
-	gql.TableHelper
+	gql.Table
 	ID   gql.Column
 	Name gql.Column
 }
@@ -22,9 +22,9 @@ type Users struct {
 func NewUsers() *Users {
 	cm := gql.NewColumnMaker("user", "users")
 	return &Users{
-		TableHelper: gql.NewTableHelper("users", ""),
-		ID:          cm.Col("ID", "id"),
-		Name:        cm.Col("Name", "name"),
+		Table: gql.NewTableHelper("users", ""),
+		ID:    cm.Col("ID", "id"),
+		Name:  cm.Col("Name", "name"),
 	}
 }
 
