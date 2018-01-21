@@ -45,3 +45,20 @@ func (t *TableHelper) ApplyTable(q *Query, ctx DBContext) {
 		q.query = append(q.query, " AS ", t.alias)
 	}
 }
+
+type DynmTable struct {
+	name  string
+	alias string
+}
+
+func (t *DynmTable) As(alias string) *DynmTable {
+	t.alias = alias
+	return t
+}
+
+func (t *DynmTable) ApplyTable(q *Query, ctx DBContext) {
+	q.query = append(q.query, t.name)
+	if t.alias != "" {
+		q.query = append(q.query, " AS ", t.alias)
+	}
+}

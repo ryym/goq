@@ -44,12 +44,10 @@ func (c *column) Apply(q *Query, ctx DBContext) {
 	if table == "" {
 		table = c.tableName
 	}
-	q.query = append(
-		q.query,
-		ctx.QuoteIdent(table),
-		".",
-		ctx.QuoteIdent(c.name),
-	)
+	if table != "" {
+		q.query = append(q.query, ctx.QuoteIdent(table), ".")
+	}
+	q.query = append(q.query, ctx.QuoteIdent(c.name))
 }
 
 func (c *column) Selection() Selection {

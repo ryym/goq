@@ -151,6 +151,16 @@ func TestBasicExprs(t *testing.T) {
 				"RIGHT OUTER JOIN (SELECT users.id FROM users) AS u ON $3 = $4",
 			args: []interface{}{1, 3, 5, 7},
 		},
+		{
+			gql: z.Select(
+				z.Col("", "id"), z.Col("f", "title"), z.Col("foo", "body").As("content"),
+				z.Col("", "count").Add(3),
+			).From(
+				z.Table("foo").As("f"),
+			),
+			sql:  "SELECT id, f.title, foo.body AS content, count + $1 FROM foo AS f",
+			args: []interface{}{3},
+		},
 	}
 
 	for i, test := range tests {

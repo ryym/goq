@@ -28,6 +28,20 @@ func (b *Builder) Parens(exp Expr) AnonExpr {
 	return (&parensExpr{exp: exp}).init()
 }
 
+func (b *Builder) Col(table, col string) Column {
+	return (&column{
+		tableName:  "",
+		tableAlias: table,
+		structName: "",
+		name:       col,
+		fieldName:  "",
+	}).init()
+}
+
+func (b *Builder) Table(name string) *DynmTable {
+	return &DynmTable{name, ""}
+}
+
 func (b *Builder) And(preds ...PredExpr) PredExpr {
 	return (&logicalOp{op: "AND", preds: preds}).init()
 }
