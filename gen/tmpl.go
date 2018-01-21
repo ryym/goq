@@ -73,9 +73,8 @@ func writeImports(buf io.Writer, pkgs map[string]bool) {
 
 const tableTmpl = `
 type {{.Name}} struct {
+	gql.TableHelper
 	model {{.ModelFullName}}
-	name  string
-	alias string
 	{{range .Fields}}
 	{{.Name}} gql.Column{{end}}
 }
@@ -83,22 +82,20 @@ type {{.Name}} struct {
 func New{{.Name}}() *{{.Name}} {
 	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}")
 	return &{{.Name}}{
+		TableHelper: gql.NewTableHelper("{{.TableName}}", ""),
 		model: {{.ModelFullName}}{},
-		name:  "{{.TableName}}",
 		{{range .Fields}}
 		{{.Name}}: cm.Col("{{.Name}}", "{{.Column}}"),{{end}}
 	}
 }
 
-func (t *{{.Name}}) TableName() string     { return t.name }
-func (t *{{.Name}}) TableAlias() string    { return t.alias }
 func (t *{{.Name}}) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
 func (t *{{.Name}}) Columns() []gql.Column {
 	return []gql.Column{ {{.JoinFields "t"}} }
 }
 func (t *{{.Name}}) As(alias string) *{{.Name}} {
 	t2 := *t
-	t2.alias = alias
+	t2.TableHelper = gql.NewTableHelper(t.TableHelper.TableName(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }

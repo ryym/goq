@@ -2,48 +2,44 @@ package sample
 
 import (
 	"github.com/ryym/goq"
+	"github.com/ryym/goq/_sample/models"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/gen/sample/models"
 	"github.com/ryym/goq/gql"
 )
 
 type Users struct {
+	gql.TableHelper
 	model models.User
-	name  string
-	alias string
 
 	ID   gql.Column
 	Name gql.Column
 }
 
 func NewUsers() *Users {
-	cm := gql.NewColumnMaker("users", "User")
+	cm := gql.NewColumnMaker("User", "users")
 	return &Users{
-		model: models.User{},
-		name:  "users",
+		TableHelper: gql.NewTableHelper("users", ""),
+		model:       models.User{},
 
 		ID:   cm.Col("ID", "id"),
 		Name: cm.Col("Name", "name"),
 	}
 }
 
-func (t *Users) TableName() string     { return t.name }
-func (t *Users) TableAlias() string    { return t.alias }
 func (t *Users) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
 func (t *Users) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name}
 }
 func (t *Users) As(alias string) *Users {
 	t2 := *t
-	t2.alias = alias
+	t2.TableHelper = gql.NewTableHelper(t.TableHelper.TableName(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }
 
 type Cities struct {
+	gql.TableHelper
 	model City
-	name  string
-	alias string
 
 	ID           gql.Column
 	Name         gql.Column
@@ -51,10 +47,10 @@ type Cities struct {
 }
 
 func NewCities() *Cities {
-	cm := gql.NewColumnMaker("cities", "City")
+	cm := gql.NewColumnMaker("City", "cities")
 	return &Cities{
-		model: City{},
-		name:  "cities",
+		TableHelper: gql.NewTableHelper("cities", ""),
+		model:       City{},
 
 		ID:           cm.Col("ID", "id"),
 		Name:         cm.Col("Name", "name"),
@@ -62,15 +58,13 @@ func NewCities() *Cities {
 	}
 }
 
-func (t *Cities) TableName() string     { return t.name }
-func (t *Cities) TableAlias() string    { return t.alias }
 func (t *Cities) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
 func (t *Cities) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name, t.PrefectureID}
 }
 func (t *Cities) As(alias string) *Cities {
 	t2 := *t
-	t2.alias = alias
+	t2.TableHelper = gql.NewTableHelper(t.TableHelper.TableName(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }

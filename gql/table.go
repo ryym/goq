@@ -36,6 +36,10 @@ type TableHelper struct {
 	alias string
 }
 
+func NewTableHelper(name, alias string) TableHelper {
+	return TableHelper{name, alias}
+}
+
 func (t *TableHelper) TableName() string  { return t.name }
 func (t *TableHelper) TableAlias() string { return t.alias }
 

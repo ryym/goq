@@ -1,6 +1,6 @@
 package sample
 
-import "github.com/ryym/goq/gen/sample/models"
+import "github.com/ryym/goq/_sample/models"
 
 //go:generate go run "../cmd/goq/goq.go"
 
