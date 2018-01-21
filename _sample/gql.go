@@ -2,14 +2,14 @@ package main
 
 import (
 	"github.com/ryym/goq"
-	"github.com/ryym/goq/_sample/models"
+	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gql"
 )
 
 type Users struct {
 	gql.Table
-	model models.User
+	*cllct.ModelCollectorMaker
 
 	ID   gql.Column
 	Name gql.Column
@@ -17,13 +17,14 @@ type Users struct {
 
 func NewUsers() *Users {
 	cm := gql.NewColumnMaker("User", "users")
-	return &Users{
+	t := &Users{
 		Table: gql.NewTableHelper("users", ""),
-		model: models.User{},
 
 		ID:   cm.Col("ID", "id"),
 		Name: cm.Col("Name", "name"),
 	}
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), "")
+	return t
 }
 
 func (t *Users) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
@@ -33,13 +34,14 @@ func (t *Users) Columns() []gql.Column {
 func (t *Users) As(alias string) *Users {
 	t2 := *t
 	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
+	t2.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }
 
 type Cities struct {
 	gql.Table
-	model City
+	*cllct.ModelCollectorMaker
 
 	ID           gql.Column
 	Name         gql.Column
@@ -48,14 +50,15 @@ type Cities struct {
 
 func NewCities() *Cities {
 	cm := gql.NewColumnMaker("City", "cities")
-	return &Cities{
+	t := &Cities{
 		Table: gql.NewTableHelper("cities", ""),
-		model: City{},
 
 		ID:           cm.Col("ID", "id"),
 		Name:         cm.Col("Name", "name"),
 		PrefectureID: cm.Col("PrefectureID", "prefecture_id"),
 	}
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), "")
+	return t
 }
 
 func (t *Cities) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
@@ -65,6 +68,7 @@ func (t *Cities) Columns() []gql.Column {
 func (t *Cities) As(alias string) *Cities {
 	t2 := *t
 	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
+	t2.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }

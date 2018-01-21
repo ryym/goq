@@ -70,7 +70,6 @@ func GenerateTableHelpers(opts Opts) error {
 	}
 
 	helpers := make([]*helper, tablesT.NumFields())
-	modelPkgs := map[string]bool{}
 
 	for i := 0; i < tablesT.NumFields(); i++ {
 		fld := tablesT.Field(i)
@@ -89,7 +88,6 @@ func GenerateTableHelpers(opts Opts) error {
 		modelPkg := fldVar.Obj().Pkg()
 		if modelPkg.Name() != tablesPkg.Name() {
 			modelPkgName = modelPkg.Name()
-			modelPkgs[modelPkg.Path()] = true
 		}
 
 		helpers[i] = &helper{
@@ -108,7 +106,7 @@ func GenerateTableHelpers(opts Opts) error {
 	}
 	defer file.Close() // TODO: Remove file on error
 
-	err = writeTemplate(file, tablesPkg.Name(), helpers, modelPkgs)
+	err = writeTemplate(file, tablesPkg.Name(), helpers, nil)
 	if err != nil {
 		return err
 	}

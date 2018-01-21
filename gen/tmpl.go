@@ -57,6 +57,7 @@ func writeImports(buf io.Writer, pkgs map[string]bool) {
 
 	paths := []string{
 		"github.com/ryym/goq",
+		"github.com/ryym/goq/cllct",
 		"github.com/ryym/goq/dialect",
 		"github.com/ryym/goq/gql",
 	}
@@ -74,19 +75,20 @@ func writeImports(buf io.Writer, pkgs map[string]bool) {
 const tableTmpl = `
 type {{.Name}} struct {
 	gql.Table
-	model {{.ModelFullName}}
+	*cllct.ModelCollectorMaker
 	{{range .Fields}}
 	{{.Name}} gql.Column{{end}}
 }
 
 func New{{.Name}}() *{{.Name}} {
 	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}")
-	return &{{.Name}}{
+	t := &{{.Name}}{
 		Table: gql.NewTableHelper("{{.TableName}}", ""),
-		model: {{.ModelFullName}}{},
 		{{range .Fields}}
 		{{.Name}}: cm.Col("{{.Name}}", "{{.Column}}"),{{end}}
 	}
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), "")
+	return t
 }
 
 func (t *{{.Name}}) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
@@ -96,6 +98,7 @@ func (t *{{.Name}}) Columns() []gql.Column {
 func (t *{{.Name}}) As(alias string) *{{.Name}} {
 	t2 := *t
 	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
+	t2.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	gql.CopyTableAs(alias, t, &t2)
 	return &t2
 }
