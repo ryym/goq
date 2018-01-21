@@ -25,18 +25,9 @@ func (t *Table) ApplyTable(q *Query, ctx DBContext) {
 }
 
 type DynmTable struct {
-	name  string
-	alias string
+	Table
 }
 
 func (t *DynmTable) As(alias string) *DynmTable {
-	t.alias = alias
-	return t
-}
-
-func (t *DynmTable) ApplyTable(q *Query, ctx DBContext) {
-	q.query = append(q.query, ctx.QuoteIdent(t.name))
-	if t.alias != "" {
-		q.query = append(q.query, " AS ", ctx.QuoteIdent(t.alias))
-	}
+	return &DynmTable{NewTable(t.name, alias)}
 }

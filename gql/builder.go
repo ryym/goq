@@ -39,7 +39,7 @@ func (b *Builder) Col(table, col string) Column {
 }
 
 func (b *Builder) Table(name string) *DynmTable {
-	return &DynmTable{name, ""}
+	return &DynmTable{NewTable(name, "")}
 }
 
 func (b *Builder) And(preds ...PredExpr) PredExpr {
