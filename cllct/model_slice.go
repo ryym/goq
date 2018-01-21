@@ -29,6 +29,7 @@ func (cl *ModelSliceCollector) Init(selects []gql.Selection, _names []string) bo
 			}
 		}
 	}
+	cl.elemType = cl.slice.Type().Elem()
 	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
 	return len(cl.colToFld) > 0
 }

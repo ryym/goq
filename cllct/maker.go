@@ -20,15 +20,13 @@ func (cm *CollectorMaker) ToRowMap(mp *map[string]interface{}) *RowMapCollector 
 	return &RowMapCollector{mp: mp}
 }
 
-func NewModelCollectorMaker(
-	model interface{},
-	cols []gql.Column,
-	alias string,
-) *ModelCollectorMaker {
-	elemType := reflect.TypeOf(model)
+func NewModelCollectorMaker(cols []gql.Column, alias string) *ModelCollectorMaker {
+	var structName string
+	if len(cols) > 0 {
+		structName = cols[0].StructName()
+	}
 	return &ModelCollectorMaker{
-		elemType:   elemType,
-		structName: elemType.Name(),
+		structName: structName,
 		tableAlias: alias,
 		cols:       cols,
 	}

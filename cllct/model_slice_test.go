@@ -40,7 +40,7 @@ func sel(alias, strct, field string) gql.Selection {
 // selected column orders and their aliases.
 func TestModelSliceCollector(t *testing.T) {
 	users := NewUsers()
-	maker := NewModelCollectorMaker(user{}, users.Columns(), "")
+	maker := NewModelCollectorMaker(users.Columns(), "")
 
 	var got []user
 	cl := maker.ToSlice(&got)
