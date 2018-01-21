@@ -33,6 +33,32 @@ func (t *Users) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name}
 }
 
+type Prefectures struct {
+	gql.Table
+	*cllct.ModelCollectorMaker
+
+	ID   gql.Column
+	Name gql.Column
+}
+
+func NewPrefectures(alias string) *Prefectures {
+	cm := gql.NewColumnMaker("Prefecture", "prefectures").As(alias)
+	t := &Prefectures{
+		Table: gql.NewTable("prefectures", alias),
+
+		ID:   cm.Col("ID", "id"),
+		Name: cm.Col("Name", "name"),
+	}
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
+	return t
+}
+
+func (t *Prefectures) As(alias string) *Prefectures { return NewPrefectures(alias) }
+func (t *Prefectures) All() gql.ExprListExpr        { return gql.AllCols(t.Columns()) }
+func (t *Prefectures) Columns() []gql.Column {
+	return []gql.Column{t.ID, t.Name}
+}
+
 type Cities struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
@@ -64,15 +90,17 @@ func (t *Cities) Columns() []gql.Column {
 type Builder struct {
 	*goq.Builder
 
-	Users  *Users
-	Cities *Cities
+	Users       *Users
+	Prefectures *Prefectures
+	Cities      *Cities
 }
 
 func NewBuilder(dl dialect.Dialect) *Builder {
 	return &Builder{
 		Builder: goq.NewBuilder(dl),
 
-		Users:  NewUsers(""),
-		Cities: NewCities(""),
+		Users:       NewUsers(""),
+		Prefectures: NewPrefectures(""),
+		Cities:      NewCities(""),
 	}
 }
