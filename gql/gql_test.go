@@ -32,7 +32,7 @@ func (t *usersTable) As(alias string) *usersTable { return t /* FOR NOW */ }
 
 func TestBasicExprs(t *testing.T) {
 	z := NewBuilder(&testDialect{})
-	cm := NewColumnMaker("users", "User")
+	cm := NewColumnMaker("User", "users")
 	ID := cm.Col("ID", "id")
 	Name := cm.Col("Name", "name")
 	Users := &usersTable{

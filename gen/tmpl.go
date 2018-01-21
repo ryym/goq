@@ -81,7 +81,7 @@ type {{.Name}} struct {
 }
 
 func New{{.Name}}() *{{.Name}} {
-	cm := gql.NewColumnMaker("{{.TableName}}", "{{.ModelName}}")
+	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}")
 	return &{{.Name}}{
 		model: {{.ModelFullName}}{},
 		name:  "{{.TableName}}",

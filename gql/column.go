@@ -1,12 +1,12 @@
 package gql
 
-func NewColumnMaker(tableName, structName string) ColumnMaker {
-	return ColumnMaker{tableName, structName}
+func NewColumnMaker(structName, tableName string) ColumnMaker {
+	return ColumnMaker{structName, tableName}
 }
 
 type ColumnMaker struct {
-	tableName  string
 	structName string
+	tableName  string
 }
 
 func (m *ColumnMaker) Col(fieldName, name string) *column {
