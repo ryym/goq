@@ -97,8 +97,6 @@ type QueryTable interface {
 
 type SchemaTable interface {
 	TableLike
-	TableName() string
-	TableAlias() string
 	All() ExprListExpr
 	Columns() []Column
 }

@@ -17,9 +17,6 @@ func NewTable(name, alias string) Table {
 	return Table{name, alias}
 }
 
-func (t *Table) TableName() string  { return t.name }
-func (t *Table) TableAlias() string { return t.alias }
-
 func (t *Table) ApplyTable(q *Query, ctx DBContext) {
 	q.query = append(q.query, ctx.QuoteIdent(t.name))
 	if t.alias != "" {
