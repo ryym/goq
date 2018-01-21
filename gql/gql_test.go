@@ -14,7 +14,7 @@ func (d *testDialect) Placeholder(prevArgs []interface{}) string {
 }
 
 func (d *testDialect) QuoteIdent(v string) string {
-	return v
+	return fmt.Sprintf("`%s`", v)
 }
 
 type usersTable struct {
@@ -53,7 +53,7 @@ func TestBasicExprs(t *testing.T) {
 		},
 		{
 			gql:  z.Var(1).As("one"),
-			sql:  "$1 AS one",
+			sql:  "$1 AS `one`",
 			args: []interface{}{1},
 		},
 		{
@@ -63,22 +63,22 @@ func TestBasicExprs(t *testing.T) {
 		},
 		{
 			gql:  z.Var(1).Eq(2).As("t"),
-			sql:  "$1 = $2 AS t",
+			sql:  "$1 = $2 AS `t`",
 			args: []interface{}{1, 2},
 		},
 		{
 			gql:  ID.Between(0, 5),
-			sql:  "users.id BETWEEN $1 AND $2",
+			sql:  "`users`.`id` BETWEEN $1 AND $2",
 			args: []interface{}{0, 5},
 		},
 		{
 			gql:  z.Parens(ID.Add(4).Sbt(3)).Mlt(2).Dvd(1),
-			sql:  "(users.id + $1 - $2) * $3 / $4",
+			sql:  "(`users`.`id` + $1 - $2) * $3 / $4",
 			args: []interface{}{4, 3, 2, 1},
 		},
 		{
 			gql:  Name.Concat("a").Concat(Name),
-			sql:  "users.name || $1 || users.name",
+			sql:  "`users`.`name` || $1 || `users`.`name`",
 			args: []interface{}{"a"},
 		},
 		{
@@ -87,17 +87,17 @@ func TestBasicExprs(t *testing.T) {
 				z.Or(ID.Lte(3), z.Var(1).Gt(ID)),
 				Name.IsNotNull(),
 			),
-			sql:  "(users.id = $1 AND (users.id <= $2 OR $3 > users.id) AND users.name IS NOT NULL)",
+			sql:  "(`users`.`id` = $1 AND (`users`.`id` <= $2 OR $3 > `users`.`id`) AND `users`.`name` IS NOT NULL)",
 			args: []interface{}{1, 3, 1},
 		},
 		{
 			gql:  z.Func("foo", 1, ID, 2).Add(3),
-			sql:  "foo($1, users.id, $2) + $3",
+			sql:  "foo($1, `users`.`id`, $2) + $3",
 			args: []interface{}{1, 2, 3},
 		},
 		{
 			gql:  z.Coalesce(Name, z.Var(20)),
-			sql:  "COALESCE(users.name, $1)",
+			sql:  "COALESCE(`users`.`name`, $1)",
 			args: []interface{}{20},
 		},
 		{
@@ -105,13 +105,13 @@ func TestBasicExprs(t *testing.T) {
 				z.When(ID.Eq(1)).Then(-1),
 				z.When(ID.Eq(2)).Then(-3),
 			).Else(0).Add(1),
-			sql: "CASE WHEN users.id = $1 THEN $2 WHEN users.id = $3 THEN $4" +
+			sql: "CASE WHEN `users`.`id` = $1 THEN $2 WHEN `users`.`id` = $3 THEN $4" +
 				" ELSE $5 END + $6",
 			args: []interface{}{1, -1, 2, -3, 0, 1},
 		},
 		{
 			gql:  z.Select(ID, Name, z.Var(1).Add(ID).As("test")),
-			sql:  "SELECT users.id, users.name, $1 + users.id AS test",
+			sql:  "SELECT `users`.`id`, `users`.`name`, $1 + `users`.`id` AS `test`",
 			args: []interface{}{1},
 		},
 		{
@@ -126,17 +126,17 @@ func TestBasicExprs(t *testing.T) {
 			).Having(
 				z.Count(ID).Lt(100),
 			).OrderBy(ID).Limit(10).Offset(20),
-			sql: "SELECT users.id, users.name FROM users " +
-				"LEFT OUTER JOIN users ON users.name = $1 " +
-				"WHERE (users.id >= $2 AND users.name LIKE $3) " +
-				"GROUP BY users.id, users.name " +
-				"HAVING (COUNT(users.id) < $4) " +
-				"ORDER BY users.id LIMIT 10 OFFSET 20",
+			sql: "SELECT `users`.`id`, `users`.`name` FROM `users` " +
+				"LEFT OUTER JOIN `users` ON `users`.`name` = $1 " +
+				"WHERE (`users`.`id` >= $2 AND `users`.`name` LIKE $3) " +
+				"GROUP BY `users`.`id`, `users`.`name` " +
+				"HAVING (COUNT(`users`.`id`) < $4) " +
+				"ORDER BY `users`.`id` LIMIT 10 OFFSET 20",
 			args: []interface{}{"bob", 3, "%bob", 100},
 		},
 		{
 			gql:  z.Select(z.Select(z.Var(1)).As("subquery")),
-			sql:  "SELECT (SELECT $1) AS subquery",
+			sql:  "SELECT (SELECT $1) AS `subquery`",
 			args: []interface{}{1},
 		},
 		{
@@ -147,8 +147,8 @@ func TestBasicExprs(t *testing.T) {
 					z.Var(5).Eq(7),
 				),
 			),
-			sql: "SELECT $1 FROM (SELECT $2) AS subquery " +
-				"RIGHT OUTER JOIN (SELECT users.id FROM users) AS u ON $3 = $4",
+			sql: "SELECT $1 FROM (SELECT $2) AS `subquery` " +
+				"RIGHT OUTER JOIN (SELECT `users`.`id` FROM `users`) AS `u` ON $3 = $4",
 			args: []interface{}{1, 3, 5, 7},
 		},
 		{
@@ -158,7 +158,7 @@ func TestBasicExprs(t *testing.T) {
 			).From(
 				z.Table("foo").As("f"),
 			),
-			sql:  "SELECT id, f.title, foo.body AS content, count + $1 FROM foo AS f",
+			sql:  "SELECT `id`, `f`.`title`, `foo`.`body` AS `content`, `count` + $1 FROM `foo` AS `f`",
 			args: []interface{}{3},
 		},
 	}

@@ -44,9 +44,9 @@ func (t *TableHelper) TableName() string  { return t.name }
 func (t *TableHelper) TableAlias() string { return t.alias }
 
 func (t *TableHelper) ApplyTable(q *Query, ctx DBContext) {
-	q.query = append(q.query, t.name)
+	q.query = append(q.query, ctx.QuoteIdent(t.name))
 	if t.alias != "" {
-		q.query = append(q.query, " AS ", t.alias)
+		q.query = append(q.query, " AS ", ctx.QuoteIdent(t.alias))
 	}
 }
 
@@ -61,8 +61,8 @@ func (t *DynmTable) As(alias string) *DynmTable {
 }
 
 func (t *DynmTable) ApplyTable(q *Query, ctx DBContext) {
-	q.query = append(q.query, t.name)
+	q.query = append(q.query, ctx.QuoteIdent(t.name))
 	if t.alias != "" {
-		q.query = append(q.query, " AS ", t.alias)
+		q.query = append(q.query, " AS ", ctx.QuoteIdent(t.alias))
 	}
 }

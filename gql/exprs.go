@@ -9,7 +9,7 @@ func (a *aliased) Alias() string { return a.alias }
 
 func (a *aliased) Apply(q *Query, ctx DBContext) {
 	a.exp.Apply(q, ctx)
-	q.query = append(q.query, " AS ", a.alias)
+	q.query = append(q.query, " AS ", ctx.QuoteIdent(a.alias))
 }
 
 func (a *aliased) Selection() Selection { return Selection{} }
