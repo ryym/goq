@@ -9,17 +9,29 @@ const (
 
 type JoinType string
 
+type JoinDefiner interface {
+	joinDef() *JoinDef
+}
+
+type JoinDef struct {
+	Table TableLike
+	On    PredExpr
+	Type  JoinType
+}
+
 type JoinClause struct {
 	joinType JoinType
 	table    TableLike
 }
 
-func (jc *JoinClause) On(pred PredExpr) JoinOn {
-	return JoinOn{jc.table, pred, jc.joinType}
+func (jc *JoinClause) On(pred PredExpr) *JoinOn {
+	return &JoinOn{&JoinDef{jc.table, pred, jc.joinType}}
 }
 
 type JoinOn struct {
-	Table TableLike
-	On    PredExpr
-	Type  JoinType
+	def *JoinDef
+}
+
+func (jo *JoinOn) joinDef() *JoinDef {
+	return jo.def
 }

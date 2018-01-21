@@ -127,7 +127,7 @@ type SelectClause interface {
 
 type Clauses interface {
 	QueryExpr
-	Joins(joins ...JoinOn) Clauses
+	Joins(joins ...JoinDefiner) Clauses
 	Where(preds ...PredExpr) Clauses
 	GroupBy(exps ...Expr) GroupByClause
 }

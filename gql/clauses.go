@@ -8,7 +8,7 @@ import (
 type queryExpr struct {
 	exps    []Querier
 	froms   []TableLike
-	joins   []JoinOn
+	joins   []*JoinDef
 	wheres  []PredExpr
 	groups  []Expr
 	havings []PredExpr
@@ -126,8 +126,10 @@ func (qe *queryExpr) From(table TableLike, tables ...TableLike) Clauses {
 	return qe
 }
 
-func (qe *queryExpr) Joins(joins ...JoinOn) Clauses {
-	qe.joins = append(qe.joins, joins...)
+func (qe *queryExpr) Joins(definers ...JoinDefiner) Clauses {
+	for _, def := range definers {
+		qe.joins = append(qe.joins, def.joinDef())
+	}
 	return qe
 }
 
