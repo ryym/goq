@@ -1,18 +1,24 @@
 package gql
 
-func NewColumnMaker(structName, tableName string) ColumnMaker {
-	return ColumnMaker{structName, tableName}
-}
-
 type ColumnMaker struct {
 	structName string
 	tableName  string
+	tableAlias string
+}
+
+func NewColumnMaker(structName, tableName string) *ColumnMaker {
+	return &ColumnMaker{structName: structName, tableName: tableName}
+}
+
+func (m *ColumnMaker) As(alias string) *ColumnMaker {
+	m.tableAlias = alias
+	return m
 }
 
 func (m *ColumnMaker) Col(fieldName, name string) *column {
 	return (&column{
 		tableName:  m.tableName,
-		tableAlias: "",
+		tableAlias: m.tableAlias,
 		structName: m.structName,
 		name:       name,
 		fieldName:  fieldName,

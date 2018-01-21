@@ -80,27 +80,21 @@ type {{.Name}} struct {
 	{{.Name}} gql.Column{{end}}
 }
 
-func New{{.Name}}() *{{.Name}} {
-	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}")
+func New{{.Name}}(alias string) *{{.Name}} {
+	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias)
 	t := &{{.Name}}{
-		Table: gql.NewTableHelper("{{.TableName}}", ""),
+		Table: gql.NewTableHelper("{{.TableName}}", alias),
 		{{range .Fields}}
 		{{.Name}}: cm.Col("{{.Name}}", "{{.Column}}"),{{end}}
 	}
-	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), "")
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
 }
 
-func (t *{{.Name}}) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
+func (t *{{.Name}}) As(alias string) *{{.Name}} { return New{{.Name}}(alias) }
+func (t *{{.Name}}) All() gql.ExprListExpr      { return gql.AllCols(t.Columns()) }
 func (t *{{.Name}}) Columns() []gql.Column {
 	return []gql.Column{ {{.JoinFields "t"}} }
-}
-func (t *{{.Name}}) As(alias string) *{{.Name}} {
-	t2 := *t
-	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
-	t2.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
-	gql.CopyTableAs(alias, t, &t2)
-	return &t2
 }
 `
 
@@ -117,6 +111,6 @@ func NewBuilder(dl dialect.Dialect) *Builder {
 	return &Builder{
 		Builder: goq.NewBuilder(dl),
 		{{range .}}
-		{{.Name}}: New{{.Name}}(),{{end}}
+		{{.Name}}: New{{.Name}}(""),{{end}}
 	}
 }`

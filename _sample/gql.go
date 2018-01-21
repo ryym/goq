@@ -15,28 +15,22 @@ type Users struct {
 	Name gql.Column
 }
 
-func NewUsers() *Users {
-	cm := gql.NewColumnMaker("User", "users")
+func NewUsers(alias string) *Users {
+	cm := gql.NewColumnMaker("User", "users").As(alias)
 	t := &Users{
-		Table: gql.NewTableHelper("users", ""),
+		Table: gql.NewTableHelper("users", alias),
 
 		ID:   cm.Col("ID", "id"),
 		Name: cm.Col("Name", "name"),
 	}
-	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), "")
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
 }
 
-func (t *Users) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
+func (t *Users) As(alias string) *Users { return NewUsers(alias) }
+func (t *Users) All() gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
 func (t *Users) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name}
-}
-func (t *Users) As(alias string) *Users {
-	t2 := *t
-	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
-	t2.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
-	gql.CopyTableAs(alias, t, &t2)
-	return &t2
 }
 
 type Cities struct {
@@ -48,29 +42,23 @@ type Cities struct {
 	PrefectureID gql.Column
 }
 
-func NewCities() *Cities {
-	cm := gql.NewColumnMaker("City", "cities")
+func NewCities(alias string) *Cities {
+	cm := gql.NewColumnMaker("City", "cities").As(alias)
 	t := &Cities{
-		Table: gql.NewTableHelper("cities", ""),
+		Table: gql.NewTableHelper("cities", alias),
 
 		ID:           cm.Col("ID", "id"),
 		Name:         cm.Col("Name", "name"),
 		PrefectureID: cm.Col("PrefectureID", "prefecture_id"),
 	}
-	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), "")
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
 }
 
-func (t *Cities) All() gql.ExprListExpr { return gql.AllCols(t.Columns()) }
+func (t *Cities) As(alias string) *Cities { return NewCities(alias) }
+func (t *Cities) All() gql.ExprListExpr   { return gql.AllCols(t.Columns()) }
 func (t *Cities) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name, t.PrefectureID}
-}
-func (t *Cities) As(alias string) *Cities {
-	t2 := *t
-	t2.Table = gql.NewTableHelper(t.Table.TableName(), alias)
-	t2.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
-	gql.CopyTableAs(alias, t, &t2)
-	return &t2
 }
 
 type Builder struct {
@@ -84,7 +72,7 @@ func NewBuilder(dl dialect.Dialect) *Builder {
 	return &Builder{
 		Builder: goq.NewBuilder(dl),
 
-		Users:  NewUsers(),
-		Cities: NewCities(),
+		Users:  NewUsers(""),
+		Cities: NewCities(""),
 	}
 }
