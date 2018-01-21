@@ -126,13 +126,6 @@ func (qe *queryExpr) Selections() []Selection {
 	return items
 }
 
-func (qe *queryExpr) As(alias string) Aliased {
-	return &aliased{
-		(&parensExpr{exp: qe}).init(),
-		alias,
-	}
-}
-
 func (qe *queryExpr) From(table Table, tables ...Table) Clauses {
 	qe.froms = append(qe.froms, table)
 	qe.froms = append(qe.froms, tables...)
@@ -172,4 +165,19 @@ func (qe *queryExpr) Limit(n int) QueryExpr {
 func (qe *queryExpr) Offset(n int) QueryExpr {
 	qe.offset = n
 	return qe
+}
+
+func (qe *queryExpr) As(alias string) QueryTable {
+	return &aliasedQuery{aliased{
+		(&parensExpr{exp: qe}).init(),
+		alias,
+	}}
+}
+
+type aliasedQuery struct {
+	aliased
+}
+
+func (aq *aliasedQuery) ApplyTable(q *Query, ctx DBContext) {
+	aq.aliased.Apply(q, ctx)
 }

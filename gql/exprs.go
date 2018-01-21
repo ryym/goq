@@ -33,7 +33,7 @@ func (l *litExpr) Apply(q *Query, ctx DBContext) {
 func (l *litExpr) Selection() Selection { return Selection{} }
 
 type predExpr struct {
-	Expr
+	AnonExpr
 }
 
 func (p *predExpr) ImplPredExpr() {}

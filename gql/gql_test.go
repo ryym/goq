@@ -18,16 +18,15 @@ func (d *testDialect) QuoteIdent(v string) string {
 }
 
 type usersTable struct {
+	TableHelper
 	name  string
 	alias string
 	ID    Column
 	Name  Column
 }
 
-func (t *usersTable) TableName() string  { return t.name }
-func (t *usersTable) TableAlias() string { return t.alias }
-func (t *usersTable) All() ExprListExpr  { return AllCols(t.Columns()) }
-func (t *usersTable) Columns() []Column  { return []Column{t.ID, t.Name} }
+func (t *usersTable) All() ExprListExpr { return AllCols(t.Columns()) }
+func (t *usersTable) Columns() []Column { return []Column{t.ID, t.Name} }
 
 func (t *usersTable) As(alias string) *usersTable { return t /* FOR NOW */ }
 
@@ -37,10 +36,9 @@ func TestBasicExprs(t *testing.T) {
 	ID := cm.Col("ID", "id")
 	Name := cm.Col("Name", "name")
 	Users := &usersTable{
-		name:  "users",
-		alias: "",
-		ID:    ID,
-		Name:  Name,
+		TableHelper: TableHelper{"users", ""},
+		ID:          ID,
+		Name:        Name,
 	}
 
 	var tests = []struct {
@@ -61,6 +59,11 @@ func TestBasicExprs(t *testing.T) {
 		{
 			gql:  z.Var(1).Eq(2),
 			sql:  "$1 = $2",
+			args: []interface{}{1, 2},
+		},
+		{
+			gql:  z.Var(1).Eq(2).As("t"),
+			sql:  "$1 = $2 AS t",
 			args: []interface{}{1, 2},
 		},
 		{

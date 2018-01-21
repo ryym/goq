@@ -94,7 +94,7 @@ func (o *ops) IsNotNull() PredExpr {
 	})}
 }
 
-func (o *ops) Add(v interface{}) Expr {
+func (o *ops) Add(v interface{}) AnonExpr {
 	return (&infixOp{
 		left:  o.expr,
 		right: lift(v),
@@ -102,7 +102,7 @@ func (o *ops) Add(v interface{}) Expr {
 	}).init()
 }
 
-func (o *ops) Sbt(v interface{}) Expr {
+func (o *ops) Sbt(v interface{}) AnonExpr {
 	return (&infixOp{
 		left:  o.expr,
 		right: lift(v),
@@ -110,7 +110,7 @@ func (o *ops) Sbt(v interface{}) Expr {
 	}).init()
 }
 
-func (o *ops) Mlt(v interface{}) Expr {
+func (o *ops) Mlt(v interface{}) AnonExpr {
 	return (&infixOp{
 		left:  o.expr,
 		right: lift(v),
@@ -118,7 +118,7 @@ func (o *ops) Mlt(v interface{}) Expr {
 	}).init()
 }
 
-func (o *ops) Dvd(v interface{}) Expr {
+func (o *ops) Dvd(v interface{}) AnonExpr {
 	return (&infixOp{
 		left:  o.expr,
 		right: lift(v),
@@ -126,7 +126,7 @@ func (o *ops) Dvd(v interface{}) Expr {
 	}).init()
 }
 
-func (o *ops) Concat(v interface{}) Expr {
+func (o *ops) Concat(v interface{}) AnonExpr {
 	return (&infixOp{
 		left:  o.expr,
 		right: lift(v),

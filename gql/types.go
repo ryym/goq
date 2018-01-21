@@ -48,7 +48,6 @@ type Aliased interface {
 
 type Expr interface {
 	Querier
-	As(alias string) Aliased
 
 	Eq(v interface{}) PredExpr
 	Neq(v interface{}) PredExpr
@@ -63,16 +62,22 @@ type Expr interface {
 
 	In(vals ...interface{}) PredExpr
 
-	Add(v interface{}) Expr
-	Sbt(v interface{}) Expr
-	Mlt(v interface{}) Expr
-	Dvd(v interface{}) Expr
-	Concat(s interface{}) Expr
+	Add(v interface{}) AnonExpr
+	Sbt(v interface{}) AnonExpr
+	Mlt(v interface{}) AnonExpr
+	Dvd(v interface{}) AnonExpr
+	Concat(s interface{}) AnonExpr
+}
+
+// AnonExpr represents an anonymous (not aliased) expression.
+type AnonExpr interface {
+	Expr
+	As(alias string) Aliased
 }
 
 // PredExpr represents this expression is a predicate.
 type PredExpr interface {
-	Expr
+	AnonExpr
 	ImplPredExpr()
 }
 
@@ -81,7 +86,17 @@ type ExprListExpr interface {
 	Exprs() []Expr
 }
 
+type TableLike interface {
+	ApplyTable(q *Query, ctx DBContext)
+}
+
+type QueryTable interface {
+	Querier
+	TableLike
+}
+
 type Table interface {
+	TableLike
 	TableName() string
 	TableAlias() string
 	All() ExprListExpr
@@ -89,7 +104,7 @@ type Table interface {
 }
 
 type Column interface {
-	Expr
+	AnonExpr
 	TableName() string
 	TableAlias() string
 	StructName() string
@@ -99,6 +114,7 @@ type Column interface {
 
 type QueryExpr interface {
 	Expr
+	As(alias string) QueryTable
 	Selections() []Selection
 	Construct() Query
 	OrderBy(exps ...Expr) QueryExpr

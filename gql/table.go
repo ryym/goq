@@ -30,3 +30,18 @@ func CopyTableAs(alias string, src Table, dest Table) {
 		}
 	}
 }
+
+type TableHelper struct {
+	name  string
+	alias string
+}
+
+func (t *TableHelper) TableName() string  { return t.name }
+func (t *TableHelper) TableAlias() string { return t.alias }
+
+func (t *TableHelper) ApplyTable(q *Query, ctx DBContext) {
+	q.query = append(q.query, t.name)
+	if t.alias != "" {
+		q.query = append(q.query, " AS ", t.alias)
+	}
+}
