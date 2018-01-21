@@ -83,7 +83,7 @@ type {{.Name}} struct {
 func New{{.Name}}(alias string) *{{.Name}} {
 	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias)
 	t := &{{.Name}}{
-		Table: gql.NewTableHelper("{{.TableName}}", alias),
+		Table: gql.NewTable("{{.TableName}}", alias),
 		{{range .Fields}}
 		{{.Name}}: cm.Col("{{.Name}}", "{{.Column}}"),{{end}}
 	}

@@ -13,7 +13,7 @@ type Table struct {
 	alias string
 }
 
-func NewTableHelper(name, alias string) Table {
+func NewTable(name, alias string) Table {
 	return Table{name, alias}
 }
 

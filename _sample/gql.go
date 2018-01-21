@@ -18,7 +18,7 @@ type Users struct {
 func NewUsers(alias string) *Users {
 	cm := gql.NewColumnMaker("User", "users").As(alias)
 	t := &Users{
-		Table: gql.NewTableHelper("users", alias),
+		Table: gql.NewTable("users", alias),
 
 		ID:   cm.Col("ID", "id"),
 		Name: cm.Col("Name", "name"),
@@ -45,7 +45,7 @@ type Cities struct {
 func NewCities(alias string) *Cities {
 	cm := gql.NewColumnMaker("City", "cities").As(alias)
 	t := &Cities{
-		Table: gql.NewTableHelper("cities", alias),
+		Table: gql.NewTable("cities", alias),
 
 		ID:           cm.Col("ID", "id"),
 		Name:         cm.Col("Name", "name"),
