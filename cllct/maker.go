@@ -6,11 +6,11 @@ import (
 	"github.com/ryym/goq/gql"
 )
 
+type CollectorMaker struct{}
+
 func NewMaker() *CollectorMaker {
 	return &CollectorMaker{}
 }
-
-type CollectorMaker struct{}
 
 func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMapSliceCollector {
 	return &RowMapSliceCollector{slice: slice}
@@ -18,6 +18,13 @@ func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMap
 
 func (cm *CollectorMaker) ToRowMap(mp *map[string]interface{}) *RowMapCollector {
 	return &RowMapCollector{mp: mp}
+}
+
+type ModelCollectorMaker struct {
+	elemType   reflect.Type
+	structName string
+	tableAlias string
+	cols       []gql.Column
 }
 
 func NewModelCollectorMaker(cols []gql.Column, alias string) *ModelCollectorMaker {
@@ -30,13 +37,6 @@ func NewModelCollectorMaker(cols []gql.Column, alias string) *ModelCollectorMake
 		tableAlias: alias,
 		cols:       cols,
 	}
-}
-
-type ModelCollectorMaker struct {
-	elemType   reflect.Type
-	structName string
-	tableAlias string
-	cols       []gql.Column
 }
 
 func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
