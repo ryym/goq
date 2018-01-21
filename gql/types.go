@@ -124,7 +124,7 @@ type QueryExpr interface {
 
 type SelectClause interface {
 	QueryExpr
-	From(table Table, tables ...Table) Clauses
+	From(table TableLike, tables ...TableLike) Clauses
 }
 
 type Clauses interface {
@@ -141,7 +141,7 @@ type GroupByClause interface {
 
 type JoinClause struct {
 	joinType JoinType
-	table    Table
+	table    TableLike
 }
 
 func (jc *JoinClause) On(pred PredExpr) JoinOn {
@@ -158,7 +158,7 @@ const (
 type JoinType string
 
 type JoinOn struct {
-	Table Table
+	Table TableLike
 	On    PredExpr
 	Type  JoinType
 }

@@ -7,7 +7,7 @@ import (
 
 type queryExpr struct {
 	exps    []Querier
-	froms   []Table
+	froms   []TableLike
 	joins   []JoinOn
 	wheres  []PredExpr
 	groups  []Expr
@@ -48,11 +48,7 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 		q.query = append(q.query, " FROM ")
 		lastIdx := len(qe.froms) - 1
 		for i, t := range qe.froms {
-			table := t.TableName()
-			if alias := t.TableAlias(); alias != "" {
-				table += " AS " + alias
-			}
-			q.query = append(q.query, table)
+			t.ApplyTable(q, ctx)
 			if i < lastIdx {
 				q.query = append(q.query, ", ")
 			}
@@ -61,11 +57,9 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 
 	// JOIN
 	for _, j := range qe.joins {
-		table := j.Table.TableName()
-		if alias := j.Table.TableAlias(); alias != "" {
-			table += " AS " + alias
-		}
-		q.query = append(q.query, fmt.Sprintf(" %s JOIN %s ON ", j.Type, table))
+		q.query = append(q.query, fmt.Sprintf(" %s JOIN ", j.Type))
+		j.Table.ApplyTable(q, ctx)
+		q.query = append(q.query, " ON ")
 		j.On.Apply(q, ctx)
 	}
 
@@ -126,7 +120,7 @@ func (qe *queryExpr) Selections() []Selection {
 	return items
 }
 
-func (qe *queryExpr) From(table Table, tables ...Table) Clauses {
+func (qe *queryExpr) From(table TableLike, tables ...TableLike) Clauses {
 	qe.froms = append(qe.froms, table)
 	qe.froms = append(qe.froms, tables...)
 	return qe

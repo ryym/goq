@@ -87,19 +87,19 @@ func (b *Builder) Select(exps ...Querier) SelectClause {
 }
 
 // TODO: Accept a sub query.
-func (b *Builder) InnerJoin(table Table) *JoinClause {
+func (b *Builder) InnerJoin(table TableLike) *JoinClause {
 	return &JoinClause{JOIN_INNER, table}
 }
 
-func (b *Builder) LeftJoin(table Table) *JoinClause {
+func (b *Builder) LeftJoin(table TableLike) *JoinClause {
 	return &JoinClause{JOIN_LEFT, table}
 }
 
-func (b *Builder) RightJoin(table Table) *JoinClause {
+func (b *Builder) RightJoin(table TableLike) *JoinClause {
 	return &JoinClause{JOIN_RIGHT, table}
 }
 
-func (b *Builder) FullJoin(table Table) *JoinClause {
+func (b *Builder) FullJoin(table TableLike) *JoinClause {
 	return &JoinClause{JOIN_FULL, table}
 }
 

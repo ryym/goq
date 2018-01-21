@@ -139,6 +139,18 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "SELECT (SELECT $1) AS subquery",
 			args: []interface{}{1},
 		},
+		{
+			gql: z.Select(z.Var(1)).From(
+				z.Select(z.Var(3)).As("subquery"),
+			).Joins(
+				z.RightJoin(z.Select(Users.ID).From(Users).As("u")).On(
+					z.Var(5).Eq(7),
+				),
+			),
+			sql: "SELECT $1 FROM (SELECT $2) AS subquery " +
+				"RIGHT OUTER JOIN (SELECT users.id FROM users) AS u ON $3 = $4",
+			args: []interface{}{1, 3, 5, 7},
+		},
 	}
 
 	for i, test := range tests {
