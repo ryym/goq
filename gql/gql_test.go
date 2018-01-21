@@ -161,6 +161,11 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "SELECT `id`, `f`.`title`, `foo`.`body` AS `content`, `count` + $1 FROM `foo` AS `f`",
 			args: []interface{}{3},
 		},
+		{
+			gql:  z.Select(z.Var(1)).From(Users).Joins(&Join{Users, Users.ID.Eq(3)}),
+			sql:  "SELECT $1 FROM `users` INNER JOIN `users` ON `users`.`id` = $2",
+			args: []interface{}{1, 3},
+		},
 	}
 
 	for i, test := range tests {

@@ -35,3 +35,24 @@ type JoinOn struct {
 func (jo *JoinOn) joinDef() *JoinDef {
 	return jo.def
 }
+
+type Join struct {
+	Table TableLike
+	On    PredExpr
+}
+
+func (j *Join) joinDef() *JoinDef {
+	return &JoinDef{j.Table, j.On, JOIN_INNER}
+}
+
+func (j *Join) Left() *JoinDef {
+	return &JoinDef{j.Table, j.On, JOIN_LEFT}
+}
+
+func (j *Join) Right() *JoinDef {
+	return &JoinDef{j.Table, j.On, JOIN_RIGHT}
+}
+
+func (j *Join) Full() *JoinDef {
+	return &JoinDef{j.Table, j.On, JOIN_FULL}
+}
