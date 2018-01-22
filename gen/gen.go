@@ -91,10 +91,9 @@ func GenerateTableHelpers(opts Opts) error {
 			modelPkgName = modelPkg.Name()
 		}
 
-		goqTag := reflect.StructTag(tablesT.Tag(i)).Get("goq")
-		tableTag, err := ParseTableTag(goqTag)
+		tableTag, err := ParseTableTag(getTag(tablesT.Tag(i), "goq"))
 		if err != nil {
-			return errors.Wrapf(err, "failed to parse tag of %s", tableName)
+			return errors.Wrapf(err, "failed to parse tag of Tables.%s", tableName)
 		}
 
 		helperName := tableTag.HelperName
@@ -102,12 +101,17 @@ func GenerateTableHelpers(opts Opts) error {
 			helperName = util.ColToFld(tableName)
 		}
 
+		modelName := fldVar.Obj().Name()
+		fields, err := listColumnFields(modelName, fldT)
+		if err != nil {
+			return err
+		}
 		helpers[i] = &helper{
 			Name:         helperName,
 			TableName:    tableName,
 			ModelPkgName: modelPkgName,
-			ModelName:    fldVar.Obj().Name(),
-			Fields:       listColumnFields(fldT),
+			ModelName:    modelName,
+			Fields:       fields,
 		}
 
 	}
@@ -126,25 +130,44 @@ func GenerateTableHelpers(opts Opts) error {
 	return nil
 }
 
-func listColumnFields(modelT *types.Struct) []*field {
+func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) {
 	var fields []*field
 	for i := 0; i < modelT.NumFields(); i++ {
 		fld := modelT.Field(i)
 		if !fld.Exported() {
 			continue
 		}
+
+		tag, err := ParseModelTag(getTag(modelT.Tag(i), "goq"))
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse tag of %s.%s", modelName, fld.Name())
+		}
+
+		if tag.NotCol {
+			continue
+		}
+
 		if fld.Anonymous() { // Embedded struct
 			if ebdT, ok := fld.Type().Underlying().(*types.Struct); ok {
-				fields = append(fields, listColumnFields(ebdT)...)
+				ebdFields, err := listColumnFields(modelName, ebdT)
+				if err != nil {
+					return nil, err
+				}
+				fields = append(fields, ebdFields...)
 			}
 		} else {
+			colName := tag.ColName
+			if colName == "" {
+				colName = util.FldToCol(fld.Name())
+			}
 			fields = append(fields, &field{
 				Name:   fld.Name(),
-				Column: util.FldToCol(fld.Name()),
+				Column: colName,
 			})
 		}
 	}
-	return fields
+
+	return fields, nil
 }
 
 func createOutFile(outPath string) (*os.File, error) {
@@ -160,4 +183,8 @@ func createOutFile(outPath string) (*os.File, error) {
 		return nil, fmt.Errorf("failed to create %s", outPath)
 	}
 	return file, nil
+}
+
+func getTag(tag, key string) string {
+	return reflect.StructTag(tag).Get(key)
 }
