@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/types"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -90,8 +91,19 @@ func GenerateTableHelpers(opts Opts) error {
 			modelPkgName = modelPkg.Name()
 		}
 
+		goqTag := reflect.StructTag(tablesT.Tag(i)).Get("goq")
+		tableTag, err := ParseTableTag(goqTag)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse tag of %s", tableName)
+		}
+
+		helperName := tableTag.HelperName
+		if helperName == "" {
+			helperName = util.ColToFld(tableName)
+		}
+
 		helpers[i] = &helper{
-			Name:         util.ColToFld(tableName),
+			Name:         helperName,
 			TableName:    tableName,
 			ModelPkgName: modelPkgName,
 			ModelName:    fldVar.Obj().Name(),
