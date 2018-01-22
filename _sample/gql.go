@@ -63,9 +63,9 @@ type Cities struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
-	ID           gql.Column
-	Name         gql.Column
-	PrefectureID gql.Column
+	ID     gql.Column
+	Name   gql.Column
+	PrefID gql.Column
 }
 
 func NewCities(alias string) *Cities {
@@ -73,9 +73,9 @@ func NewCities(alias string) *Cities {
 	t := &Cities{
 		Table: gql.NewTable("cities", alias),
 
-		ID:           cm.Col("ID", "id"),
-		Name:         cm.Col("Name", "name"),
-		PrefectureID: cm.Col("PrefectureID", "prefecture_id"),
+		ID:     cm.Col("ID", "id"),
+		Name:   cm.Col("Name", "name"),
+		PrefID: cm.Col("PrefID", "prefecture_id"),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
@@ -84,7 +84,7 @@ func NewCities(alias string) *Cities {
 func (t *Cities) As(alias string) *Cities { return NewCities(alias) }
 func (t *Cities) All() gql.ExprListExpr   { return gql.AllCols(t.Columns()) }
 func (t *Cities) Columns() []gql.Column {
-	return []gql.Column{t.ID, t.Name, t.PrefectureID}
+	return []gql.Column{t.ID, t.Name, t.PrefID}
 }
 
 type Builder struct {

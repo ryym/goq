@@ -21,6 +21,7 @@ type Pref struct {
 
 type City struct {
 	Common
-	Name         string
-	PrefectureID int
+	Name   string
+	PrefID int  `goq:"name:prefecture_id"`
+	Foo    bool `goq:"-"`
 }
