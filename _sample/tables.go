@@ -6,7 +6,7 @@ import "github.com/ryym/goq/_sample/models"
 
 type Tables struct {
 	users       models.User
-	prefectures Prefecture
+	prefectures Pref `goq:"helper:Prefs"`
 	cities      City
 }
 
@@ -14,7 +14,7 @@ type Common struct {
 	ID int
 }
 
-type Prefecture struct {
+type Pref struct {
 	Common
 	Name string
 }

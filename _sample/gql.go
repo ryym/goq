@@ -33,7 +33,7 @@ func (t *Users) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name}
 }
 
-type Prefectures struct {
+type Prefs struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
@@ -41,9 +41,9 @@ type Prefectures struct {
 	Name gql.Column
 }
 
-func NewPrefectures(alias string) *Prefectures {
-	cm := gql.NewColumnMaker("Prefecture", "prefectures").As(alias)
-	t := &Prefectures{
+func NewPrefs(alias string) *Prefs {
+	cm := gql.NewColumnMaker("Pref", "prefectures").As(alias)
+	t := &Prefs{
 		Table: gql.NewTable("prefectures", alias),
 
 		ID:   cm.Col("ID", "id"),
@@ -53,9 +53,9 @@ func NewPrefectures(alias string) *Prefectures {
 	return t
 }
 
-func (t *Prefectures) As(alias string) *Prefectures { return NewPrefectures(alias) }
-func (t *Prefectures) All() gql.ExprListExpr        { return gql.AllCols(t.Columns()) }
-func (t *Prefectures) Columns() []gql.Column {
+func (t *Prefs) As(alias string) *Prefs { return NewPrefs(alias) }
+func (t *Prefs) All() gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
+func (t *Prefs) Columns() []gql.Column {
 	return []gql.Column{t.ID, t.Name}
 }
 
@@ -90,17 +90,17 @@ func (t *Cities) Columns() []gql.Column {
 type Builder struct {
 	*goq.Builder
 
-	Users       *Users
-	Prefectures *Prefectures
-	Cities      *Cities
+	Users  *Users
+	Prefs  *Prefs
+	Cities *Cities
 }
 
 func NewBuilder(dl dialect.Dialect) *Builder {
 	return &Builder{
 		Builder: goq.NewBuilder(dl),
 
-		Users:       NewUsers(""),
-		Prefectures: NewPrefectures(""),
-		Cities:      NewCities(""),
+		Users:  NewUsers(""),
+		Prefs:  NewPrefs(""),
+		Cities: NewCities(""),
 	}
 }
