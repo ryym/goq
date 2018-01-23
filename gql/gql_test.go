@@ -21,12 +21,12 @@ type usersTable struct {
 	Table
 	name  string
 	alias string
-	ID    Column
-	Name  Column
+	ID    *Column
+	Name  *Column
 }
 
-func (t *usersTable) All() ExprListExpr { return AllCols(t.Columns()) }
-func (t *usersTable) Columns() []Column { return []Column{t.ID, t.Name} }
+func (t *usersTable) All() ExprListExpr  { return AllCols(t.Columns()) }
+func (t *usersTable) Columns() []*Column { return []*Column{t.ID, t.Name} }
 
 func (t *usersTable) As(alias string) *usersTable { return t /* FOR NOW */ }
 

@@ -1,6 +1,6 @@
 package gql
 
-func AllCols(cols []Column) ExprListExpr {
+func AllCols(cols []*Column) ExprListExpr {
 	exps := make([]Expr, len(cols))
 	for i, c := range cols {
 		exps[i] = c

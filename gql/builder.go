@@ -28,8 +28,8 @@ func (b *Builder) Parens(exp Expr) AnonExpr {
 	return (&parensExpr{exp: exp}).init()
 }
 
-func (b *Builder) Col(table, col string) Column {
-	return (&column{
+func (b *Builder) Col(table, col string) *Column {
+	return (&Column{
 		tableName:  "",
 		tableAlias: table,
 		structName: "",

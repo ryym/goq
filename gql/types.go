@@ -98,16 +98,7 @@ type QueryTable interface {
 type SchemaTable interface {
 	TableLike
 	All() ExprListExpr
-	Columns() []Column
-}
-
-type Column interface {
-	AnonExpr
-	TableName() string
-	TableAlias() string
-	StructName() string
-	ColumnName() string
-	FieldName() string
+	Columns() []*Column
 }
 
 type QueryExpr interface {

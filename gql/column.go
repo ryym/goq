@@ -15,8 +15,8 @@ func (m *ColumnMaker) As(alias string) *ColumnMaker {
 	return m
 }
 
-func (m *ColumnMaker) Col(fieldName, name string) *column {
-	return (&column{
+func (m *ColumnMaker) Col(fieldName, name string) *Column {
+	return (&Column{
 		tableName:  m.tableName,
 		tableAlias: m.tableAlias,
 		structName: m.structName,
@@ -25,7 +25,7 @@ func (m *ColumnMaker) Col(fieldName, name string) *column {
 	}).init()
 }
 
-type column struct {
+type Column struct {
 	tableName  string
 	tableAlias string
 	structName string
@@ -34,18 +34,18 @@ type column struct {
 	ops
 }
 
-func (c *column) init() *column {
+func (c *Column) init() *Column {
 	c.ops = ops{c}
 	return c
 }
 
-func (c *column) TableName() string  { return c.tableName }
-func (c *column) TableAlias() string { return c.tableAlias }
-func (c *column) StructName() string { return c.structName }
-func (c *column) ColumnName() string { return c.name }
-func (c *column) FieldName() string  { return c.fieldName }
+func (c *Column) TableName() string  { return c.tableName }
+func (c *Column) TableAlias() string { return c.tableAlias }
+func (c *Column) StructName() string { return c.structName }
+func (c *Column) ColumnName() string { return c.name }
+func (c *Column) FieldName() string  { return c.fieldName }
 
-func (c *column) Apply(q *Query, ctx DBContext) {
+func (c *Column) Apply(q *Query, ctx DBContext) {
 	table := c.tableAlias
 	if table == "" {
 		table = c.tableName
@@ -56,7 +56,7 @@ func (c *column) Apply(q *Query, ctx DBContext) {
 	q.query = append(q.query, ctx.QuoteIdent(c.name))
 }
 
-func (c *column) Selection() Selection {
+func (c *Column) Selection() Selection {
 	return Selection{
 		ColumnName: c.name,
 		TableName:  c.tableName,

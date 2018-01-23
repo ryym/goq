@@ -77,7 +77,7 @@ type {{.Name}} struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 	{{range .Fields}}
-	{{.Name}} gql.Column{{end}}
+	{{.Name}} *gql.Column{{end}}
 }
 
 func New{{.Name}}(alias string) *{{.Name}} {
@@ -93,8 +93,8 @@ func New{{.Name}}(alias string) *{{.Name}} {
 
 func (t *{{.Name}}) As(alias string) *{{.Name}} { return New{{.Name}}(alias) }
 func (t *{{.Name}}) All() gql.ExprListExpr      { return gql.AllCols(t.Columns()) }
-func (t *{{.Name}}) Columns() []gql.Column {
-	return []gql.Column{ {{.JoinFields "t"}} }
+func (t *{{.Name}}) Columns() []*gql.Column {
+	return []*gql.Column{ {{.JoinFields "t"}} }
 }
 `
 

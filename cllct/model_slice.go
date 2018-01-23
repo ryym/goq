@@ -8,7 +8,7 @@ import (
 
 type ModelSliceCollector struct {
 	elemType   reflect.Type
-	cols       []gql.Column
+	cols       []*gql.Column
 	structName string
 	tableAlias string
 	colToFld   map[int]int

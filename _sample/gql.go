@@ -11,8 +11,8 @@ type Users struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
-	ID   gql.Column
-	Name gql.Column
+	ID   *gql.Column
+	Name *gql.Column
 }
 
 func NewUsers(alias string) *Users {
@@ -29,16 +29,16 @@ func NewUsers(alias string) *Users {
 
 func (t *Users) As(alias string) *Users { return NewUsers(alias) }
 func (t *Users) All() gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
-func (t *Users) Columns() []gql.Column {
-	return []gql.Column{t.ID, t.Name}
+func (t *Users) Columns() []*gql.Column {
+	return []*gql.Column{t.ID, t.Name}
 }
 
 type Prefs struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
-	ID   gql.Column
-	Name gql.Column
+	ID   *gql.Column
+	Name *gql.Column
 }
 
 func NewPrefs(alias string) *Prefs {
@@ -55,17 +55,17 @@ func NewPrefs(alias string) *Prefs {
 
 func (t *Prefs) As(alias string) *Prefs { return NewPrefs(alias) }
 func (t *Prefs) All() gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
-func (t *Prefs) Columns() []gql.Column {
-	return []gql.Column{t.ID, t.Name}
+func (t *Prefs) Columns() []*gql.Column {
+	return []*gql.Column{t.ID, t.Name}
 }
 
 type Cities struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
-	ID     gql.Column
-	Name   gql.Column
-	PrefID gql.Column
+	ID     *gql.Column
+	Name   *gql.Column
+	PrefID *gql.Column
 }
 
 func NewCities(alias string) *Cities {
@@ -83,8 +83,8 @@ func NewCities(alias string) *Cities {
 
 func (t *Cities) As(alias string) *Cities { return NewCities(alias) }
 func (t *Cities) All() gql.ExprListExpr   { return gql.AllCols(t.Columns()) }
-func (t *Cities) Columns() []gql.Column {
-	return []gql.Column{t.ID, t.Name, t.PrefID}
+func (t *Cities) Columns() []*gql.Column {
+	return []*gql.Column{t.ID, t.Name, t.PrefID}
 }
 
 type Builder struct {

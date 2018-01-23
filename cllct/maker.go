@@ -24,10 +24,10 @@ type ModelCollectorMaker struct {
 	elemType   reflect.Type
 	structName string
 	tableAlias string
-	cols       []gql.Column
+	cols       []*gql.Column
 }
 
-func NewModelCollectorMaker(cols []gql.Column, alias string) *ModelCollectorMaker {
+func NewModelCollectorMaker(cols []*gql.Column, alias string) *ModelCollectorMaker {
 	var structName string
 	if len(cols) > 0 {
 		structName = cols[0].StructName()

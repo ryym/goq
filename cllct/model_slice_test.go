@@ -15,8 +15,8 @@ type user struct {
 
 type Users struct {
 	gql.Table
-	ID   gql.Column
-	Name gql.Column
+	ID   *gql.Column
+	Name *gql.Column
 }
 
 func NewUsers() *Users {
@@ -28,8 +28,8 @@ func NewUsers() *Users {
 	}
 }
 
-func (t *Users) Columns() []gql.Column {
-	return []gql.Column{t.ID, t.Name}
+func (t *Users) Columns() []*gql.Column {
+	return []*gql.Column{t.ID, t.Name}
 }
 
 func sel(alias, strct, field string) gql.Selection {
