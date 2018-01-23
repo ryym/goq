@@ -26,13 +26,6 @@ type helper struct {
 	Fields       []*field
 }
 
-func (h *helper) ModelFullName() string {
-	if h.ModelPkgName != "" {
-		return fmt.Sprintf("%s.%s", h.ModelPkgName, h.ModelName)
-	}
-	return h.ModelName
-}
-
 func (h *helper) JoinFields(alias string) string {
 	cols := make([]string, len(h.Fields))
 	for i, f := range h.Fields {
