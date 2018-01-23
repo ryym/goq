@@ -118,18 +118,17 @@ func GenerateTableHelpers(opts Opts) error {
 
 	}
 
-	file, err := createOutFile(opts.OutFile)
-	if err != nil {
-		return err
+	src, err := execTemplate(tablesPkg.Name(), helpers, nil)
+	if src != nil {
+		file, err := createOutFile(opts.OutFile)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		file.Write(src)
 	}
-	defer file.Close() // TODO: Remove file on error
 
-	err = writeTemplate(file, tablesPkg.Name(), helpers, nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) {

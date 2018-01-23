@@ -11,12 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func writeTemplate(
-	w io.Writer,
+func execTemplate(
 	pkgName string,
 	helpers []*helper,
 	pkgs map[string]bool,
-) error {
+) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	buf.Write([]byte(fmt.Sprintf("package %s\n\n", pkgName)))
 
@@ -27,29 +26,27 @@ func writeTemplate(
 	for _, h := range helpers {
 		err = tableT.Execute(buf, h)
 		if err != nil {
-			return errors.Wrapf(err, "failed to execute template of %s", h.Name)
+			return nil, errors.Wrapf(err, "failed to execute template of %s", h.Name)
 		}
 	}
 
 	gqlStructT := template.Must(template.New("gqlStruct").Parse(gqlStructTmpl))
 	err = gqlStructT.Execute(buf, helpers)
 	if err != nil {
-		return errors.Wrap(err, "failed to execute Builder struct template")
+		return nil, errors.Wrap(err, "failed to execute Builder struct template")
 	}
 
 	newBuilderT := template.Must(template.New("newBuilder").Parse(newBuilderTmpl))
 	err = newBuilderT.Execute(buf, helpers)
 	if err != nil {
-		return errors.Wrap(err, "failed to execute NewBuilder() template")
+		return nil, errors.Wrap(err, "failed to execute NewBuilder() template")
 	}
 
 	src, err := format.Source(buf.Bytes())
 	if err != nil {
-		return err
+		err = errors.Wrap(err, "failed to format generated code")
 	}
-	w.Write(src)
-
-	return nil
+	return src, err
 }
 
 func writeImports(buf io.Writer, pkgs map[string]bool) {
