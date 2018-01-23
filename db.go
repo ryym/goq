@@ -29,6 +29,10 @@ type DB struct {
 	dialect dialect.Dialect
 }
 
+func (d *DB) Close() error {
+	return d.DB.Close()
+}
+
 func (d *DB) Dialect() dialect.Dialect {
 	return d.dialect
 }
