@@ -11,7 +11,7 @@ type Tables struct {
 }
 
 type Common struct {
-	ID int
+	ID int `goq:"pk"`
 }
 
 type Pref struct {

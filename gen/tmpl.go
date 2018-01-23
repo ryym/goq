@@ -85,7 +85,7 @@ func New{{.Name}}(alias string) *{{.Name}} {
 	t := &{{.Name}}{
 		Table: gql.NewTable("{{.TableName}}", alias),
 		{{range .Fields}}
-		{{.Name}}: cm.Col("{{.Name}}", "{{.Column}}"),{{end}}
+		{{.Name}}: {{$.ColumnBuilder "cm" .}},{{end}}
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t

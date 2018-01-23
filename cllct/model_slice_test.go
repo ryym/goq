@@ -23,8 +23,8 @@ func NewUsers() *Users {
 	cm := gql.NewColumnMaker("user", "users")
 	return &Users{
 		Table: gql.NewTable("users", ""),
-		ID:    cm.Col("ID", "id"),
-		Name:  cm.Col("Name", "name"),
+		ID:    cm.Col("ID", "id").Bld(),
+		Name:  cm.Col("Name", "name").Bld(),
 	}
 }
 

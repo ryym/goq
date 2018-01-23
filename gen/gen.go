@@ -34,9 +34,18 @@ func (h *helper) JoinFields(alias string) string {
 	return strings.Join(cols, ", ")
 }
 
+func (h *helper) ColumnBuilder(maker string, f *field) string {
+	s := fmt.Sprintf(`%s.Col("%s", "%s")`, maker, f.Name, f.Column)
+	if f.Tag.IsPK {
+		s += ".PK()"
+	}
+	return s + ".Bld()"
+}
+
 type field struct {
 	Name   string
 	Column string
+	Tag    ColumnTag
 }
 
 func GenerateTableHelpers(opts Opts) error {
@@ -156,6 +165,7 @@ func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) 
 			fields = append(fields, &field{
 				Name:   fld.Name(),
 				Column: colName,
+				Tag:    tag,
 			})
 		}
 	}

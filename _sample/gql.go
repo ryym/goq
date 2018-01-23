@@ -20,8 +20,8 @@ func NewUsers(alias string) *Users {
 	t := &Users{
 		Table: gql.NewTable("users", alias),
 
-		ID:   cm.Col("ID", "id"),
-		Name: cm.Col("Name", "name"),
+		ID:   cm.Col("ID", "id").PK().Bld(),
+		Name: cm.Col("Name", "name").Bld(),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
@@ -46,8 +46,8 @@ func NewPrefs(alias string) *Prefs {
 	t := &Prefs{
 		Table: gql.NewTable("prefectures", alias),
 
-		ID:   cm.Col("ID", "id"),
-		Name: cm.Col("Name", "name"),
+		ID:   cm.Col("ID", "id").PK().Bld(),
+		Name: cm.Col("Name", "name").Bld(),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
@@ -73,9 +73,9 @@ func NewCities(alias string) *Cities {
 	t := &Cities{
 		Table: gql.NewTable("cities", alias),
 
-		ID:     cm.Col("ID", "id"),
-		Name:   cm.Col("Name", "name"),
-		PrefID: cm.Col("PrefID", "prefecture_id"),
+		ID:     cm.Col("ID", "id").PK().Bld(),
+		Name:   cm.Col("Name", "name").Bld(),
+		PrefID: cm.Col("PrefID", "prefecture_id").Bld(),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
