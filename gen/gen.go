@@ -131,7 +131,7 @@ func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) 
 			continue
 		}
 
-		tag, err := ParseModelTag(getTag(modelT.Tag(i), "goq"))
+		tag, err := ParseColumnTag(getTag(modelT.Tag(i), "goq"))
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to parse tag of %s.%s", modelName, fld.Name())
 		}

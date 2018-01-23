@@ -48,31 +48,31 @@ func ParseTag(tag string, wants map[string]Type) (map[string]interface{}, error)
 	return ret, nil
 }
 
-type ModelTag struct {
+type ColumnTag struct {
 	IsPK    bool
 	ColName string
 	NotCol  bool
 }
 
-func ParseModelTag(tagStr string) (ModelTag, error) {
+func ParseColumnTag(tagStr string) (ColumnTag, error) {
 	attrs, err := ParseTag(tagStr, map[string]Type{
 		"pk":   TYPE_BOOL,
 		"name": TYPE_STR,
 		"-":    TYPE_BOOL,
 	})
 	if err != nil {
-		return ModelTag{}, err
+		return ColumnTag{}, err
 	}
 
 	if _, ok := attrs["-"]; ok && len(attrs) > 1 {
-		return ModelTag{}, errors.New(`"-" cannot be used with other attributes`)
+		return ColumnTag{}, errors.New(`"-" cannot be used with other attributes`)
 	}
 
 	return makeModelTag(attrs), nil
 }
 
-func makeModelTag(attrs map[string]interface{}) ModelTag {
-	tag := ModelTag{}
+func makeModelTag(attrs map[string]interface{}) ColumnTag {
+	tag := ColumnTag{}
 	for key, val := range attrs {
 		switch key {
 		case "pk":

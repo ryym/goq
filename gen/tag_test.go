@@ -69,9 +69,9 @@ func TestParseTag(t *testing.T) {
 	}
 }
 
-func TestParseModelTag(t *testing.T) {
-	got, _ := ParseModelTag("pk;name:foo_bar")
-	want := ModelTag{
+func TestParseColumnTag(t *testing.T) {
+	got, _ := ParseColumnTag("pk;name:foo_bar")
+	want := ColumnTag{
 		IsPK:    true,
 		ColName: "foo_bar",
 	}
