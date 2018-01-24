@@ -2,7 +2,7 @@ package main
 
 import "github.com/ryym/goq/_sample/models"
 
-//go:generate go run "../cmd/goq/goq.go"
+//go:generate goq
 
 type Tables struct {
 	users       models.User
