@@ -30,14 +30,17 @@ func main() {
 		panic(err)
 	}
 
-	var outPath string
+	var outFile string
 	args := flag.Args()
 	switch len(args) {
 	case 0:
-		outPath = "gql.go"
+		outFile = "gql.go"
 	case 1:
 		if strings.HasSuffix(args[0], ".go") {
-			outPath = args[0]
+			if strings.ContainsRune(args[0], filepath.Separator) {
+				panic("output file must be in the same directory")
+			}
+			outFile = args[0]
 		} else {
 			panic("Invalid output file name")
 		}
@@ -47,7 +50,7 @@ func main() {
 
 	opts := gen.Opts{
 		Pkg:              pkgPath,
-		OutPath:          outPath,
+		OutFile:          outFile,
 		TablesStructName: "Tables",
 		ImportTests:      *withTests,
 	}

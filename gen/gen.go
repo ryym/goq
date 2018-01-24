@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/types"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -15,7 +14,7 @@ import (
 
 type Opts struct {
 	Pkg              string
-	OutPath          string
+	OutFile          string
 	TablesStructName string
 	ImportTests      bool
 }
@@ -126,7 +125,7 @@ func GenerateTableHelpers(opts Opts) error {
 
 	src, err := execTemplate(tablesPkg.Name(), helpers, nil)
 	if src != nil {
-		file, err := createOutFile(opts.OutPath)
+		file, err := createOutFile(opts.OutFile)
 		if err != nil {
 			return err
 		}
@@ -178,28 +177,21 @@ func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) 
 	return fields, nil
 }
 
-func createOutFile(outPath string) (*os.File, error) {
-	_, err := os.Stat(outPath)
+func createOutFile(outFile string) (*os.File, error) {
+	_, err := os.Stat(outFile)
 
 	if err == nil {
-		err = os.Remove(outPath)
+		err = os.Remove(outFile)
 		if err != nil {
-			return nil, fmt.Errorf("failed to remove %s", outPath)
+			return nil, fmt.Errorf("failed to remove %s", outFile)
 		}
 	} else if !os.IsNotExist(err) {
 		return nil, err
 	}
 
-	if dir := filepath.Dir(outPath); dir != "." {
-		err = os.MkdirAll(dir, 0755)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	file, err := os.Create(outPath)
+	file, err := os.Create(outFile)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create %s", outPath)
+		return nil, fmt.Errorf("failed to create %s", outFile)
 	}
 	return file, nil
 }
