@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/types"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -14,7 +15,7 @@ import (
 
 type Opts struct {
 	Pkg              string
-	OutFile          string
+	OutPath          string
 	TablesStructName string
 }
 
@@ -120,7 +121,7 @@ func GenerateTableHelpers(opts Opts) error {
 
 	src, err := execTemplate(tablesPkg.Name(), helpers, nil)
 	if src != nil {
-		file, err := createOutFile(opts.OutFile)
+		file, err := createOutFile(opts.OutPath)
 		if err != nil {
 			return err
 		}
@@ -173,10 +174,21 @@ func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) 
 }
 
 func createOutFile(outPath string) (*os.File, error) {
-	if _, err := os.Stat(outPath); err == nil {
+	_, err := os.Stat(outPath)
+
+	if err == nil {
 		err = os.Remove(outPath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to remove %s", outPath)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	if dir := filepath.Dir(outPath); dir != "." {
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			return nil, err
 		}
 	}
 
