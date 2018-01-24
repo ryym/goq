@@ -17,6 +17,7 @@ type Opts struct {
 	Pkg              string
 	OutPath          string
 	TablesStructName string
+	ImportTests      bool
 }
 
 type helper struct {
@@ -51,7 +52,11 @@ type field struct {
 
 func GenerateTableHelpers(opts Opts) error {
 	conf := loader.Config{}
-	conf.Import(opts.Pkg)
+	if opts.ImportTests {
+		conf.ImportWithTests(opts.Pkg)
+	} else {
+		conf.Import(opts.Pkg)
+	}
 	prg, err := conf.Load()
 	if err != nil {
 		return nil
