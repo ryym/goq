@@ -13,10 +13,10 @@ import (
 )
 
 type Opts struct {
-	Pkg              string
+	PkgPath          string
 	OutFile          string
 	TablesStructName string
-	ImportTests      bool
+	IsTestPkg        bool
 }
 
 type helper struct {
@@ -51,19 +51,24 @@ type field struct {
 
 func GenerateTableHelpers(opts Opts) error {
 	conf := loader.Config{}
-	if opts.ImportTests {
-		conf.ImportWithTests(opts.Pkg)
+	if opts.IsTestPkg {
+		conf.ImportWithTests(opts.PkgPath)
 	} else {
-		conf.Import(opts.Pkg)
+		conf.Import(opts.PkgPath)
 	}
 	prg, err := conf.Load()
 	if err != nil {
 		return nil
 	}
 
-	pkg := prg.Package(opts.Pkg)
+	pkgPath := opts.PkgPath
+	if opts.IsTestPkg {
+		pkgPath += "_test"
+	}
+
+	pkg := prg.Package(pkgPath)
 	if pkg == nil {
-		return fmt.Errorf("package %s not found", opts.Pkg)
+		return fmt.Errorf("package %s not found", opts.PkgPath)
 	}
 
 	tablesPkg := pkg.Pkg

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	withTests := flag.Bool("tests", false, "Include test files for parsing")
+	isTestPkg := flag.Bool("testpkg", false, "Generate from code in test package")
 	flag.Parse()
 
 	gopath := os.Getenv("GOPATH")
@@ -49,10 +49,10 @@ func main() {
 	}
 
 	opts := gen.Opts{
-		Pkg:              pkgPath,
+		PkgPath:          pkgPath,
 		OutFile:          outFile,
 		TablesStructName: "Tables",
-		ImportTests:      *withTests,
+		IsTestPkg:        *isTestPkg,
 	}
 
 	err = gen.GenerateTableHelpers(opts)
