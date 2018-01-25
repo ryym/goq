@@ -20,6 +20,7 @@ func (b *Builder) Var(v interface{}) AnonExpr {
 	return (&litExpr{val: v}).init()
 }
 
+// XXX: This should be able to use everywhere.
 func (b *Builder) Raw(sql string) AnonExpr {
 	return (&rawExpr{sql: sql}).init()
 }
