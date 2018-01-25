@@ -12,7 +12,9 @@ func (a *aliased) Apply(q *Query, ctx DBContext) {
 	q.query = append(q.query, " AS ", ctx.QuoteIdent(a.alias))
 }
 
-func (a *aliased) Selection() Selection { return Selection{} }
+func (a *aliased) Selection() Selection {
+	return Selection{Alias: a.alias}
+}
 
 type litExpr struct {
 	val interface{}
