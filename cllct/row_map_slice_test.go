@@ -1,36 +1,21 @@
 package cllct_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/go-test/deep"
-	. "github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/cllct"
 )
 
 func TestRowMapSliceCollector(t *testing.T) {
 	var got []map[string]interface{}
-	cl := NewRowMapSliceCollector(&got)
+	cl := cllct.NewRowMapSliceCollector(&got)
 
 	rows := [][]interface{}{
 		{1, "foo", true},
 		{2, "bar", false},
 	}
-
-	cl.Init(
-		make([]gql.Selection, 3),
-		[]string{"a", "b", "c"},
-	)
-
-	for _, row := range rows {
-		ptrs := make([]interface{}, 3)
-		cl.Next(ptrs)
-		for i, p := range ptrs {
-			reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
-		}
-		cl.AfterScan(ptrs)
-	}
+	execCollector(cl, rows, nil, []string{"a", "b", "c"})
 
 	want := []map[string]interface{}{
 		{"a": 1, "b": "foo", "c": true},

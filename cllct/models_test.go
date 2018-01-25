@@ -1,11 +1,5 @@
 package cllct_test
 
-import "github.com/ryym/goq/gql"
-
-func sel(alias, strct, field string) gql.Selection {
-	return gql.Selection{TableAlias: alias, StructName: strct, FieldName: field}
-}
-
 //go:generate goq -testpkg gql_test.go
 
 type Tables struct {

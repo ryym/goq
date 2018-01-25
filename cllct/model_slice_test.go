@@ -1,11 +1,10 @@
 package cllct_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/go-test/deep"
-	. "github.com/ryym/goq/cllct"
+	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/gql"
 )
 
@@ -13,7 +12,7 @@ import (
 // selected column orders and their aliases.
 func TestModelSliceCollector(t *testing.T) {
 	users := NewUsers("")
-	maker := NewModelCollectorMaker(users.Columns(), "")
+	maker := cllct.NewModelCollectorMaker(users.Columns(), "")
 
 	var got []User
 	cl := maker.ToSlice(&got)
@@ -29,18 +28,7 @@ func TestModelSliceCollector(t *testing.T) {
 		sel("", "User", "ID"),
 	}
 
-	cl.Init(selects, []string{"a", "b", "c"})
-
-	for _, row := range rows {
-		ptrs := make([]interface{}, len(selects))
-		cl.Next(ptrs)
-		for i, p := range ptrs {
-			if p != nil {
-				reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
-			}
-		}
-		cl.AfterScan(ptrs)
-	}
+	execCollector(cl, rows, selects, nil)
 
 	want := []User{
 		{ID: 250, Name: "bob"},
