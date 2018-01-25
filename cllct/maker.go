@@ -38,6 +38,15 @@ func NewModelCollectorMaker(cols []*gql.Column, alias string) *ModelCollectorMak
 	}
 }
 
+func (cm *ModelCollectorMaker) ToElem(elem interface{}) *ModelElemCollector {
+	return &ModelElemCollector{
+		structName: cm.structName,
+		tableAlias: cm.tableAlias,
+		elem:       reflect.ValueOf(elem).Elem(),
+		cols:       cm.cols,
+	}
+}
+
 func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
 	return &ModelSliceCollector{
 		structName: cm.structName,
