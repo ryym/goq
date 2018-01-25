@@ -1,36 +1,13 @@
-package cllct
+package cllct_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/go-test/deep"
+	. "github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/gql"
 )
-
-type user struct {
-	ID   int
-	Name string
-}
-
-type Users struct {
-	gql.Table
-	ID   *gql.Column
-	Name *gql.Column
-}
-
-func NewUsers() *Users {
-	cm := gql.NewColumnMaker("user", "users")
-	return &Users{
-		Table: gql.NewTable("users", ""),
-		ID:    cm.Col("ID", "id").Bld(),
-		Name:  cm.Col("Name", "name").Bld(),
-	}
-}
-
-func (t *Users) Columns() []*gql.Column {
-	return []*gql.Column{t.ID, t.Name}
-}
 
 func sel(alias, strct, field string) gql.Selection {
 	return gql.Selection{TableAlias: alias, StructName: strct, FieldName: field}
@@ -39,10 +16,10 @@ func sel(alias, strct, field string) gql.Selection {
 // Model collectors collect results regardless of
 // selected column orders and their aliases.
 func TestModelSliceCollector(t *testing.T) {
-	users := NewUsers()
+	users := NewUsers("")
 	maker := NewModelCollectorMaker(users.Columns(), "")
 
-	var got []user
+	var got []User
 	cl := maker.ToSlice(&got)
 
 	rows := [][]interface{}{
@@ -52,8 +29,8 @@ func TestModelSliceCollector(t *testing.T) {
 
 	selects := []gql.Selection{
 		sel("", "foo", "Bar"),
-		sel("", "user", "Name"),
-		sel("", "user", "ID"),
+		sel("", "User", "Name"),
+		sel("", "User", "ID"),
 	}
 
 	cl.Init(selects, []string{"a", "b", "c"})
@@ -69,7 +46,7 @@ func TestModelSliceCollector(t *testing.T) {
 		cl.AfterScan(ptrs)
 	}
 
-	want := []user{
+	want := []User{
 		{ID: 250, Name: "bob"},
 		{ID: 101, Name: "alice"},
 	}

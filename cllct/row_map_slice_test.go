@@ -1,16 +1,17 @@
-package cllct
+package cllct_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/go-test/deep"
+	. "github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/gql"
 )
 
 func TestRowMapSliceCollector(t *testing.T) {
 	var got []map[string]interface{}
-	cl := &RowMapSliceCollector{slice: &got}
+	cl := NewRowMapSliceCollector(&got)
 
 	rows := [][]interface{}{
 		{1, "foo", true},
