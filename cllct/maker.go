@@ -21,7 +21,6 @@ func (cm *CollectorMaker) ToRowMap(mp *map[string]interface{}) *RowMapCollector 
 }
 
 type ModelCollectorMaker struct {
-	elemType   reflect.Type
 	structName string
 	tableAlias string
 	cols       []*gql.Column
@@ -41,7 +40,6 @@ func NewModelCollectorMaker(cols []*gql.Column, alias string) *ModelCollectorMak
 
 func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
 	return &ModelSliceCollector{
-		elemType:   cm.elemType,
 		structName: cm.structName,
 		tableAlias: cm.tableAlias,
 		slice:      reflect.ValueOf(slice).Elem(),
