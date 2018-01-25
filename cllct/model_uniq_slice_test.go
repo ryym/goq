@@ -9,24 +9,30 @@ import (
 	"github.com/ryym/goq/gql"
 )
 
-// Model collectors collect results regardless of
-// selected column orders and their aliases.
-func TestModelSliceCollector(t *testing.T) {
+func TestModelUniqSliceCollector(t *testing.T) {
 	users := NewUsers("")
 	maker := NewModelCollectorMaker(users.Columns(), "")
 
 	var got []User
-	cl := maker.ToSlice(&got)
+	cl := maker.ToUniqSlice(&got)
 
 	rows := [][]interface{}{
-		{"unrelated", "bob", 250},
-		{"unrelated", "alice", 101},
+		{2, "_", "bob"},
+		{1, "_", "alice"},
+		{2, "_", "bob"},
+		{1, "_", "alice"},
+		{1, "_", "alice"},
+		{3, "_", "carol"},
+		{2, "_", "bob"},
+		{2, "_", "bob"},
+		{3, "_", "carol"},
+		{2, "_", "bob"},
 	}
 
 	selects := []gql.Selection{
-		sel("", "foo", "Bar"),
-		sel("", "User", "Name"),
 		sel("", "User", "ID"),
+		sel("", "foo", "Unrelated"),
+		sel("", "User", "Name"),
 	}
 
 	cl.Init(selects, []string{"a", "b", "c"})
@@ -43,8 +49,9 @@ func TestModelSliceCollector(t *testing.T) {
 	}
 
 	want := []User{
-		{ID: 250, Name: "bob"},
-		{ID: 101, Name: "alice"},
+		{ID: 2, Name: "bob"},
+		{ID: 1, Name: "alice"},
+		{ID: 3, Name: "carol"},
 	}
 	if diff := deep.Equal(got, want); diff != nil {
 		t.Error(diff)

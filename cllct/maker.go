@@ -46,3 +46,19 @@ func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
 		cols:       cm.cols,
 	}
 }
+
+func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCollector {
+	var pkFieldName string
+	for _, col := range cm.cols {
+		if meta := col.Meta(); meta.PK {
+			pkFieldName = col.FieldName()
+		}
+	}
+	return &ModelUniqSliceCollector{
+		structName:  cm.structName,
+		tableAlias:  cm.tableAlias,
+		pkFieldName: pkFieldName,
+		slice:       reflect.ValueOf(slice).Elem(),
+		cols:        cm.cols,
+	}
+}
