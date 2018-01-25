@@ -16,6 +16,24 @@ func (a *aliased) Selection() Selection {
 	return Selection{Alias: a.alias}
 }
 
+type nameExpr struct {
+	name string
+	ops
+}
+
+func (nm *nameExpr) init() *nameExpr {
+	nm.ops = ops{nm}
+	return nm
+}
+
+func (nm *nameExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, ctx.QuoteIdent(nm.name))
+}
+
+func (nm *nameExpr) Selection() Selection {
+	return Selection{Alias: nm.name}
+}
+
 type litExpr struct {
 	val interface{}
 	ops

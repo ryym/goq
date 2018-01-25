@@ -29,6 +29,11 @@ func (b *Builder) Parens(exp Expr) AnonExpr {
 	return (&parensExpr{exp: exp}).init()
 }
 
+// XXX: This should be used only in ORDER BY?
+func (b *Builder) Name(name string) *nameExpr {
+	return (&nameExpr{name: name}).init()
+}
+
 func (b *Builder) Col(table, col string) *Column {
 	return (&Column{
 		tableName:  "",
