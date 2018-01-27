@@ -71,11 +71,7 @@ func (cl *ModelUniqSliceCollector) AfterScan(ptrs []interface{}) {
 		return
 	}
 
-	copy := reflect.New(cl.elemType).Elem()
-	for _, f := range cl.colToFld {
-		copy.Field(f).Addr().Elem().Set(cl.elem.Field(f))
-	}
-
-	cl.slice.Set(reflect.Append(cl.slice, copy))
+	// Copy `elem` and append it.
+	cl.slice.Set(reflect.Append(cl.slice, *cl.elem))
 	cl.pks[pk] = true
 }
