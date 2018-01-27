@@ -71,3 +71,43 @@ func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCol
 		cols:        cm.cols,
 	}
 }
+
+type modelSliceMapCollectorMaker struct {
+	collector *ModelSliceMapCollector
+}
+
+func (m *modelSliceMapCollectorMaker) By(key gql.Querier) *ModelSliceMapCollector {
+	m.collector.key = key
+	return m.collector
+}
+
+// Sometimes you need to provide a pointer to store each key value of the result map.
+// For example, the pattern A is OK because `Countries.ID` will be mapped to each Country model.
+// But the pattern B fails because there is no place each `Country.ID` is mapped to.
+// In this case, you need to use `ByWith` to provide a place for `Country.ID` mapping (pattern C).
+//
+// pattern A (GOOD):
+//     Collect(
+//         Countries.ToSlice(&countries),
+//         Cities.ToSliceMap(&cities).By(Countries.ID),
+//     )
+//
+// pattern B (BAD):
+//     Collect(Cities.ToSliceMap(&cities).By(Countries.ID))
+//
+// pattern C (GOOD):
+//     Collect(Cities.ToSliceMap(&cities).ByWith(&countryID, Countries.ID))
+func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *ModelSliceMapCollector {
+	m.collector.key = key
+	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
+	return m.collector
+}
+
+func (cm *ModelCollectorMaker) ToSliceMap(mp interface{}) *modelSliceMapCollectorMaker {
+	return &modelSliceMapCollectorMaker{&ModelSliceMapCollector{
+		structName: cm.structName,
+		tableAlias: cm.tableAlias,
+		mp:         reflect.ValueOf(mp).Elem(),
+		cols:       cm.cols,
+	}}
+}
