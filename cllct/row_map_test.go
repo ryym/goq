@@ -8,13 +8,16 @@ import (
 )
 
 func TestRowMapCollector(t *testing.T) {
-	var got map[string]interface{}
-	cl := cllct.NewMaker().ToRowMap(&got)
-
 	rows := [][]interface{}{
 		{1, "foo", true},
 	}
-	execCollector(cl, rows, nil, []string{"a", "b", "c"})
+
+	cl := cllct.NewMaker()
+
+	var got map[string]interface{}
+	execCollector([]cllct.Collector{
+		cl.ToRowMap(&got),
+	}, rows, nil, []string{"a", "b", "c"})
 
 	want := map[string]interface{}{"a": 1, "b": "foo", "c": true}
 	if diff := deep.Equal(got, want); diff != nil {

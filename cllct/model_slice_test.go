@@ -11,12 +11,6 @@ import (
 // Model collectors collect results regardless of
 // selected column orders and their aliases.
 func TestModelSliceCollector(t *testing.T) {
-	users := NewUsers("")
-	maker := cllct.NewModelCollectorMaker(users.Columns(), "")
-
-	var got []User
-	cl := maker.ToSlice(&got)
-
 	rows := [][]interface{}{
 		{"unrelated", "bob", 250},
 		{"unrelated", "alice", 101},
@@ -28,7 +22,12 @@ func TestModelSliceCollector(t *testing.T) {
 		sel("", "User", "ID"),
 	}
 
-	execCollector(cl, rows, selects, nil)
+	users := NewUsers("")
+
+	var got []User
+	execCollector([]cllct.Collector{
+		users.ToSlice(&got),
+	}, rows, selects, nil)
 
 	want := []User{
 		{ID: 250, Name: "bob"},

@@ -12,7 +12,7 @@ func sel(alias, strct, field string) gql.Selection {
 }
 
 func execCollector(
-	cl cllct.Collector,
+	cllcts []cllct.Collector,
 	rows [][]interface{},
 	selects []gql.Selection,
 	colNames []string,
@@ -23,20 +23,24 @@ func execCollector(
 		colNames = make([]string, len(selects))
 	}
 
-	ok, err := cl.Init(selects, colNames)
-	if err != nil {
-		return err
+	for _, cl := range cllcts {
+		_, err := cl.Init(selects, colNames)
+		if err != nil {
+			return err
+		}
 	}
 
-	if ok {
-		for _, row := range rows {
-			ptrs := make([]interface{}, len(selects))
+	for _, row := range rows {
+		ptrs := make([]interface{}, len(selects))
+		for _, cl := range cllcts {
 			cl.Next(ptrs)
-			for i, p := range ptrs {
-				if p != nil {
-					reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
-				}
+		}
+		for i, p := range ptrs {
+			if p != nil {
+				reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
 			}
+		}
+		for _, cl := range cllcts {
 			cl.AfterScan(ptrs)
 		}
 	}

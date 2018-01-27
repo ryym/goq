@@ -9,12 +9,6 @@ import (
 )
 
 func TestModelElemCollector(t *testing.T) {
-	users := NewUsers("")
-	maker := cllct.NewModelCollectorMaker(users.Columns(), "")
-
-	var got User
-	cl := maker.ToElem(&got)
-
 	rows := [][]interface{}{
 		{"alice", 101},
 	}
@@ -24,7 +18,12 @@ func TestModelElemCollector(t *testing.T) {
 		sel("", "User", "ID"),
 	}
 
-	execCollector(cl, rows, selects, nil)
+	users := NewUsers("")
+
+	var got User
+	execCollector([]cllct.Collector{
+		users.ToElem(&got),
+	}, rows, selects, nil)
 
 	want := User{ID: 101, Name: "alice"}
 	if diff := deep.Equal(got, want); diff != nil {

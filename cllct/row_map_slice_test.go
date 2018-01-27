@@ -8,14 +8,17 @@ import (
 )
 
 func TestRowMapSliceCollector(t *testing.T) {
-	var got []map[string]interface{}
-	cl := cllct.NewMaker().ToRowMapSlice(&got)
-
 	rows := [][]interface{}{
 		{1, "foo", true},
 		{2, "bar", false},
 	}
-	execCollector(cl, rows, nil, []string{"a", "b", "c"})
+
+	cl := cllct.NewMaker()
+
+	var got []map[string]interface{}
+	execCollector([]cllct.Collector{
+		cl.ToRowMapSlice(&got),
+	}, rows, nil, []string{"a", "b", "c"})
 
 	want := []map[string]interface{}{
 		{"a": 1, "b": "foo", "c": true},

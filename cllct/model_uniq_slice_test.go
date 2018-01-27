@@ -9,12 +9,6 @@ import (
 )
 
 func TestModelUniqSliceCollector(t *testing.T) {
-	users := NewUsers("")
-	maker := cllct.NewModelCollectorMaker(users.Columns(), "")
-
-	var got []User
-	cl := maker.ToUniqSlice(&got)
-
 	rows := [][]interface{}{
 		{2, "_", "bob"},
 		{1, "_", "alice"},
@@ -34,7 +28,12 @@ func TestModelUniqSliceCollector(t *testing.T) {
 		sel("", "User", "Name"),
 	}
 
-	execCollector(cl, rows, selects, nil)
+	users := NewUsers("")
+
+	var got []User
+	execCollector([]cllct.Collector{
+		users.ToUniqSlice(&got),
+	}, rows, selects, nil)
 
 	want := []User{
 		{ID: 2, Name: "bob"},
