@@ -3,7 +3,7 @@ package cllct
 import "github.com/ryym/goq/gql"
 
 type Collector interface {
-	Init(selects []gql.Selection, colNames []string) (mappable bool)
+	Init(selects []gql.Selection, colNames []string) (collectable bool, err error)
 	Next(ptrs []interface{})
 	AfterScan(ptrs []interface{})
 }

@@ -13,9 +13,9 @@ type RowMapSliceCollector struct {
 
 func (c *RowMapSliceCollector) ImplListCollector() {}
 
-func (c *RowMapSliceCollector) Init(_selects []gql.Selection, names []string) bool {
+func (c *RowMapSliceCollector) Init(_selects []gql.Selection, names []string) (bool, error) {
 	c.colNames = names
-	return true
+	return true, nil
 }
 
 func (c *RowMapSliceCollector) Next(ptrs []interface{}) {

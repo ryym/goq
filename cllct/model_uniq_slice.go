@@ -1,6 +1,7 @@
 package cllct
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/ryym/goq/gql"
@@ -21,10 +22,9 @@ type ModelUniqSliceCollector struct {
 
 func (cl *ModelUniqSliceCollector) ImplListCollector() {}
 
-func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string) bool {
+func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
 	if cl.pkFieldName == "" {
-		// TODO: return error
-		panic("[ModelUniqSliceCollector] primary key not defined")
+		return false, fmt.Errorf("primary key not defined for %s", cl.structName)
 	}
 
 	cl.pks = map[interface{}]bool{}
@@ -53,11 +53,10 @@ func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string
 	}
 
 	if cl.keyIdx == -1 {
-		// TODO: return error
-		panic("[ModelUniqSliceCollector] primary key not found")
+		return false, fmt.Errorf("primary key %s not selected", cl.pkFieldName)
 	}
 
-	return len(cl.colToFld) > 0
+	return len(cl.colToFld) > 0, nil
 }
 
 func (cl *ModelUniqSliceCollector) Next(ptrs []interface{}) {

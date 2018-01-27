@@ -16,7 +16,7 @@ type ModelElemCollector struct {
 
 func (cl *ModelElemCollector) ImplSingleCollector() {}
 
-func (cl *ModelElemCollector) Init(selects []gql.Selection, _names []string) bool {
+func (cl *ModelElemCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
 	cl.colToFld = map[int]int{}
 	for iC, c := range selects {
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
@@ -27,7 +27,7 @@ func (cl *ModelElemCollector) Init(selects []gql.Selection, _names []string) boo
 			}
 		}
 	}
-	return len(cl.colToFld) > 0
+	return len(cl.colToFld) > 0, nil
 }
 
 func (cl *ModelElemCollector) Next(ptrs []interface{}) {

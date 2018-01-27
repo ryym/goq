@@ -3,7 +3,9 @@ package goq
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 
+	"github.com/pkg/errors"
 	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/gql"
@@ -96,8 +98,15 @@ func (cl *Collectable) collect(query gql.QueryExpr, collectors ...cllct.Collecto
 	}
 
 	clls := make([]cllct.Collector, 0, len(collectors))
-	for _, cl := range collectors {
-		if cl.Init(selects, colNames) {
+	for i, cl := range collectors {
+		ok, err := cl.Init(selects, colNames)
+		if err != nil {
+			return errors.Wrapf(
+				err, "failed to initialize collectors[%d] (%s)",
+				i, reflect.TypeOf(cl).Name(),
+			)
+		}
+		if ok {
 			clls = append(clls, cl)
 		}
 	}

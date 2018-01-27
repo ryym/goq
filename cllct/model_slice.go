@@ -18,7 +18,7 @@ type ModelSliceCollector struct {
 
 func (cl *ModelSliceCollector) ImplListCollector() {}
 
-func (cl *ModelSliceCollector) Init(selects []gql.Selection, _names []string) bool {
+func (cl *ModelSliceCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
 	cl.colToFld = map[int]int{}
 	for iC, c := range selects {
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
@@ -31,7 +31,7 @@ func (cl *ModelSliceCollector) Init(selects []gql.Selection, _names []string) bo
 	}
 	cl.elemType = cl.slice.Type().Elem()
 	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
-	return len(cl.colToFld) > 0
+	return len(cl.colToFld) > 0, nil
 }
 
 func (cl *ModelSliceCollector) Next(ptrs []interface{}) {

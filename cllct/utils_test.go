@@ -16,22 +16,30 @@ func execCollector(
 	rows [][]interface{},
 	selects []gql.Selection,
 	colNames []string,
-) {
+) error {
 	if selects == nil {
 		selects = make([]gql.Selection, len(colNames))
 	} else {
 		colNames = make([]string, len(selects))
 	}
 
-	cl.Init(selects, colNames)
-	for _, row := range rows {
-		ptrs := make([]interface{}, len(selects))
-		cl.Next(ptrs)
-		for i, p := range ptrs {
-			if p != nil {
-				reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
-			}
-		}
-		cl.AfterScan(ptrs)
+	ok, err := cl.Init(selects, colNames)
+	if err != nil {
+		return err
 	}
+
+	if ok {
+		for _, row := range rows {
+			ptrs := make([]interface{}, len(selects))
+			cl.Next(ptrs)
+			for i, p := range ptrs {
+				if p != nil {
+					reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
+				}
+			}
+			cl.AfterScan(ptrs)
+		}
+	}
+
+	return nil
 }
