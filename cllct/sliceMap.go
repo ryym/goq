@@ -1,0 +1,74 @@
+package cllct
+
+import (
+	"errors"
+	"reflect"
+
+	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/util"
+)
+
+type SliceMapCollector struct {
+	elemType reflect.Type
+	colToFld map[int]int
+	key      gql.Querier
+	keyIdx   int
+	keyStore reflect.Value
+	mp       reflect.Value
+	row      reflect.Value
+}
+
+func (cl *SliceMapCollector) Init(selects []gql.Selection, names []string) (bool, error) {
+	cl.elemType = cl.mp.Type().Elem().Elem()
+
+	targets := map[string]int{}
+	for i := 0; i < cl.elemType.NumField(); i++ {
+		f := cl.elemType.Field(i)
+		if f.PkgPath == "" { // exported
+			targets[util.FldToCol(f.Name)] = i
+		}
+	}
+
+	cl.colToFld = map[int]int{}
+	key := cl.key.Selection()
+	cl.keyIdx = -1
+
+	for iC, name := range names {
+		if iF, ok := targets[name]; ok {
+			cl.colToFld[iC] = iF
+		}
+		if name == key.Alias || isKeyCol(&selects[iC], &key) {
+			cl.keyIdx = iC
+		}
+	}
+
+	if cl.keyIdx == -1 {
+		return false, errors.New("specified key not found")
+	}
+
+	mapType := cl.mp.Type()
+	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), mapType.Elem())))
+
+	return len(cl.colToFld) > 0, nil
+}
+
+func (cl *SliceMapCollector) Next(ptrs []interface{}) {
+	row := reflect.New(cl.elemType).Elem()
+	cl.row = row.Addr()
+	for c, f := range cl.colToFld {
+		ptrs[c] = row.Field(f).Addr().Interface()
+	}
+	if cl.keyStore.IsValid() {
+		ptrs[cl.keyIdx] = cl.keyStore.Addr().Interface()
+	}
+}
+
+func (cl *SliceMapCollector) AfterScan(ptrs []interface{}) {
+	key := reflect.ValueOf(ptrs[cl.keyIdx]).Elem()
+	slice := cl.mp.MapIndex(key)
+	if !slice.IsValid() {
+		slice = reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0)
+	}
+	slice = reflect.Append(slice, cl.row.Elem())
+	cl.mp.SetMapIndex(key, slice)
+}

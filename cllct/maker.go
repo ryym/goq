@@ -45,6 +45,27 @@ func (cm *CollectorMaker) ToMap(mp interface{}) *mapCollectorMaker {
 	}}
 }
 
+type sliceMapCollector struct {
+	collector *SliceMapCollector
+}
+
+func (m *sliceMapCollector) By(key gql.Querier) *SliceMapCollector {
+	m.collector.key = key
+	return m.collector
+}
+
+func (m *sliceMapCollector) ByWith(ptr interface{}, key gql.Querier) *SliceMapCollector {
+	m.collector.key = key
+	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
+	return m.collector
+}
+
+func (cm *CollectorMaker) ToSliceMap(mp interface{}) *sliceMapCollector {
+	return &sliceMapCollector{&SliceMapCollector{
+		mp: reflect.ValueOf(mp).Elem(),
+	}}
+}
+
 func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMapSliceCollector {
 	return &RowMapSliceCollector{slice: slice}
 }
