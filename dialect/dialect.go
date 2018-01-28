@@ -10,29 +10,37 @@ type Dialect interface {
 func New(driver string) Dialect {
 	switch driver {
 	case "postgres":
-		return &Postgres{}
+		return &postgres{}
 	case "sqlite3":
-		return &Sqlite{}
+		return &sqlite{}
 	}
 	return nil
 }
 
-type Postgres struct{}
+type postgres struct{}
 
-func (ctx *Postgres) Placeholder(prevArgs []interface{}) string {
+func Postgres() *postgres {
+	return &postgres{}
+}
+
+func (dl *postgres) Placeholder(prevArgs []interface{}) string {
 	return fmt.Sprintf("$%d", len(prevArgs)+1)
 }
 
-func (ctx *Postgres) QuoteIdent(v string) string {
+func (dl *postgres) QuoteIdent(v string) string {
 	return fmt.Sprintf(`"%s"`, v)
 }
 
-type Sqlite struct{}
+type sqlite struct{}
 
-func (ctx *Sqlite) Placeholder(prevArgs []interface{}) string {
+func Sqlite() *sqlite {
+	return &sqlite{}
+}
+
+func (dl *sqlite) Placeholder(prevArgs []interface{}) string {
 	return "?"
 }
 
-func (ctx *Sqlite) QuoteIdent(v string) string {
+func (dl *sqlite) QuoteIdent(v string) string {
 	return fmt.Sprintf(`"%s"`, v)
 }
