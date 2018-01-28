@@ -42,9 +42,7 @@ func (cl *ModelUniqSliceMapCollector) Init(selects []gql.Selection, _names []str
 			}
 		}
 
-		isKey := c.Alias != "" && c.Alias == key.Alias ||
-			c.TableAlias == key.TableAlias && c.StructName == key.StructName && c.FieldName == key.FieldName
-		if isKey {
+		if isKeyCol(&c, &key) {
 			cl.keyIdx = iC
 		}
 	}
