@@ -17,6 +17,20 @@ func New(driver string) Dialect {
 	return nil
 }
 
+type generic struct{}
+
+func Generic() *generic {
+	return &generic{}
+}
+
+func (dl *generic) Placeholder(prevArgs []interface{}) string {
+	return "?"
+}
+
+func (dl *generic) QuoteIdent(v string) string {
+	return v
+}
+
 type postgres struct{}
 
 func Postgres() *postgres {
