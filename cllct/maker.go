@@ -57,11 +57,9 @@ func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
 }
 
 func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCollector {
-	var pkFieldName string
-	for _, col := range cm.cols {
-		if meta := col.Meta(); meta.PK {
-			pkFieldName = col.FieldName()
-		}
+	pkFieldName := ""
+	if pkCol := findPKCol(cm.cols); pkCol != nil {
+		pkFieldName = pkCol.FieldName()
 	}
 	return &ModelUniqSliceCollector{
 		structName:  cm.structName,
@@ -69,6 +67,16 @@ func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCol
 		pkFieldName: pkFieldName,
 		slice:       reflect.ValueOf(slice).Elem(),
 		cols:        cm.cols,
+	}
+}
+
+func (cm *ModelCollectorMaker) ToMap(mp interface{}) *ModelMapCollector {
+	return &ModelMapCollector{
+		structName: cm.structName,
+		tableAlias: cm.tableAlias,
+		key:        findPKCol(cm.cols),
+		mp:         reflect.ValueOf(mp).Elem(),
+		cols:       cm.cols,
 	}
 }
 
@@ -129,11 +137,9 @@ func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querie
 }
 
 func (cm *ModelCollectorMaker) ToUniqSliceMap(mp interface{}) *modelUniqSliceMapCollectorMaker {
-	var pkFieldName string
-	for _, col := range cm.cols {
-		if meta := col.Meta(); meta.PK {
-			pkFieldName = col.FieldName()
-		}
+	pkFieldName := ""
+	if pkCol := findPKCol(cm.cols); pkCol != nil {
+		pkFieldName = pkCol.FieldName()
 	}
 	return &modelUniqSliceMapCollectorMaker{&ModelUniqSliceMapCollector{
 		structName:  cm.structName,
@@ -142,4 +148,13 @@ func (cm *ModelCollectorMaker) ToUniqSliceMap(mp interface{}) *modelUniqSliceMap
 		mp:          reflect.ValueOf(mp).Elem(),
 		cols:        cm.cols,
 	}}
+}
+
+func findPKCol(cols []*gql.Column) *gql.Column {
+	for _, col := range cols {
+		if meta := col.Meta(); meta.PK {
+			return col
+		}
+	}
+	return nil
 }
