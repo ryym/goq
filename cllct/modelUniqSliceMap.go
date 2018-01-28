@@ -24,13 +24,16 @@ type ModelUniqSliceMapCollector struct {
 	elem        *reflect.Value
 }
 
-func (cl *ModelUniqSliceMapCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
+func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.colToFld = map[int]int{}
 	key := cl.key.Selection()
 	cl.keyIdx = -1
 	cl.pkIdx = -1
 
-	for iC, c := range selects {
+	for iC, c := range conf.Selects {
+		if !conf.take(iC) {
+			continue
+		}
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
 			if cl.pkFieldName == c.FieldName {
 				cl.pkIdx = iC

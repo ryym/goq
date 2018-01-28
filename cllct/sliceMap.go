@@ -18,7 +18,7 @@ type SliceMapCollector struct {
 	row      reflect.Value
 }
 
-func (cl *SliceMapCollector) Init(selects []gql.Selection, names []string) (bool, error) {
+func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.elemType = cl.mp.Type().Elem().Elem()
 
 	targets := map[string]int{}
@@ -33,11 +33,14 @@ func (cl *SliceMapCollector) Init(selects []gql.Selection, names []string) (bool
 	key := cl.key.Selection()
 	cl.keyIdx = -1
 
-	for iC, name := range names {
+	for iC, name := range conf.ColNames {
+		if !conf.take(iC) {
+			continue
+		}
 		if iF, ok := targets[name]; ok {
 			cl.colToFld[iC] = iF
 		}
-		if name == key.Alias || isKeyCol(&selects[iC], &key) {
+		if name == key.Alias || isKeyCol(&conf.Selects[iC], &key) {
 			cl.keyIdx = iC
 		}
 	}

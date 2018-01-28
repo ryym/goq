@@ -3,7 +3,6 @@ package cllct
 import (
 	"reflect"
 
-	"github.com/ryym/goq/gql"
 	"github.com/ryym/goq/util"
 )
 
@@ -14,7 +13,7 @@ type ElemCollector struct {
 
 func (cl *ElemCollector) ImplSingleCollector() {}
 
-func (cl *ElemCollector) Init(selects []gql.Selection, names []string) (bool, error) {
+func (cl *ElemCollector) Init(conf *InitConf) (bool, error) {
 	targets := map[string]int{}
 	elemType := cl.elem.Type()
 	for i := 0; i < elemType.NumField(); i++ {
@@ -25,7 +24,10 @@ func (cl *ElemCollector) Init(selects []gql.Selection, names []string) (bool, er
 	}
 
 	cl.colToFld = map[int]int{}
-	for iC, c := range names {
+	for iC, c := range conf.ColNames {
+		if !conf.take(iC) {
+			continue
+		}
 		if iF, ok := targets[c]; ok {
 			cl.colToFld[iC] = iF
 		}

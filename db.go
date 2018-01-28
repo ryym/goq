@@ -97,8 +97,9 @@ func (cl *Collectable) collect(query gql.QueryExpr, collectors ...cllct.Collecto
 	}
 
 	clls := make([]cllct.Collector, 0, len(collectors))
+	initConf := cllct.NewInitConf(selects, colNames)
 	for i, cl := range collectors {
-		ok, err := cl.Init(selects, colNames)
+		ok, err := cl.Init(initConf)
 		if err != nil {
 			return errors.Wrapf(
 				err, "failed to initialize collectors[%d] (%s)",

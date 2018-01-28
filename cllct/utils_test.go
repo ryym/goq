@@ -24,7 +24,7 @@ func execCollector(
 	}
 
 	for _, cl := range cllcts {
-		_, err := cl.Init(selects, colNames)
+		_, err := cl.Init(cllct.NewInitConf(selects, colNames))
 		if err != nil {
 			return err
 		}

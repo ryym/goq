@@ -21,7 +21,7 @@ type ModelMapCollector struct {
 
 func (cl *ModelMapCollector) ImplListCollector() {}
 
-func (cl *ModelMapCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
+func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	if cl.key == nil {
 		return false, errors.New("PK column required")
 	}
@@ -30,7 +30,10 @@ func (cl *ModelMapCollector) Init(selects []gql.Selection, _names []string) (boo
 	key := cl.key.Selection()
 	cl.keyIdx = -1
 
-	for iC, c := range selects {
+	for iC, c := range conf.Selects {
+		if !conf.take(iC) {
+			continue
+		}
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {

@@ -22,7 +22,7 @@ type ModelUniqSliceCollector struct {
 
 func (cl *ModelUniqSliceCollector) ImplListCollector() {}
 
-func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
+func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
 	if cl.pkFieldName == "" {
 		return false, fmt.Errorf("primary key not defined for %s", cl.structName)
 	}
@@ -39,7 +39,10 @@ func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string
 
 	cl.pkIdx = -1
 	cl.colToFld = map[int]int{}
-	for iC, c := range selects {
+	for iC, c := range conf.Selects {
+		if !conf.take(iC) {
+			continue
+		}
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
 			if cl.pkFieldName == c.FieldName {
 				cl.pkIdx = iC

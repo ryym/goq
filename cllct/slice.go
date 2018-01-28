@@ -3,7 +3,6 @@ package cllct
 import (
 	"reflect"
 
-	"github.com/ryym/goq/gql"
 	"github.com/ryym/goq/util"
 )
 
@@ -16,7 +15,7 @@ type SliceCollector struct {
 
 func (cl *SliceCollector) ImplListCollector() {}
 
-func (cl *SliceCollector) Init(selects []gql.Selection, names []string) (bool, error) {
+func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
 	cl.elemType = cl.slice.Type().Elem()
 
 	targets := map[string]int{}
@@ -28,7 +27,10 @@ func (cl *SliceCollector) Init(selects []gql.Selection, names []string) (bool, e
 	}
 
 	cl.colToFld = map[int]int{}
-	for iC, c := range names {
+	for iC, c := range conf.ColNames {
+		if !conf.take(iC) {
+			continue
+		}
 		if iF, ok := targets[c]; ok {
 			cl.colToFld[iC] = iF
 		}

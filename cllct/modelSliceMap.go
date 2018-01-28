@@ -20,12 +20,15 @@ type ModelSliceMapCollector struct {
 	row        reflect.Value
 }
 
-func (cl *ModelSliceMapCollector) Init(selects []gql.Selection, _names []string) (bool, error) {
+func (cl *ModelSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.colToFld = map[int]int{}
 	key := cl.key.Selection()
 	cl.keyIdx = -1
 
-	for iC, c := range selects {
+	for iC, c := range conf.Selects {
+		if !conf.take(iC) {
+			continue
+		}
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {

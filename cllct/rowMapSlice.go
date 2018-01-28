@@ -2,8 +2,6 @@ package cllct
 
 import (
 	"reflect"
-
-	"github.com/ryym/goq/gql"
 )
 
 type RowMapSliceCollector struct {
@@ -13,8 +11,12 @@ type RowMapSliceCollector struct {
 
 func (c *RowMapSliceCollector) ImplListCollector() {}
 
-func (c *RowMapSliceCollector) Init(_selects []gql.Selection, names []string) (bool, error) {
-	c.colNames = names
+func (c *RowMapSliceCollector) Init(conf *InitConf) (bool, error) {
+	for i, col := range conf.ColNames {
+		if conf.take(i) {
+			c.colNames = append(c.colNames, col)
+		}
+	}
 	return true, nil
 }
 
