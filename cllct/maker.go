@@ -12,6 +12,12 @@ func NewMaker() *CollectorMaker {
 	return &CollectorMaker{}
 }
 
+func (cm *CollectorMaker) ToElem(elem interface{}) *ElemCollector {
+	return &ElemCollector{
+		elem: reflect.ValueOf(elem).Elem(),
+	}
+}
+
 func (cm *CollectorMaker) ToSlice(slice interface{}) *SliceCollector {
 	return &SliceCollector{
 		slice: reflect.ValueOf(slice).Elem(),
