@@ -12,6 +12,12 @@ func NewMaker() *CollectorMaker {
 	return &CollectorMaker{}
 }
 
+func (cm *CollectorMaker) ToSlice(slice interface{}) *SliceCollector {
+	return &SliceCollector{
+		slice: reflect.ValueOf(slice).Elem(),
+	}
+}
+
 func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMapSliceCollector {
 	return &RowMapSliceCollector{slice: slice}
 }
