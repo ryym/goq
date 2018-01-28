@@ -111,3 +111,35 @@ func (cm *ModelCollectorMaker) ToSliceMap(mp interface{}) *modelSliceMapCollecto
 		cols:       cm.cols,
 	}}
 }
+
+type modelUniqSliceMapCollectorMaker struct {
+	collector *ModelUniqSliceMapCollector
+}
+
+func (m *modelUniqSliceMapCollectorMaker) By(key gql.Querier) *ModelUniqSliceMapCollector {
+	m.collector.key = key
+	return m.collector
+}
+
+// See modelSliceMapCollectorMaker.ByWith
+func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *ModelUniqSliceMapCollector {
+	m.collector.key = key
+	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
+	return m.collector
+}
+
+func (cm *ModelCollectorMaker) ToUniqSliceMap(mp interface{}) *modelUniqSliceMapCollectorMaker {
+	var pkFieldName string
+	for _, col := range cm.cols {
+		if meta := col.Meta(); meta.PK {
+			pkFieldName = col.FieldName()
+		}
+	}
+	return &modelUniqSliceMapCollectorMaker{&ModelUniqSliceMapCollector{
+		structName:  cm.structName,
+		tableAlias:  cm.tableAlias,
+		pkFieldName: pkFieldName,
+		mp:          reflect.ValueOf(mp).Elem(),
+		cols:        cm.cols,
+	}}
+}

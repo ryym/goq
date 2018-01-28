@@ -15,7 +15,7 @@ type ModelUniqSliceCollector struct {
 	colToFld    map[int]int
 	slice       reflect.Value
 	pkFieldName string
-	keyIdx      int
+	pkIdx       int
 	pks         map[interface{}]bool
 	elem        *reflect.Value
 }
@@ -37,12 +37,12 @@ func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string
 	elem := reflect.New(cl.elemType).Elem()
 	cl.elem = &elem
 
-	cl.keyIdx = -1
+	cl.pkIdx = -1
 	cl.colToFld = map[int]int{}
 	for iC, c := range selects {
 		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
 			if cl.pkFieldName == c.FieldName {
-				cl.keyIdx = iC
+				cl.pkIdx = iC
 			}
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {
@@ -52,7 +52,7 @@ func (cl *ModelUniqSliceCollector) Init(selects []gql.Selection, _names []string
 		}
 	}
 
-	if cl.keyIdx == -1 {
+	if cl.pkIdx == -1 {
 		return false, fmt.Errorf("primary key %s not selected", cl.pkFieldName)
 	}
 
@@ -66,7 +66,7 @@ func (cl *ModelUniqSliceCollector) Next(ptrs []interface{}) {
 }
 
 func (cl *ModelUniqSliceCollector) AfterScan(ptrs []interface{}) {
-	pk := reflect.ValueOf(ptrs[cl.keyIdx]).Elem().Interface()
+	pk := reflect.ValueOf(ptrs[cl.pkIdx]).Elem().Interface()
 	if cl.pks[pk] {
 		return
 	}

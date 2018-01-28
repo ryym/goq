@@ -8,14 +8,23 @@ import (
 	"github.com/ryym/goq/gql"
 )
 
-func TestModelSliceMapCollector(t *testing.T) {
+func TestModelUniqSliceMapCollector(t *testing.T) {
 	rows := [][]interface{}{
 		{8, "japan", 1, "tokyo"},
+		{8, "japan", 1, "tokyo"},
+		{8, "japan", 1, "tokyo"},
+		{8, "japan", 2, "oosaka"},
 		{8, "japan", 2, "oosaka"},
 		{8, "japan", 3, "hiroshima"},
 		{3, "us", 4, "newyork"},
+		{3, "us", 4, "newyork"},
+		{3, "us", 4, "newyork"},
+		{3, "us", 5, "losangeles"},
+		{3, "us", 5, "losangeles"},
+		{3, "us", 5, "losangeles"},
 		{3, "us", 5, "losangeles"},
 		{3, "us", 6, "chicago"},
+		{3, "us", 7, "houston"},
 		{3, "us", 7, "houston"},
 	}
 
@@ -32,7 +41,7 @@ func TestModelSliceMapCollector(t *testing.T) {
 	var countryID int
 	var got map[int][]City
 	err := execCollector([]cllct.Collector{
-		cities.ToSliceMap(&got).ByWith(&countryID, countries.ID),
+		cities.ToUniqSliceMap(&got).ByWith(&countryID, countries.ID),
 	}, rows, selects, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -51,6 +60,7 @@ func TestModelSliceMapCollector(t *testing.T) {
 			{ID: 7, Name: "houston"},
 		},
 	}
+	t.Log(got)
 	if diff := deep.Equal(got, want); diff != nil {
 		t.Error(diff)
 	}
