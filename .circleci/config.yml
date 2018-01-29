@@ -3,7 +3,24 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
+      - image: circleci/postgres:9.6-alpine
+        environment:
+          POSTGRES_USER: goq
+          POSTGRES_DB: goq
     working_directory: /go/src/github.com/ryym/goq
     steps:
       - checkout
-      - run: go test -race ./...
+      - run: go test -race `go list ./... | grep -v /tests`
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Could not connect && exit 1
+      - run:
+          name: Integration test
+          command: go test -race ./tests
