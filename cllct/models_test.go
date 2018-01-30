@@ -1,6 +1,6 @@
 package cllct_test
 
-//go:generate goq -testpkg gql_test.go
+//go:generate goq -test gql_test.go
 
 type Tables struct {
 	users     User

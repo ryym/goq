@@ -16,7 +16,7 @@ type Opts struct {
 	PkgPath          string
 	OutFile          string
 	TablesStructName string
-	IsTestPkg        bool
+	IsTestFile       bool
 }
 
 type helper struct {
@@ -51,7 +51,7 @@ type field struct {
 
 func GenerateTableHelpers(opts Opts) error {
 	conf := loader.Config{}
-	if opts.IsTestPkg {
+	if opts.IsTestFile {
 		conf.ImportWithTests(opts.PkgPath)
 	} else {
 		conf.Import(opts.PkgPath)
@@ -61,20 +61,19 @@ func GenerateTableHelpers(opts Opts) error {
 		return nil
 	}
 
-	pkgPath := opts.PkgPath
-	if opts.IsTestPkg {
-		pkgPath += "_test"
+	var tables types.Object
+	var tablesPkg *types.Package
+
+	pkg := prg.Package(opts.PkgPath)
+	if opts.IsTestFile {
+		testPkg := prg.Package(opts.PkgPath + "_test")
+		tables, tablesPkg = findTablesDef(opts.TablesStructName, testPkg, pkg)
+	} else {
+		tables, tablesPkg = findTablesDef(opts.TablesStructName, pkg)
 	}
 
-	pkg := prg.Package(pkgPath)
-	if pkg == nil {
-		return fmt.Errorf("package %s not found", opts.PkgPath)
-	}
-
-	tablesPkg := pkg.Pkg
-	tables := tablesPkg.Scope().Lookup(opts.TablesStructName)
 	if tables == nil {
-		return fmt.Errorf("struct %s not found", opts.TablesStructName)
+		return fmt.Errorf("Table definition struct %s not found", opts.TablesStructName)
 	}
 
 	tablesT, ok := tables.Type().Underlying().(*types.Struct)
@@ -139,6 +138,17 @@ func GenerateTableHelpers(opts Opts) error {
 	}
 
 	return err
+}
+
+func findTablesDef(structName string, pkgs ...*loader.PackageInfo) (types.Object, *types.Package) {
+	for _, pkg := range pkgs {
+		if pkg != nil {
+			if tables := pkg.Pkg.Scope().Lookup(structName); tables != nil {
+				return tables, pkg.Pkg
+			}
+		}
+	}
+	return nil, nil
 }
 
 func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) {

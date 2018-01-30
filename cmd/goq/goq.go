@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	isTestPkg := flag.Bool("testpkg", false, "Generate from code in test package")
+	IsTestFile := flag.Bool("test", false, "Generate from code in test file")
 	flag.Parse()
 
 	gopath := os.Getenv("GOPATH")
@@ -52,7 +52,7 @@ func main() {
 		PkgPath:          pkgPath,
 		OutFile:          outFile,
 		TablesStructName: "Tables",
-		IsTestPkg:        *isTestPkg,
+		IsTestFile:       *IsTestFile,
 	}
 
 	err = gen.GenerateTableHelpers(opts)
