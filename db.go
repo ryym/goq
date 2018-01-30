@@ -1,6 +1,7 @@
 package goq
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -38,12 +39,35 @@ func (d *DB) Dialect() dialect.Dialect {
 	return d.dialect
 }
 
+func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
+	tx, err := d.DB.BeginTx(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return &Tx{tx}, nil
+}
+
 func (d *DB) Query(query gql.QueryExpr) *Collectable {
 	return &Collectable{d.DB, query}
 }
 
+type Tx struct {
+	Tx *sql.Tx
+}
+
+func (tx *Tx) Query(query gql.QueryExpr) *Collectable {
+	return &Collectable{tx.Tx, query}
+}
+
+func (tx *Tx) Commit() error   { return tx.Tx.Commit() }
+func (tx *Tx) Rollback() error { return tx.Tx.Rollback() }
+
+type Queryable interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+}
+
 type Collectable struct {
-	db    *sql.DB
+	db    Queryable
 	query gql.QueryExpr
 }
 
