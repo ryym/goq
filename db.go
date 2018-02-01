@@ -73,9 +73,6 @@ type Collectable struct {
 
 func (cl *Collectable) Rows() (*sql.Rows, error) {
 	q := cl.query.Construct()
-
-	// TODO: remove debug code.
-	fmt.Printf("[LOG] %s %v\n", q.Query(), q.Args())
 	return cl.db.Query(q.Query(), q.Args()...)
 }
 
@@ -97,9 +94,6 @@ func (cl *Collectable) Collect(collectors ...cllct.ListCollector) error {
 
 func (cl *Collectable) collect(query gql.QueryExpr, collectors ...cllct.Collector) error {
 	q := query.Construct()
-
-	// TODO: remove debug code.
-	fmt.Printf("[LOG] %s %v\n", q.Query(), q.Args())
 	rows, err := cl.db.Query(q.Query(), q.Args()...)
 	if err != nil {
 		return err
