@@ -12,7 +12,7 @@ type queryExpr struct {
 	wheres  []PredExpr
 	groups  []Expr
 	havings []PredExpr
-	orders  []Expr
+	orders  []Orderer
 	limit   int
 	offset  int
 	ctx     DBContext
@@ -88,10 +88,18 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 	// ORDER BY
 	if len(qe.orders) > 0 {
 		q.query = append(q.query, " ORDER BY ")
-		qe.orders[0].Apply(q, ctx)
+		ord := qe.orders[0].Ordering()
+		ord.expr.Apply(q, ctx)
+		if ord.order == ORDER_DESC {
+			q.query = append(q.query, " DESC")
+		}
 		for i := 1; i < len(qe.orders); i++ {
 			q.query = append(q.query, ", ")
-			qe.orders[i].Apply(q, ctx)
+			ord = qe.orders[i].Ordering()
+			ord.expr.Apply(q, ctx)
+			if ord.order == ORDER_DESC {
+				q.query = append(q.query, " DESC")
+			}
 		}
 	}
 
@@ -148,8 +156,8 @@ func (qe *queryExpr) Having(preds ...PredExpr) GroupByClause {
 	return qe
 }
 
-func (qe *queryExpr) OrderBy(exps ...Expr) QueryExpr {
-	qe.orders = append(qe.orders, exps...)
+func (qe *queryExpr) OrderBy(orders ...Orderer) QueryExpr {
+	qe.orders = append(qe.orders, orders...)
 	return qe
 }
 

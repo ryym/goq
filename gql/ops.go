@@ -144,3 +144,15 @@ func (o *ops) In(vals ...interface{}) PredExpr {
 		exps: exps,
 	}).init()}
 }
+
+func (o *ops) Asc() Orderer {
+	return o
+}
+
+func (o *ops) Desc() Orderer {
+	return Ordering{o.expr, ORDER_DESC}
+}
+
+func (o *ops) Ordering() Ordering {
+	return Ordering{o.expr, ORDER_ASC}
+}

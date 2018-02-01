@@ -106,7 +106,7 @@ type QueryExpr interface {
 	As(alias string) QueryTable
 	Selections() []Selection
 	Construct() Query
-	OrderBy(exps ...Expr) QueryExpr
+	OrderBy(ords ...Orderer) QueryExpr
 	Limit(n int) QueryExpr
 	Offset(n int) QueryExpr
 }
@@ -126,4 +126,24 @@ type Clauses interface {
 type GroupByClause interface {
 	QueryExpr
 	Having(preds ...PredExpr) GroupByClause
+}
+
+type Orderer interface {
+	Ordering() Ordering
+}
+
+const (
+	ORDER_ASC  = "ASC"
+	ORDER_DESC = "DESC"
+)
+
+type Order string
+
+type Ordering struct {
+	expr  Expr
+	order Order
+}
+
+func (ord Ordering) Ordering() Ordering {
+	return ord
 }

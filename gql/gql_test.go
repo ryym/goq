@@ -171,6 +171,11 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "SELECT $1 AS `num` ORDER BY `num`",
 			args: []interface{}{1},
 		},
+		{
+			gql:  z.Select(z.Var(1)).OrderBy(Name.Asc(), ID.Desc(), ID),
+			sql:  "SELECT $1 ORDER BY `users`.`name`, `users`.`id` DESC, `users`.`id`",
+			args: []interface{}{1},
+		},
 	}
 
 	for i, test := range tests {
