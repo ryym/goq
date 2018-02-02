@@ -13,7 +13,7 @@ type ModelMapCollector struct {
 	structName string
 	tableAlias string
 	colToFld   map[int]int
-	key        gql.Querier
+	keySel     *gql.Selection
 	keyIdx     int
 	mp         reflect.Value
 	row        reflect.Value
@@ -22,12 +22,11 @@ type ModelMapCollector struct {
 func (cl *ModelMapCollector) ImplListCollector() {}
 
 func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
-	if cl.key == nil {
+	if cl.keySel == nil {
 		return false, errors.New("PK column required")
 	}
 
 	cl.colToFld = map[int]int{}
-	key := cl.key.Selection()
 	cl.keyIdx = -1
 
 	for iC, c := range conf.Selects {
@@ -42,7 +41,7 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 			}
 		}
 
-		if isKeyCol(&c, &key) {
+		if isKeyCol(&c, cl.keySel) {
 			cl.keyIdx = iC
 		}
 	}

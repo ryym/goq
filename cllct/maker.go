@@ -125,13 +125,17 @@ func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCol
 }
 
 func (cm *ModelCollectorMaker) ToMap(mp interface{}) *ModelMapCollector {
-	return &ModelMapCollector{
+	mapCllct := &ModelMapCollector{
 		structName: cm.structName,
 		tableAlias: cm.tableAlias,
-		key:        findPKCol(cm.cols),
 		mp:         reflect.ValueOf(mp).Elem(),
 		cols:       cm.cols,
 	}
+	if pkCol := findPKCol(cm.cols); pkCol != nil {
+		keySel := pkCol.Selection()
+		mapCllct.keySel = &keySel
+	}
+	return mapCllct
 }
 
 type modelSliceMapCollectorMaker struct {
