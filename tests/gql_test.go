@@ -21,7 +21,7 @@ func NewCountries(alias string) *Countries {
 	t := &Countries{
 		Table: gql.NewTable("countries", alias),
 
-		ID:        cm.Col("ID", "id").Bld(),
+		ID:        cm.Col("ID", "id").PK().Bld(),
 		Name:      cm.Col("Name", "name").Bld(),
 		UpdatedAt: cm.Col("UpdatedAt", "updated_at").Bld(),
 	}
@@ -50,7 +50,7 @@ func NewCities(alias string) *Cities {
 	t := &Cities{
 		Table: gql.NewTable("cities", alias),
 
-		ID:        cm.Col("ID", "id").Bld(),
+		ID:        cm.Col("ID", "id").PK().Bld(),
 		Name:      cm.Col("Name", "name").Bld(),
 		CountryID: cm.Col("CountryID", "country_id").Bld(),
 		UpdatedAt: cm.Col("UpdatedAt", "updated_at").Bld(),

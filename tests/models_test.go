@@ -10,13 +10,13 @@ type Tables struct {
 }
 
 type Country struct {
-	ID        int
+	ID        int `goq:"pk"`
 	Name      string
 	UpdatedAt time.Time
 }
 
 type City struct {
-	ID        int
+	ID        int `goq:"pk"`
 	Name      string
 	CountryID int
 	UpdatedAt time.Time
