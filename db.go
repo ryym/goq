@@ -121,7 +121,7 @@ func (cl *Collectable) collect(query gql.QueryExpr, collectors ...cllct.Collecto
 		if err != nil {
 			return errors.Wrapf(
 				err, "failed to initialize collectors[%d] (%s)",
-				i, reflect.TypeOf(cl).Name(),
+				i, reflect.TypeOf(cl).Elem().Name(),
 			)
 		}
 		if ok {
