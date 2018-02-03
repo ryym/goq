@@ -11,11 +11,22 @@ type testCase struct {
 	name string
 	data string
 	run  func(t *testing.T, tx *goq.Tx, z *Builder) error
+	only bool
 }
 
 func RunIntegrationTest(t *testing.T, db *goq.DB) {
-	builder := NewBuilder(db.Dialect())
+	var targets []testCase
 	for _, c := range testCases {
+		if c.only {
+			targets = append(targets, c)
+		}
+	}
+	if len(targets) == 0 {
+		targets = testCases
+	}
+
+	builder := NewBuilder(db.Dialect())
+	for _, c := range targets {
 		RunTestCase(t, c, builder, db)
 	}
 }
