@@ -7,31 +7,31 @@ import (
 type RowMapSliceCollector struct {
 	slice    *[]map[string]interface{}
 	colNames []string
+	targets  []int
 }
 
-func (c *RowMapSliceCollector) ImplListCollector() {}
+func (cl *RowMapSliceCollector) ImplListCollector() {}
 
-func (c *RowMapSliceCollector) Init(conf *InitConf) (bool, error) {
-	for i, col := range conf.ColNames {
+func (cl *RowMapSliceCollector) Init(conf *InitConf) (bool, error) {
+	cl.colNames = conf.ColNames
+	for i, _ := range conf.ColNames {
 		if conf.take(i) {
-			c.colNames = append(c.colNames, col)
+			cl.targets = append(cl.targets, i)
 		}
 	}
 	return true, nil
 }
 
-func (c *RowMapSliceCollector) Next(ptrs []interface{}) {
-	for i := 0; i < len(ptrs); i++ {
-		if ptrs[i] == nil {
-			ptrs[i] = new(interface{})
-		}
+func (cl *RowMapSliceCollector) Next(ptrs []interface{}) {
+	for _, i := range cl.targets {
+		ptrs[i] = new(interface{})
 	}
 }
 
-func (c *RowMapSliceCollector) AfterScan(ptrs []interface{}) {
+func (cl *RowMapSliceCollector) AfterScan(ptrs []interface{}) {
 	row := make(map[string]interface{}, len(ptrs))
-	for i, p := range ptrs {
-		row[c.colNames[i]] = reflect.ValueOf(p).Elem().Interface()
+	for _, i := range cl.targets {
+		row[cl.colNames[i]] = reflect.ValueOf(ptrs[i]).Elem().Interface()
 	}
-	*c.slice = append(*c.slice, row)
+	*cl.slice = append(*cl.slice, row)
 }
