@@ -3,7 +3,7 @@ package dialect
 import "fmt"
 
 type Dialect interface {
-	Placeholder(prevArgs []interface{}) string
+	Placeholder(typ string, prevArgs []interface{}) string
 	QuoteIdent(v string) string
 }
 
@@ -23,7 +23,7 @@ func Generic() *generic {
 	return &generic{}
 }
 
-func (dl *generic) Placeholder(prevArgs []interface{}) string {
+func (dl *generic) Placeholder(typ string, prevArgs []interface{}) string {
 	return "?"
 }
 
@@ -37,8 +37,12 @@ func Postgres() *postgres {
 	return &postgres{}
 }
 
-func (dl *postgres) Placeholder(prevArgs []interface{}) string {
-	return fmt.Sprintf("$%d", len(prevArgs)+1)
+func (dl *postgres) Placeholder(typ string, prevArgs []interface{}) string {
+	ph := fmt.Sprintf("$%d", len(prevArgs)+1)
+	if typ != "" {
+		ph += "::" + typ
+	}
+	return ph
 }
 
 func (dl *postgres) QuoteIdent(v string) string {
@@ -51,7 +55,7 @@ func Sqlite() *sqlite {
 	return &sqlite{}
 }
 
-func (dl *sqlite) Placeholder(prevArgs []interface{}) string {
+func (dl *sqlite) Placeholder(typ string, prevArgs []interface{}) string {
 	return "?"
 }
 

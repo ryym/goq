@@ -9,8 +9,12 @@ import (
 
 type testDialect struct{}
 
-func (d *testDialect) Placeholder(prevArgs []interface{}) string {
-	return fmt.Sprintf("$%d", len(prevArgs)+1)
+func (d *testDialect) Placeholder(typ string, prevArgs []interface{}) string {
+	ph := fmt.Sprintf("$%d", len(prevArgs)+1)
+	if typ != "" {
+		ph += "::" + typ
+	}
+	return ph
 }
 
 func (d *testDialect) QuoteIdent(v string) string {
@@ -174,6 +178,12 @@ func TestBasicExprs(t *testing.T) {
 		{
 			gql:  z.Select(z.Var(1)).OrderBy(Name.Asc(), ID.Desc(), ID),
 			sql:  "SELECT $1 ORDER BY `users`.`name`, `users`.`id` DESC, `users`.`id`",
+			args: []interface{}{1},
+		},
+		{
+			// Postgres needs type information for placeholders in some cases.
+			gql:  z.Select(z.VarT(1, "int")),
+			sql:  "SELECT $1::int",
 			args: []interface{}{1},
 		},
 	}

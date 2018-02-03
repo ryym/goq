@@ -32,7 +32,7 @@ type Selection struct {
 }
 
 type DBContext interface {
-	Placeholder(prevArgs []interface{}) string
+	Placeholder(typ string, prevArgs []interface{}) string
 	QuoteIdent(v string) string
 }
 

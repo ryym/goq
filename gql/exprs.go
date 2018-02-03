@@ -36,6 +36,7 @@ func (nm *nameExpr) Selection() Selection {
 
 type litExpr struct {
 	val interface{}
+	typ string
 	ops
 }
 
@@ -46,7 +47,7 @@ func (l *litExpr) init() *litExpr {
 
 // TODO: Add no placeholder version?
 func (l *litExpr) Apply(q *Query, ctx DBContext) {
-	q.query = append(q.query, ctx.Placeholder(q.args))
+	q.query = append(q.query, ctx.Placeholder(l.typ, q.args))
 	q.args = append(q.args, l.val)
 }
 
