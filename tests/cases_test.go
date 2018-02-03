@@ -98,4 +98,128 @@ var testCases = []testCase{
 			return nil
 		},
 	},
+	{
+		name: "select records by multiple slice collectors",
+		data: `
+			INSERT INTO countries (id, name) VALUES (8, 'Japan');
+			INSERT INTO countries (id, name) VALUES (20, 'Nowhere');
+
+			INSERT INTO cities (name, country_id) VALUES ('tokyo', 8);
+			INSERT INTO cities (name, country_id) VALUES ('hokkaido', 8);
+			INSERT INTO cities (name, country_id) VALUES ('okinawa', 8);
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(
+				z.Countries.Name,
+				z.Cities.Name,
+				z.Cities.CountryID,
+			).From(
+				z.Countries,
+			).Joins(
+				z.LeftJoin(z.Cities).On(
+					z.Cities.CountryID.Eq(z.Countries.ID),
+				),
+			).OrderBy(
+				z.Countries.Name,
+				z.Cities.Name,
+			)
+
+			var countries []Country
+			var cities []City
+			err := tx.Query(q).Collect(
+				z.Countries.ToSlice(&countries),
+				z.Cities.ToSlice(&cities),
+			)
+			if err != nil {
+				return err
+			}
+
+			// Duplicated results.
+			wantCountries := []Country{
+				{Name: "Japan"},
+				{Name: "Japan"},
+				{Name: "Japan"},
+				{Name: "Nowhere"},
+			}
+			if diff := deep.Equal(countries, wantCountries); diff != nil {
+				t.Log(q.Construct())
+				return fmt.Errorf("countries diff: %s", diff)
+			}
+
+			// Empty City exists because of LEFT JOIN.
+			wantCities := []City{
+				{Name: "hokkaido", CountryID: 8},
+				{Name: "okinawa", CountryID: 8},
+				{Name: "tokyo", CountryID: 8},
+				{},
+			}
+			if diff := deep.Equal(cities, wantCities); diff != nil {
+				t.Log(q.Construct())
+				return fmt.Errorf("cities diff: %s", diff)
+			}
+
+			return nil
+		},
+	},
+	{
+		name: "select records uniquely by multiple slice collectors",
+		data: `
+			INSERT INTO countries (id, name) VALUES (8, 'Japan');
+			INSERT INTO countries (id, name) VALUES (20, 'Somewhere');
+
+			INSERT INTO cities (name, country_id) VALUES ('tokyo', 8);
+			INSERT INTO cities (name, country_id) VALUES ('hokkaido', 8);
+			INSERT INTO cities (name, country_id) VALUES ('okinawa', 8);
+			INSERT INTO cities (name, country_id) VALUES ('foo', 20);
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(
+				z.Countries.ID,
+				z.Countries.Name,
+				z.Cities.Name,
+				z.Cities.CountryID,
+			).From(
+				z.Countries,
+			).Joins(
+				z.LeftJoin(z.Cities).On(
+					z.Cities.CountryID.Eq(z.Countries.ID),
+				),
+			).OrderBy(
+				z.Countries.Name,
+				z.Cities.Name,
+			)
+
+			var countries []Country
+			var cities []City
+			err := tx.Query(q).Collect(
+				z.Countries.ToUniqSlice(&countries),
+				z.Cities.ToSlice(&cities),
+			)
+			if err != nil {
+				return err
+			}
+
+			wantCountries := []Country{
+				{ID: 8, Name: "Japan"},
+				{ID: 20, Name: "Somewhere"},
+			}
+			if diff := deep.Equal(countries, wantCountries); diff != nil {
+				t.Log(q.Construct())
+				return fmt.Errorf("countries diff: %s", diff)
+			}
+
+			wantCities := []City{
+				{Name: "hokkaido", CountryID: 8},
+				{Name: "okinawa", CountryID: 8},
+				{Name: "tokyo", CountryID: 8},
+				{Name: "foo", CountryID: 20},
+			}
+			if diff := deep.Equal(cities, wantCities); diff != nil {
+				t.Log(q.Construct())
+				return fmt.Errorf("cities diff: %s", diff)
+			}
+
+			return nil
+		},
+	},
 }
