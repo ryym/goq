@@ -412,4 +412,70 @@ var testCases = []testCase{
 			return nil
 		},
 	},
+	{
+		name: "collect records into non-model struct slices",
+		data: `
+			INSERT INTO cities (id, name, country_id) VALUES (10, 'newyork', 5);
+			INSERT INTO cities (id, name, country_id) VALUES (12, 'chicago', 5);
+			INSERT INTO cities (id, name, country_id) VALUES (14, 'seattle', 5);
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			type myCity struct {
+				Code      int
+				CityName  string
+				CountryID int
+			}
+
+			q := z.Select(
+				z.Cities.ID.As("code"),
+				z.Cities.Name.As("city_name"),
+				z.Cities.CountryID,
+			).From(z.Cities).OrderBy(z.Cities.ID)
+
+			var cities []myCity
+			err := tx.Query(q).Collect(z.ToSlice(&cities))
+			if err != nil {
+				return err
+			}
+
+			want := []myCity{
+				{Code: 10, CityName: "newyork", CountryID: 5},
+				{Code: 12, CityName: "chicago", CountryID: 5},
+				{Code: 14, CityName: "seattle", CountryID: 5},
+			}
+			if diff := deep.Equal(cities, want); diff != nil {
+				t.Log(q.Construct())
+				return fmt.Errorf("%s", diff)
+			}
+			return nil
+		},
+	},
+	{
+		name: "collect records into map slices",
+		data: `
+			INSERT INTO cities (id, name, country_id) VALUES (10, 'newyork', 5);
+			INSERT INTO cities (id, name, country_id) VALUES (12, 'chicago', 5);
+			INSERT INTO cities (id, name, country_id) VALUES (14, 'seattle', 5);
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(z.Cities.All()).From(z.Cities)
+
+			var cities []map[string]interface{}
+			err := tx.Query(q).Collect(z.ToRowMapSlice(&cities))
+			if err != nil {
+				return err
+			}
+
+			want := []map[string]interface{}{
+				{"id": int64(10), "name": "newyork", "country_id": int64(5), "updated_at": defaultUpdatedAt},
+				{"id": int64(12), "name": "chicago", "country_id": int64(5), "updated_at": defaultUpdatedAt},
+				{"id": int64(14), "name": "seattle", "country_id": int64(5), "updated_at": defaultUpdatedAt},
+			}
+			if diff := deep.Equal(cities, want); diff != nil {
+				t.Log(cities)
+				return fmt.Errorf("%s", diff)
+			}
+			return nil
+		},
+	},
 }
