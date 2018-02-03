@@ -563,4 +563,40 @@ var testCases = []testCase{
 			return nil
 		},
 	},
+	{
+		name: "use self-join by specifying different aliases",
+		data: `
+			INSERT INTO technologies VALUES (1, 'VR', '');
+			INSERT INTO technologies VALUES (2, 'AR', '');
+			INSERT INTO technologies VALUES (3, 'MR', '');
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			t1 := z.Techs.As("t1")
+			t2 := z.Techs.As("t2")
+			q := z.Select(
+				t1.Name.As("name1"), t2.Name.As("name2"),
+			).From(t1, t2).Where(
+				t1.Name.Neq("VR"),
+			).OrderBy(t1.Name, t2.Name)
+
+			var techs []map[string]interface{}
+			err := tx.Query(q).Collect(z.ToRowMapSlice(&techs))
+			if err != nil {
+				return err
+			}
+
+			wantTechs := []map[string]interface{}{
+				{"name1": "AR", "name2": "AR"},
+				{"name1": "AR", "name2": "MR"},
+				{"name1": "AR", "name2": "VR"},
+				{"name1": "MR", "name2": "AR"},
+				{"name1": "MR", "name2": "MR"},
+				{"name1": "MR", "name2": "VR"},
+			}
+			if diff := deep.Equal(techs, wantTechs); diff != nil {
+				return fmt.Errorf("techs diff: %s", diff)
+			}
+			return nil
+		},
+	},
 }
