@@ -20,6 +20,8 @@ type ModelSliceMapCollector struct {
 	row        reflect.Value
 }
 
+func (cl *ModelSliceMapCollector) ImplListCollector() {}
+
 func (cl *ModelSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.colToFld = map[int]int{}
 	key := cl.key.Selection()

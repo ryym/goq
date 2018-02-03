@@ -24,6 +24,8 @@ type ModelUniqSliceMapCollector struct {
 	elem        *reflect.Value
 }
 
+func (cl *ModelUniqSliceMapCollector) ImplListCollector() {}
+
 func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.colToFld = map[int]int{}
 	key := cl.key.Selection()

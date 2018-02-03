@@ -18,6 +18,8 @@ type SliceMapCollector struct {
 	row      reflect.Value
 }
 
+func (cl *SliceMapCollector) ImplListCollector() {}
+
 func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.elemType = cl.mp.Type().Elem().Elem()
 
