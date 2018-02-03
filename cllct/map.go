@@ -36,19 +36,18 @@ func (cl *MapCollector) Init(conf *InitConf) (bool, error) {
 	cl.keyIdx = -1
 
 	for iC, name := range conf.ColNames {
-		if !conf.take(iC) {
-			continue
-		}
-		if iF, ok := targets[name]; ok {
-			cl.colToFld[iC] = iF
-		}
 		if name == key.Alias || isKeyCol(&conf.Selects[iC], &key) {
 			cl.keyIdx = iC
 		}
 	}
-
 	if cl.keyIdx == -1 {
 		return false, errors.New("key not found")
+	}
+
+	for iC, name := range conf.ColNames {
+		if iF, ok := targets[name]; ok && conf.take(iC) {
+			cl.colToFld[iC] = iF
+		}
 	}
 
 	mapType := cl.mp.Type()

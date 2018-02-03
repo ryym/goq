@@ -31,16 +31,14 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.pkIdx = -1
 
 	for iC, c := range conf.Selects {
-		if !conf.take(iC) {
-			continue
-		}
-		if c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
+		if conf.canTake(iC) && c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
 			if cl.pkFieldName == c.FieldName {
 				cl.pkIdx = iC
 			}
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {
 					cl.colToFld[iC] = iF
+					conf.take(iC)
 				}
 			}
 		}

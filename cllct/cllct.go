@@ -20,6 +20,10 @@ func (c *InitConf) take(colIdx int) bool {
 	return !ok
 }
 
+func (c *InitConf) canTake(colIdx int) bool {
+	return !c.takens[colIdx]
+}
+
 type Collector interface {
 	Init(conf *InitConf) (collectable bool, err error)
 	Next(ptrs []interface{})

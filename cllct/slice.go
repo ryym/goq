@@ -28,10 +28,7 @@ func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
 
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.ColNames {
-		if !conf.take(iC) {
-			continue
-		}
-		if iF, ok := targets[c]; ok {
+		if iF, ok := targets[c]; ok && conf.take(iC) {
 			cl.colToFld[iC] = iF
 		}
 	}
