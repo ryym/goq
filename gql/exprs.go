@@ -13,7 +13,9 @@ func (a *aliased) Apply(q *Query, ctx DBContext) {
 }
 
 func (a *aliased) Selection() Selection {
-	return Selection{Alias: a.alias}
+	sel := a.exp.Selection()
+	sel.Alias = a.alias
+	return sel
 }
 
 type nameExpr struct {
