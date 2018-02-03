@@ -478,4 +478,64 @@ var testCases = []testCase{
 			return nil
 		},
 	},
+	{
+		name: "collect into models and maps",
+		data: `
+			INSERT INTO countries (id, name) values (1, 'Japan');
+			INSERT INTO countries (id, name) values (2, 'Brazil');
+			INSERT INTO countries (id, name) values (3, 'Nowhere');
+
+			INSERT INTO cities (country_id, name) values (1, 'japan-city');
+			INSERT INTO cities (country_id, name) values (1, 'japan-city');
+			INSERT INTO cities (country_id, name) values (2, 'brazil-city');
+			INSERT INTO cities (country_id, name) values (2, 'brazil-city');
+			INSERT INTO cities (country_id, name) values (2, 'brazil-city');
+			INSERT INTO cities (country_id, name) values (2, 'brazil-city');
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(
+				z.Countries.ID,
+				z.Countries.Name,
+				z.Count(z.Cities.ID).As("cities_count"),
+				z.VarT(10, "int").Add(20).As("population"),
+			).From(z.Countries).Joins(
+				z.LeftJoin(z.Cities).On(
+					z.Cities.CountryID.Eq(z.Countries.ID),
+				),
+			).GroupBy(
+				z.Countries.ID, z.Countries.Name,
+			).OrderBy(z.Countries.ID)
+
+			var countries []Country
+			var extras []map[string]interface{}
+			err := tx.Query(q).Collect(
+				z.Countries.ToSlice(&countries),
+				z.ToRowMapSlice(&extras),
+			)
+			if err != nil {
+				t.Log(q.Construct())
+				return err
+			}
+
+			wantCountries := []Country{
+				{ID: 1, Name: "Japan"},
+				{ID: 2, Name: "Brazil"},
+				{ID: 3, Name: "Nowhere"},
+			}
+			if diff := deep.Equal(countries, wantCountries); diff != nil {
+				return fmt.Errorf("countries diff: %s", diff)
+			}
+
+			wantExtras := []map[string]interface{}{
+				{"cities_count": int64(2), "population": int64(30)},
+				{"cities_count": int64(4), "population": int64(30)},
+				{"cities_count": int64(0), "population": int64(30)},
+			}
+			if diff := deep.Equal(wantExtras, extras); diff != nil {
+				return fmt.Errorf("extras diff: %s", diff)
+			}
+
+			return nil
+		},
+	},
 }
