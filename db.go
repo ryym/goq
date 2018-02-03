@@ -129,12 +129,25 @@ func (cl *Collectable) collect(query gql.QueryExpr, collectors ...cllct.Collecto
 		}
 	}
 
+	// Rows.Scan stops scanning when it encounters a nil pointer
+	// in the given pointers and all subsequent pointers are ignored.
+	// We need to pass a dummy pointer to prevent this.
+	dummyPtr := new(interface{})
 	ptrs := make([]interface{}, len(colNames))
+
 	for rows.Next() {
 		for _, cl := range clls {
 			cl.Next(ptrs)
 		}
+
+		for i := 0; i < len(ptrs); i++ {
+			if ptrs[i] == nil {
+				ptrs[i] = dummyPtr
+			}
+		}
+
 		rows.Scan(ptrs...)
+
 		for _, cl := range clls {
 			cl.AfterScan(ptrs)
 		}
