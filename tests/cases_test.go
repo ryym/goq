@@ -538,4 +538,29 @@ var testCases = []testCase{
 			return nil
 		},
 	},
+	{
+		name: "collect records using custom name helper",
+		data: `
+			INSERT INTO technologies VALUES (1, 'AI', 'what!?');
+			INSERT INTO technologies VALUES (2, 'self-driving car', 'cool!');
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(z.Techs.All()).From(z.Techs).OrderBy(z.Techs.Desc)
+
+			var techs []Tech
+			err := tx.Query(q).Collect(z.Techs.ToSlice(&techs))
+			if err != nil {
+				return err
+			}
+
+			wantTechs := []Tech{
+				{2, "self-driving car", "cool!"},
+				{1, "AI", "what!?"},
+			}
+			if diff := deep.Equal(techs, wantTechs); diff != nil {
+				return fmt.Errorf("techs diff: %s", diff)
+			}
+			return nil
+		},
+	},
 }

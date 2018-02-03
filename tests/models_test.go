@@ -5,9 +5,10 @@ import "time"
 //go:generate goq -test gql_test.go
 
 type Tables struct {
-	countries Country
-	cities    City
-	addresses Address
+	countries    Country
+	cities       City
+	addresses    Address
+	technologies Tech `goq:"helper:Techs"`
 }
 
 type Country struct {
@@ -28,4 +29,10 @@ type Address struct {
 	Name      string
 	CityID    int
 	UpdatedAt time.Time
+}
+
+type Tech struct {
+	ID   int `goq:"pk"`
+	Name string
+	Desc string `goq:"name:description"`
 }

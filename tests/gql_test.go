@@ -95,12 +95,41 @@ func (t *Addresses) Columns() []*gql.Column {
 	return []*gql.Column{t.ID, t.Name, t.CityID, t.UpdatedAt}
 }
 
+type Techs struct {
+	gql.Table
+	*cllct.ModelCollectorMaker
+
+	ID   *gql.Column
+	Name *gql.Column
+	Desc *gql.Column
+}
+
+func NewTechs(alias string) *Techs {
+	cm := gql.NewColumnMaker("Tech", "technologies").As(alias)
+	t := &Techs{
+		Table: gql.NewTable("technologies", alias),
+
+		ID:   cm.Col("ID", "id").PK().Bld(),
+		Name: cm.Col("Name", "name").Bld(),
+		Desc: cm.Col("Desc", "description").Bld(),
+	}
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
+	return t
+}
+
+func (t *Techs) As(alias string) *Techs { return NewTechs(alias) }
+func (t *Techs) All() gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
+func (t *Techs) Columns() []*gql.Column {
+	return []*gql.Column{t.ID, t.Name, t.Desc}
+}
+
 type Builder struct {
 	*goq.Builder
 
 	Countries *Countries
 	Cities    *Cities
 	Addresses *Addresses
+	Techs     *Techs
 }
 
 func NewBuilder(dl dialect.Dialect) *Builder {
@@ -110,5 +139,6 @@ func NewBuilder(dl dialect.Dialect) *Builder {
 		Countries: NewCountries(""),
 		Cities:    NewCities(""),
 		Addresses: NewAddresses(""),
+		Techs:     NewTechs(""),
 	}
 }

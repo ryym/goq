@@ -20,3 +20,9 @@ CREATE TABLE IF NOT EXISTS addresses (
     city_id smallint NOT NULL,
     updated_at timestamp without time zone DEFAULT '2000-01-01 09:00:00' NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS technologies (
+    id serial NOT NULL,
+    name varchar(50) NOT NULL,
+    description varchar(200) NOT NULL DEFAULT ''
+);
