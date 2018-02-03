@@ -81,7 +81,9 @@ func (cl *Collectable) First(collectors ...cllct.SingleCollector) error {
 	for i, c := range collectors {
 		clls[i] = c
 	}
-	return cl.collect(cl.query.Limit(1), clls...)
+
+	// Use WithLimits instead of Limit to avoid mutating the given query.
+	return cl.collect(cl.query.WithLimits(1, 0), clls...)
 }
 
 func (cl *Collectable) Collect(collectors ...cllct.ListCollector) error {

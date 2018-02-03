@@ -171,6 +171,21 @@ func (qe *queryExpr) Offset(n int) QueryExpr {
 	return qe
 }
 
+func (qe *queryExpr) WithLimits(limit, offset int) QueryExpr {
+	return (&queryExpr{
+		exps:    qe.exps,
+		froms:   qe.froms,
+		joins:   qe.joins,
+		wheres:  qe.wheres,
+		groups:  qe.groups,
+		havings: qe.havings,
+		orders:  qe.orders,
+		limit:   limit,
+		offset:  offset,
+		ctx:     qe.ctx,
+	}).init()
+}
+
 func (qe *queryExpr) As(alias string) QueryTable {
 	return &aliasedQuery{aliased{
 		(&parensExpr{exp: qe}).init(),

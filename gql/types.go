@@ -109,6 +109,9 @@ type QueryExpr interface {
 	OrderBy(ords ...Orderer) QueryExpr
 	Limit(n int) QueryExpr
 	Offset(n int) QueryExpr
+
+	// Shallow copy QueryExpr and set LIMIT and OFFSET
+	WithLimits(limit, offset int) QueryExpr
 }
 
 type SelectClause interface {
