@@ -1,17 +1,169 @@
 package tests
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
 	"github.com/go-test/deep"
 	"github.com/ryym/goq"
+	"github.com/ryym/goq/cllct"
 )
 
 var defaultUpdatedAt = time.Date(2000, time.January, 1, 9, 0, 0, 0, time.UTC)
 
 var testCases = []testCase{
+	{
+		name: "check all collectors are not broken",
+		data: `
+			INSERT INTO countries (id, name) VALUES (1, 'Japan');
+			INSERT INTO countries (id, name) VALUES (2, 'US');
+			INSERT INTO cities (country_id, id, name) VALUES (1, 1, 'chiba');
+			INSERT INTO cities (country_id, id, name) VALUES (1, 2, 'gunma');
+			INSERT INTO cities (country_id, id, name) VALUES (2, 3, 'miami');
+			INSERT INTO cities (country_id, id, name) VALUES (2, 4, 'reno');
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(
+				z.Countries.ID.As("country_id"),
+				z.Cities.ID.As("city_id"),
+			).From(z.Countries, z.Cities).Where(
+				z.Countries.ID.Eq(z.Cities.CountryID),
+			).OrderBy(z.Countries.ID, z.Cities.ID)
+
+			type myCityT struct{ CityID int }
+			var (
+				myCity       myCityT
+				row          map[string]interface{}
+				rows         []map[string]interface{}
+				myCityMap    map[int]myCityT
+				myCities     []myCityT
+				myCitiesMap  map[int][]myCityT
+				city         City
+				cities       []City
+				cityMap      map[int]City
+				citiesMap    map[int][]City
+				countriesMap map[int][]Country
+			)
+			var keyStore int
+
+			cases := []struct {
+				cllct cllct.Collector
+				got   interface{}
+				want  interface{}
+			}{
+				{
+					cllct: z.ToElem(&myCity),
+					got:   &myCity,
+					want:  myCityT{1},
+				},
+				{
+					cllct: z.ToRowMap(&row),
+					got:   &row,
+					want: map[string]interface{}{
+						"country_id": int64(1),
+						"city_id":    int64(1),
+					},
+				},
+				{
+					cllct: z.ToRowMapSlice(&rows),
+					got:   &rows,
+					want: []map[string]interface{}{
+						{"country_id": int64(1), "city_id": int64(1)},
+						{"country_id": int64(1), "city_id": int64(2)},
+						{"country_id": int64(2), "city_id": int64(3)},
+						{"country_id": int64(2), "city_id": int64(4)},
+					},
+				},
+				{
+					cllct: z.ToMap(&myCityMap).By(z.Cities.ID),
+					got:   &myCityMap,
+					want: map[int]myCityT{
+						1: {1}, 2: {2},
+						3: {3}, 4: {4},
+					},
+				},
+				{
+					cllct: z.ToSlice(&myCities),
+					got:   &myCities,
+					want:  []myCityT{{1}, {2}, {3}, {4}},
+				},
+				{
+					cllct: z.ToSliceMap(&myCitiesMap).ByWith(&keyStore, z.Countries.ID),
+					got:   &myCitiesMap,
+					want: map[int][]myCityT{
+						1: []myCityT{{1}, {2}},
+						2: []myCityT{{3}, {4}},
+					},
+				},
+				{
+					cllct: z.Cities.ToElem(&city),
+					got:   &city,
+					want:  City{ID: 1},
+				},
+				{
+					cllct: z.Cities.ToSlice(&cities),
+					got:   &cities,
+					want: []City{
+						{ID: 1}, {ID: 2}, {ID: 3}, {ID: 4},
+					},
+				},
+				{
+					cllct: z.Cities.ToMap(&cityMap),
+					got:   &cityMap,
+					want: map[int]City{
+						1: {ID: 1}, 2: {ID: 2},
+						3: {ID: 3}, 4: {ID: 4},
+					},
+				},
+				{
+					cllct: z.Cities.ToSliceMap(&citiesMap).ByWith(&keyStore, z.Countries.ID),
+					got:   &citiesMap,
+					want: map[int][]City{
+						1: []City{{ID: 1}, {ID: 2}},
+						2: []City{{ID: 3}, {ID: 4}},
+					},
+				},
+				{
+					cllct: z.Countries.ToUniqSliceMap(&countriesMap).By(z.Countries.ID),
+					got:   &countriesMap,
+					want: map[int][]Country{
+						1: []Country{{ID: 1}},
+						2: []Country{{ID: 2}},
+					},
+				},
+			}
+
+			var succeed = true
+			for _, c := range cases {
+				var err error
+				switch cl := c.cllct.(type) {
+				case cllct.ListCollector:
+					err = tx.Query(q).Collect(cl)
+				case cllct.SingleCollector:
+					err = tx.Query(q).First(cl)
+				}
+				if err != nil {
+					t.Errorf("%s: %s", reflect.TypeOf(c.cllct), err)
+					succeed = false
+					continue
+				}
+				got := reflect.ValueOf(c.got).Elem().Interface()
+				if diff := deep.Equal(got, c.want); diff != nil {
+					t.Errorf("%s: %s", reflect.TypeOf(c.cllct), diff)
+					succeed = false
+				}
+			}
+
+			if succeed {
+				return nil
+			} else {
+				return errors.New("some collector does not work")
+			}
+		},
+	},
 	{
 		name: "select first one from multiple records",
 		data: `
