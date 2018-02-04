@@ -643,19 +643,24 @@ var testCases = []testCase{
 				t1.Name.Neq("VR"),
 			).OrderBy(t1.Name, t2.Name)
 
-			var techs []map[string]interface{}
-			err := tx.Query(q).Collect(z.ToRowMapSlice(&techs))
+			type techPair struct {
+				Name1 string
+				Name2 string
+			}
+
+			var techs []techPair
+			err := tx.Query(q).Collect(z.ToSlice(&techs))
 			if err != nil {
 				return err
 			}
 
-			wantTechs := []map[string]interface{}{
-				{"name1": "AR", "name2": "AR"},
-				{"name1": "AR", "name2": "MR"},
-				{"name1": "AR", "name2": "VR"},
-				{"name1": "MR", "name2": "AR"},
-				{"name1": "MR", "name2": "MR"},
-				{"name1": "MR", "name2": "VR"},
+			wantTechs := []techPair{
+				{"AR", "AR"},
+				{"AR", "MR"},
+				{"AR", "VR"},
+				{"MR", "AR"},
+				{"MR", "MR"},
+				{"MR", "VR"},
 			}
 			if diff := deep.Equal(techs, wantTechs); diff != nil {
 				return fmt.Errorf("techs diff: %s", diff)
