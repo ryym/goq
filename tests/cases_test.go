@@ -663,4 +663,27 @@ var testCases = []testCase{
 			return nil
 		},
 	},
+	{
+		name: "ToMap for duplicated records selects last one",
+		data: `
+			INSERT INTO cities (country_id, id, name) VALUES (1, 1, 'foo');
+			INSERT INTO cities (country_id, id, name) VALUES (1, 2, 'foo');
+		`,
+		run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+			q := z.Select(z.Cities.ID, z.Cities.Name).From(z.Cities).OrderBy(z.Cities.ID)
+
+			var cities map[string]City
+			err := tx.Query(q).Collect(z.ToMap(&cities).By(z.Cities.Name))
+			if err != nil {
+				return err
+			}
+
+			want := map[string]City{"foo": {ID: 2, Name: "foo"}}
+			if diff := deep.Equal(cities, want); diff != nil {
+				t.Log(q.Construct())
+				return fmt.Errorf("%s", diff)
+			}
+			return nil
+		},
+	},
 }
