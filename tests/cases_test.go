@@ -61,18 +61,18 @@ func MakeTestCases(ctx testCtx) []testCase {
 						cllct: z.ToRowMap(&row),
 						got:   &row,
 						want: map[string]interface{}{
-							"country_id": int64(1),
-							"city_id":    int64(1),
+							"country_id": ctx.rawInt(1),
+							"city_id":    ctx.rawInt(1),
 						},
 					},
 					{
 						cllct: z.ToRowMapSlice(&rows),
 						got:   &rows,
 						want: []map[string]interface{}{
-							{"country_id": int64(1), "city_id": int64(1)},
-							{"country_id": int64(1), "city_id": int64(2)},
-							{"country_id": int64(2), "city_id": int64(3)},
-							{"country_id": int64(2), "city_id": int64(4)},
+							{"country_id": ctx.rawInt(1), "city_id": ctx.rawInt(1)},
+							{"country_id": ctx.rawInt(1), "city_id": ctx.rawInt(2)},
+							{"country_id": ctx.rawInt(2), "city_id": ctx.rawInt(3)},
+							{"country_id": ctx.rawInt(2), "city_id": ctx.rawInt(4)},
 						},
 					},
 					{
@@ -527,12 +527,23 @@ func MakeTestCases(ctx testCtx) []testCase {
 				}
 
 				want := []map[string]interface{}{
-					{"id": int64(10), "name": ctx.rawStr("newyork"), "country_id": int64(5)},
-					{"id": int64(12), "name": ctx.rawStr("chicago"), "country_id": int64(5)},
-					{"id": int64(14), "name": ctx.rawStr("seattle"), "country_id": int64(5)},
+					{
+						"id":         ctx.rawInt(10),
+						"name":       ctx.rawStr("newyork"),
+						"country_id": ctx.rawInt(5),
+					},
+					{
+						"id":         ctx.rawInt(12),
+						"name":       ctx.rawStr("chicago"),
+						"country_id": ctx.rawInt(5),
+					},
+					{
+						"id":         ctx.rawInt(14),
+						"name":       ctx.rawStr("seattle"),
+						"country_id": ctx.rawInt(5),
+					},
 				}
 				if diff := deep.Equal(cities, want); diff != nil {
-					t.Log(cities)
 					return fmt.Errorf("%s", diff)
 				}
 				return nil
@@ -587,6 +598,9 @@ func MakeTestCases(ctx testCtx) []testCase {
 				}
 
 				wantExtras := []map[string]interface{}{
+					// These values are always `int64` so we don't need to use `ctx.rawInt`.
+					// RDB seems to be able to infer their types from `COUNT` function
+					// and literal values.
 					{"cities_count": int64(2), "population": int64(30)},
 					{"cities_count": int64(4), "population": int64(30)},
 					{"cities_count": int64(0), "population": int64(30)},

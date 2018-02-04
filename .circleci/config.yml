@@ -5,15 +5,22 @@ jobs:
       - image: circleci/golang:1.9
         environment:
           POSTGRES_PORT: 5432
+          MYSQL_PORT: 3306
       - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: goq
           POSTGRES_DB: goq
+      - image: circleci/mysql:8.0
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: goq
     working_directory: /go/src/github.com/ryym/goq
     steps:
       - checkout
       - run: go test -v -race `go list ./... | grep -v /tests`
-      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: wait databases setup
+          command: dockerize -wait tcp://localhost:5432 -wait tcp://localhost:3306 -timeout 1m
       - run:
           name: Integration test
           # FIXME: Building `mattn/go-sqlite3` without `go install`ing it takes some time.
