@@ -60,7 +60,6 @@ func TestModelUniqSliceMapCollector(t *testing.T) {
 			{ID: 7, Name: "houston"},
 		},
 	}
-	t.Log(got)
 	if diff := deep.Equal(got, want); diff != nil {
 		t.Error(diff)
 	}

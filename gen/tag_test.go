@@ -56,7 +56,6 @@ func TestParseTag(t *testing.T) {
 	for _, c := range cases {
 		got, err := ParseTag(c.tag, c.attrs)
 
-		t.Logf("cases[%d] %s", i, c.tag)
 		if err != nil {
 			if c.err == "" {
 				t.Errorf("Unexpected error occurred\n%s", err)
