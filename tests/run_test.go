@@ -2,7 +2,9 @@ package tests
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/ryym/goq"
@@ -20,7 +22,33 @@ func ShouldRun(dbName string) bool {
 	return target == "" || target == dbName
 }
 
-func RunIntegrationTest(t *testing.T, db *goq.DB) {
+func RunIntegrationTest(t *testing.T, dbName, connStr string) {
+	if !ShouldRun(dbName) {
+		t.Logf("skip tests for %s", dbName)
+		return
+	}
+
+	db, err := goq.Open(dbName, connStr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err = db.Ping(); err != nil {
+		t.Fatalf("failed to ping DB: %s", err)
+	}
+
+	sql, err := ioutil.ReadFile(filepath.Join("_data", dbName+".sql"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = db.DB.Exec(string(sql)); err != nil {
+		t.Fatal(err)
+	}
+
+	RunTestCases(t, db)
+}
+
+func RunTestCases(t *testing.T, db *goq.DB) {
 	testCases := MakeTestCases()
 	var targets []testCase
 	for _, c := range testCases {
