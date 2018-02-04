@@ -21,6 +21,7 @@ func ShouldRun(dbName string) bool {
 }
 
 func RunIntegrationTest(t *testing.T, db *goq.DB) {
+	testCases := MakeTestCases()
 	var targets []testCase
 	for _, c := range testCases {
 		if c.only {
