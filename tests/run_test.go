@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/ryym/goq"
@@ -12,6 +13,11 @@ type testCase struct {
 	data string
 	run  func(t *testing.T, tx *goq.Tx, z *Builder) error
 	only bool
+}
+
+func ShouldRun(dbName string) bool {
+	target := os.Getenv("DB")
+	return target == "" || target == dbName
 }
 
 func RunIntegrationTest(t *testing.T, db *goq.DB) {

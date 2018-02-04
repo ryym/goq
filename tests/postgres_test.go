@@ -12,6 +12,11 @@ import (
 )
 
 func TestPostgres(t *testing.T) {
+	if !ShouldRun("postgres") {
+		t.Log("Skip")
+		return
+	}
+
 	port := os.Getenv("POSTGRES_PORT")
 	if port == "" {
 		port = "5433"
