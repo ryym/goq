@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/go-test/deep"
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/cllct"
 )
-
-var defaultUpdatedAt = time.Date(2000, time.January, 1, 9, 0, 0, 0, time.UTC)
 
 func MakeTestCases() []testCase {
 	return []testCase{
@@ -344,8 +341,8 @@ func MakeTestCases() []testCase {
 				}
 
 				wantCountries := []Country{
-					{1, "Japan", defaultUpdatedAt},
-					{2, "Somewhere", defaultUpdatedAt},
+					{1, "Japan"},
+					{2, "Somewhere"},
 				}
 				if diff := deep.Equal(countries, wantCountries); diff != nil {
 					return fmt.Errorf("countries diff: %s", diff)
@@ -353,12 +350,12 @@ func MakeTestCases() []testCase {
 
 				wantCities := map[int][]City{
 					1: []City{
-						{11, "tokyo", 1, defaultUpdatedAt},
-						{12, "hokkaido", 1, defaultUpdatedAt},
-						{13, "okinawa", 1, defaultUpdatedAt},
+						{11, "tokyo", 1},
+						{12, "hokkaido", 1},
+						{13, "okinawa", 1},
 					},
 					2: []City{
-						{21, "city1", 2, defaultUpdatedAt},
+						{21, "city1", 2},
 					},
 				}
 				if diff := deep.Equal(cities, wantCities); diff != nil {
@@ -367,21 +364,21 @@ func MakeTestCases() []testCase {
 
 				wantAddresses := map[int][]Address{
 					11: []Address{
-						{111, "shinjuku", 11, defaultUpdatedAt},
-						{112, "yoyogi", 11, defaultUpdatedAt},
-						{113, "nakano", 11, defaultUpdatedAt},
+						{111, "shinjuku", 11},
+						{112, "yoyogi", 11},
+						{113, "nakano", 11},
 					},
 					12: []Address{
-						{121, "sapporo", 12, defaultUpdatedAt},
-						{122, "kushiro", 12, defaultUpdatedAt},
+						{121, "sapporo", 12},
+						{122, "kushiro", 12},
 					},
 					13: []Address{
-						{131, "naha", 13, defaultUpdatedAt},
-						{132, "miyako", 13, defaultUpdatedAt},
+						{131, "naha", 13},
+						{132, "miyako", 13},
 					},
 					21: []Address{
-						{211, "address1", 21, defaultUpdatedAt},
-						{212, "address2", 21, defaultUpdatedAt},
+						{211, "address1", 21},
+						{212, "address2", 21},
 					},
 				}
 				if diff := deep.Equal(addresses, wantAddresses); diff != nil {
@@ -444,8 +441,8 @@ func MakeTestCases() []testCase {
 				}
 
 				wantCountries := map[int]Country{
-					1: {1, "Japan", defaultUpdatedAt},
-					2: {2, "Somewhere", defaultUpdatedAt},
+					1: {1, "Japan"},
+					2: {2, "Somewhere"},
 				}
 				if diff := deep.Equal(countries, wantCountries); diff != nil {
 					t.Log(q.Construct())
@@ -454,17 +451,17 @@ func MakeTestCases() []testCase {
 
 				wantAddresses := map[int][]Address{
 					1: []Address{
-						{111, "shinjuku", 11, defaultUpdatedAt},
-						{112, "yoyogi", 11, defaultUpdatedAt},
-						{113, "nakano", 11, defaultUpdatedAt},
-						{121, "sapporo", 12, defaultUpdatedAt},
-						{122, "kushiro", 12, defaultUpdatedAt},
-						{131, "naha", 13, defaultUpdatedAt},
-						{132, "miyako", 13, defaultUpdatedAt},
+						{111, "shinjuku", 11},
+						{112, "yoyogi", 11},
+						{113, "nakano", 11},
+						{121, "sapporo", 12},
+						{122, "kushiro", 12},
+						{131, "naha", 13},
+						{132, "miyako", 13},
 					},
 					2: []Address{
-						{211, "address1", 21, defaultUpdatedAt},
-						{212, "address2", 21, defaultUpdatedAt},
+						{211, "address1", 21},
+						{212, "address2", 21},
 					},
 				}
 				if diff := deep.Equal(addresses, wantAddresses); diff != nil {
@@ -530,9 +527,9 @@ func MakeTestCases() []testCase {
 				}
 
 				want := []map[string]interface{}{
-					{"id": int64(10), "name": "newyork", "country_id": int64(5), "updated_at": defaultUpdatedAt},
-					{"id": int64(12), "name": "chicago", "country_id": int64(5), "updated_at": defaultUpdatedAt},
-					{"id": int64(14), "name": "seattle", "country_id": int64(5), "updated_at": defaultUpdatedAt},
+					{"id": int64(10), "name": "newyork", "country_id": int64(5)},
+					{"id": int64(12), "name": "chicago", "country_id": int64(5)},
+					{"id": int64(14), "name": "seattle", "country_id": int64(5)},
 				}
 				if diff := deep.Equal(cities, want); diff != nil {
 					t.Log(cities)

@@ -11,9 +11,8 @@ type Countries struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
-	ID        *gql.Column
-	Name      *gql.Column
-	UpdatedAt *gql.Column
+	ID   *gql.Column
+	Name *gql.Column
 }
 
 func NewCountries(alias string) *Countries {
@@ -21,9 +20,8 @@ func NewCountries(alias string) *Countries {
 	t := &Countries{
 		Table: gql.NewTable("countries", alias),
 
-		ID:        cm.Col("ID", "id").PK().Bld(),
-		Name:      cm.Col("Name", "name").Bld(),
-		UpdatedAt: cm.Col("UpdatedAt", "updated_at").Bld(),
+		ID:   cm.Col("ID", "id").PK().Bld(),
+		Name: cm.Col("Name", "name").Bld(),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
@@ -32,7 +30,7 @@ func NewCountries(alias string) *Countries {
 func (t *Countries) As(alias string) *Countries { return NewCountries(alias) }
 func (t *Countries) All() gql.ExprListExpr      { return gql.AllCols(t.Columns()) }
 func (t *Countries) Columns() []*gql.Column {
-	return []*gql.Column{t.ID, t.Name, t.UpdatedAt}
+	return []*gql.Column{t.ID, t.Name}
 }
 
 type Cities struct {
@@ -42,7 +40,6 @@ type Cities struct {
 	ID        *gql.Column
 	Name      *gql.Column
 	CountryID *gql.Column
-	UpdatedAt *gql.Column
 }
 
 func NewCities(alias string) *Cities {
@@ -53,7 +50,6 @@ func NewCities(alias string) *Cities {
 		ID:        cm.Col("ID", "id").PK().Bld(),
 		Name:      cm.Col("Name", "name").Bld(),
 		CountryID: cm.Col("CountryID", "country_id").Bld(),
-		UpdatedAt: cm.Col("UpdatedAt", "updated_at").Bld(),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
@@ -62,17 +58,16 @@ func NewCities(alias string) *Cities {
 func (t *Cities) As(alias string) *Cities { return NewCities(alias) }
 func (t *Cities) All() gql.ExprListExpr   { return gql.AllCols(t.Columns()) }
 func (t *Cities) Columns() []*gql.Column {
-	return []*gql.Column{t.ID, t.Name, t.CountryID, t.UpdatedAt}
+	return []*gql.Column{t.ID, t.Name, t.CountryID}
 }
 
 type Addresses struct {
 	gql.Table
 	*cllct.ModelCollectorMaker
 
-	ID        *gql.Column
-	Name      *gql.Column
-	CityID    *gql.Column
-	UpdatedAt *gql.Column
+	ID     *gql.Column
+	Name   *gql.Column
+	CityID *gql.Column
 }
 
 func NewAddresses(alias string) *Addresses {
@@ -80,10 +75,9 @@ func NewAddresses(alias string) *Addresses {
 	t := &Addresses{
 		Table: gql.NewTable("addresses", alias),
 
-		ID:        cm.Col("ID", "id").PK().Bld(),
-		Name:      cm.Col("Name", "name").Bld(),
-		CityID:    cm.Col("CityID", "city_id").Bld(),
-		UpdatedAt: cm.Col("UpdatedAt", "updated_at").Bld(),
+		ID:     cm.Col("ID", "id").PK().Bld(),
+		Name:   cm.Col("Name", "name").Bld(),
+		CityID: cm.Col("CityID", "city_id").Bld(),
 	}
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
 	return t
@@ -92,7 +86,7 @@ func NewAddresses(alias string) *Addresses {
 func (t *Addresses) As(alias string) *Addresses { return NewAddresses(alias) }
 func (t *Addresses) All() gql.ExprListExpr      { return gql.AllCols(t.Columns()) }
 func (t *Addresses) Columns() []*gql.Column {
-	return []*gql.Column{t.ID, t.Name, t.CityID, t.UpdatedAt}
+	return []*gql.Column{t.ID, t.Name, t.CityID}
 }
 
 type Techs struct {

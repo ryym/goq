@@ -1,7 +1,5 @@
 package tests
 
-import "time"
-
 //go:generate goq -test gql_test.go
 
 type Tables struct {
@@ -12,23 +10,20 @@ type Tables struct {
 }
 
 type Country struct {
-	ID        int `goq:"pk"`
-	Name      string
-	UpdatedAt time.Time
+	ID   int `goq:"pk"`
+	Name string
 }
 
 type City struct {
 	ID        int `goq:"pk"`
 	Name      string
 	CountryID int
-	UpdatedAt time.Time
 }
 
 type Address struct {
-	ID        int `goq:"pk"`
-	Name      string
-	CityID    int
-	UpdatedAt time.Time
+	ID     int `goq:"pk"`
+	Name   string
+	CityID int
 }
 
 type Tech struct {
