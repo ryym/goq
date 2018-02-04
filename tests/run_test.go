@@ -42,14 +42,14 @@ func RunIntegrationTest(t *testing.T, dbName, connStr string) {
 		t.Fatal(err)
 	}
 	if _, err = db.DB.Exec(string(sql)); err != nil {
-		t.Fatal(err)
+		t.Fatal("failed to create tables: %s", err)
 	}
 
-	RunTestCases(t, db)
+	testCases := MakeTestCases(testCtx{dbName})
+	RunTestCases(t, db, testCases)
 }
 
-func RunTestCases(t *testing.T, db *goq.DB) {
-	testCases := MakeTestCases()
+func RunTestCases(t *testing.T, db *goq.DB, testCases []testCase) {
 	var targets []testCase
 	for _, c := range testCases {
 		if c.only {

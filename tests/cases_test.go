@@ -11,7 +11,7 @@ import (
 	"github.com/ryym/goq/cllct"
 )
 
-func MakeTestCases() []testCase {
+func MakeTestCases(ctx testCtx) []testCase {
 	return []testCase{
 		{
 			name: "check all collectors are not broken",
