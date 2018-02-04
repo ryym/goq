@@ -14,5 +14,5 @@ func TestPostgres(t *testing.T) {
 		port = "5433"
 	}
 	conn := fmt.Sprintf("port=%s user=goq sslmode=disable", port)
-	RunIntegrationTest(t, "postgres", conn)
+	RunIntegrationTest(t, DB_POSTGRES, conn)
 }

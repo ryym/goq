@@ -527,9 +527,9 @@ func MakeTestCases(ctx testCtx) []testCase {
 				}
 
 				want := []map[string]interface{}{
-					{"id": int64(10), "name": "newyork", "country_id": int64(5)},
-					{"id": int64(12), "name": "chicago", "country_id": int64(5)},
-					{"id": int64(14), "name": "seattle", "country_id": int64(5)},
+					{"id": int64(10), "name": ctx.rawStr("newyork"), "country_id": int64(5)},
+					{"id": int64(12), "name": ctx.rawStr("chicago"), "country_id": int64(5)},
+					{"id": int64(14), "name": ctx.rawStr("seattle"), "country_id": int64(5)},
 				}
 				if diff := deep.Equal(cities, want); diff != nil {
 					t.Log(cities)

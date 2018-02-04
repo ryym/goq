@@ -12,8 +12,11 @@ jobs:
     working_directory: /go/src/github.com/ryym/goq
     steps:
       - checkout
-      - run: go test -race `go list ./... | grep -v /tests`
+      - run: go test -v -race `go list ./... | grep -v /tests`
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: Integration test
-          command: go test -race ./tests
+          # FIXME: Building `mattn/go-sqlite3` without `go install`ing it takes some time.
+          # So skip SQLite3 tests on CI for now.
+          # (https://groups.google.com/forum/#!topic/golang-nuts/KexEyiy6PvA)
+          command: go test -v -race `ls ./tests/*.go | grep -v sqlite3_test.go`

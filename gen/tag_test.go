@@ -53,7 +53,7 @@ func TestParseTag(t *testing.T) {
 		},
 	}
 
-	for i, c := range cases {
+	for _, c := range cases {
 		got, err := ParseTag(c.tag, c.attrs)
 
 		t.Logf("cases[%d] %s", i, c.tag)
