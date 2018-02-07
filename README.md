@@ -19,10 +19,11 @@ That is, you already know most of the Goq API if you know SQL.
 Using Goq, you can collect result rows fetched from DB into various format structures:
 a slice of your model, single map, map of slices, combination of them, etc.
 
-### Table helpers generation
+### Custom Query Builder Generation
 
-You can generate table API helpers based on your models using [`go generate`](https://blog.golang.org/generate).
-It allows you to write a query with type safety and readability.
+Goq can generate your custom query builder by [`go generate`](https://blog.golang.org/generate)
+based on your models mapped to DB tables.
+This helps you write a query with more type safety and readability.
 
 ## What does it look like?
 
@@ -40,6 +41,7 @@ func main() {
     panicIf(err)
     defer db.Close()
 
+    // Initialize your builder.
     q := NewBuilder(db.Dialect())
 
     // Write a query.
