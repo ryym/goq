@@ -26,22 +26,22 @@ func InitCollectors(collectors []Collector, initConf *InitConf) ([]Collector, er
 	return clls, nil
 }
 
-func ApplyCollectors(rows *sql.Rows, colNames []string, clls []Collector) error {
+func FillUntakenCols(ptrs []interface{}, conf *InitConf) {
 	// Rows.Scan stops scanning when it encounters a nil pointer
 	// in the given pointers and all subsequent pointers are ignored.
 	// We need to pass a dummy pointer to prevent this.
 	dummyPtr := new(interface{})
-	ptrs := make([]interface{}, len(colNames))
+	for i, _ := range conf.ColNames {
+		if conf.canTake(i) {
+			ptrs[i] = dummyPtr
+		}
+	}
+}
 
+func ApplyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error {
 	for rows.Next() {
 		for _, cl := range clls {
 			cl.Next(ptrs)
-		}
-
-		for i := 0; i < len(ptrs); i++ {
-			if ptrs[i] == nil {
-				ptrs[i] = dummyPtr
-			}
 		}
 
 		rows.Scan(ptrs...)
@@ -118,5 +118,8 @@ func (r *Runner) collect(query gql.QueryExpr, collectors ...Collector) error {
 		return err
 	}
 
-	return ApplyCollectors(rows, colNames, clls)
+	ptrs := make([]interface{}, len(colNames))
+	FillUntakenCols(ptrs, initConf)
+
+	return ApplyCollectors(rows, ptrs, clls)
 }
