@@ -8,15 +8,14 @@ import (
 )
 
 type ModelMapCollector struct {
-	elemType   reflect.Type
-	cols       []*gql.Column
-	structName string
-	tableAlias string
-	colToFld   map[int]int
-	keySel     *gql.Selection
-	keyIdx     int
-	mp         reflect.Value
-	row        reflect.Value
+	elemType reflect.Type
+	cols     []*gql.Column
+	table    tableInfo
+	colToFld map[int]int
+	keySel   *gql.Selection
+	keyIdx   int
+	mp       reflect.Value
+	row      reflect.Value
 }
 
 func (cl *ModelMapCollector) ImplListCollector() {}
@@ -30,7 +29,7 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.keyIdx = -1
 
 	for iC, c := range conf.Selects {
-		if conf.canTake(iC) && c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
+		if conf.canTake(iC) && isSameTable(c, cl.table) {
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {
 					cl.colToFld[iC] = iF

@@ -7,11 +7,10 @@ import (
 )
 
 type ModelElemCollector struct {
-	cols       []*gql.Column
-	structName string
-	tableAlias string
-	colToFld   map[int]int
-	elem       reflect.Value
+	cols     []*gql.Column
+	table    tableInfo
+	colToFld map[int]int
+	elem     reflect.Value
 }
 
 func (cl *ModelElemCollector) ImplSingleCollector() {}
@@ -19,7 +18,7 @@ func (cl *ModelElemCollector) ImplSingleCollector() {}
 func (cl *ModelElemCollector) Init(conf *InitConf) (bool, error) {
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.Selects {
-		if conf.canTake(iC) && c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
+		if conf.canTake(iC) && isSameTable(c, cl.table) {
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {
 					cl.colToFld[iC] = iF

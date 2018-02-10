@@ -39,3 +39,8 @@ type SingleCollector interface {
 	Collector
 	ImplSingleCollector()
 }
+
+type tableInfo struct {
+	structName string
+	tableAlias string
+}

@@ -10,8 +10,7 @@ import (
 type ModelUniqSliceCollector struct {
 	elemType    reflect.Type
 	cols        []*gql.Column
-	structName  string
-	tableAlias  string
+	table       tableInfo
 	colToFld    map[int]int
 	slice       reflect.Value
 	pkFieldName string
@@ -24,7 +23,7 @@ func (cl *ModelUniqSliceCollector) ImplListCollector() {}
 
 func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
 	if cl.pkFieldName == "" {
-		return false, fmt.Errorf("primary key not defined for %s", cl.structName)
+		return false, fmt.Errorf("primary key not defined for %s", cl.table.structName)
 	}
 
 	cl.pks = map[interface{}]bool{}
@@ -40,7 +39,7 @@ func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
 	cl.pkIdx = -1
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.Selects {
-		if conf.canTake(iC) && c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
+		if conf.canTake(iC) && isSameTable(c, cl.table) {
 			if cl.pkFieldName == c.FieldName {
 				cl.pkIdx = iC
 			}

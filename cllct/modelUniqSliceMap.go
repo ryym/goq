@@ -11,8 +11,7 @@ import (
 type ModelUniqSliceMapCollector struct {
 	elemType    reflect.Type
 	cols        []*gql.Column
-	structName  string
-	tableAlias  string
+	table       tableInfo
 	colToFld    map[int]int
 	key         gql.Querier
 	keyIdx      int
@@ -33,7 +32,7 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.pkIdx = -1
 
 	for iC, c := range conf.Selects {
-		if conf.canTake(iC) && c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
+		if conf.canTake(iC) && isSameTable(c, cl.table) {
 			if cl.pkFieldName == c.FieldName {
 				cl.pkIdx = iC
 			}

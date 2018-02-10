@@ -7,13 +7,12 @@ import (
 )
 
 type ModelSliceCollector struct {
-	elemType   reflect.Type
-	cols       []*gql.Column
-	structName string
-	tableAlias string
-	colToFld   map[int]int
-	slice      reflect.Value
-	row        reflect.Value
+	elemType reflect.Type
+	cols     []*gql.Column
+	table    tableInfo
+	colToFld map[int]int
+	slice    reflect.Value
+	row      reflect.Value
 }
 
 func (cl *ModelSliceCollector) ImplListCollector() {}
@@ -21,7 +20,7 @@ func (cl *ModelSliceCollector) ImplListCollector() {}
 func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.Selects {
-		if conf.canTake(iC) && c.TableAlias == cl.tableAlias && c.StructName == cl.structName {
+		if conf.canTake(iC) && isSameTable(c, cl.table) {
 			for iF, f := range cl.cols {
 				if c.FieldName == f.FieldName() {
 					cl.colToFld[iC] = iF

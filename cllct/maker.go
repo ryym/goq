@@ -94,19 +94,17 @@ func NewModelCollectorMaker(cols []*gql.Column, alias string) *ModelCollectorMak
 
 func (cm *ModelCollectorMaker) ToElem(elem interface{}) *ModelElemCollector {
 	return &ModelElemCollector{
-		structName: cm.structName,
-		tableAlias: cm.tableAlias,
-		elem:       reflect.ValueOf(elem).Elem(),
-		cols:       cm.cols,
+		table: tableInfo{cm.structName, cm.tableAlias},
+		elem:  reflect.ValueOf(elem).Elem(),
+		cols:  cm.cols,
 	}
 }
 
 func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
 	return &ModelSliceCollector{
-		structName: cm.structName,
-		tableAlias: cm.tableAlias,
-		slice:      reflect.ValueOf(slice).Elem(),
-		cols:       cm.cols,
+		table: tableInfo{cm.structName, cm.tableAlias},
+		slice: reflect.ValueOf(slice).Elem(),
+		cols:  cm.cols,
 	}
 }
 
@@ -116,8 +114,7 @@ func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCol
 		pkFieldName = pkCol.FieldName()
 	}
 	return &ModelUniqSliceCollector{
-		structName:  cm.structName,
-		tableAlias:  cm.tableAlias,
+		table:       tableInfo{cm.structName, cm.tableAlias},
 		pkFieldName: pkFieldName,
 		slice:       reflect.ValueOf(slice).Elem(),
 		cols:        cm.cols,
@@ -126,10 +123,9 @@ func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCol
 
 func (cm *ModelCollectorMaker) ToMap(mp interface{}) *ModelMapCollector {
 	mapCllct := &ModelMapCollector{
-		structName: cm.structName,
-		tableAlias: cm.tableAlias,
-		mp:         reflect.ValueOf(mp).Elem(),
-		cols:       cm.cols,
+		table: tableInfo{cm.structName, cm.tableAlias},
+		mp:    reflect.ValueOf(mp).Elem(),
+		cols:  cm.cols,
 	}
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
 		keySel := pkCol.Selection()
@@ -171,10 +167,9 @@ func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *
 
 func (cm *ModelCollectorMaker) ToSliceMap(mp interface{}) *modelSliceMapCollectorMaker {
 	return &modelSliceMapCollectorMaker{&ModelSliceMapCollector{
-		structName: cm.structName,
-		tableAlias: cm.tableAlias,
-		mp:         reflect.ValueOf(mp).Elem(),
-		cols:       cm.cols,
+		table: tableInfo{cm.structName, cm.tableAlias},
+		mp:    reflect.ValueOf(mp).Elem(),
+		cols:  cm.cols,
 	}}
 }
 
@@ -200,8 +195,7 @@ func (cm *ModelCollectorMaker) ToUniqSliceMap(mp interface{}) *modelUniqSliceMap
 		pkFieldName = pkCol.FieldName()
 	}
 	return &modelUniqSliceMapCollectorMaker{&ModelUniqSliceMapCollector{
-		structName:  cm.structName,
-		tableAlias:  cm.tableAlias,
+		table:       tableInfo{cm.structName, cm.tableAlias},
 		pkFieldName: pkFieldName,
 		mp:          reflect.ValueOf(mp).Elem(),
 		cols:        cm.cols,
