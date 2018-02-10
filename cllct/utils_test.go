@@ -23,11 +23,10 @@ func execCollector(
 		colNames = make([]string, len(selects))
 	}
 
-	for _, cl := range cllcts {
-		_, err := cl.Init(cllct.NewInitConf(selects, colNames))
-		if err != nil {
-			return err
-		}
+	initConf := cllct.NewInitConf(selects, colNames)
+	cllcts, err := cllct.InitCollectors(cllcts, initConf)
+	if err != nil {
+		return err
 	}
 
 	for _, row := range rows {
