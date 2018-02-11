@@ -23,6 +23,16 @@ func InitCollectors(collectors []Collector, initConf *InitConf) ([]Collector, er
 			clls = append(clls, cl)
 		}
 	}
+
+	for i, cl := range clls {
+		err := cl.AfterInit(initConf)
+		if err != nil {
+			return nil, errors.Wrapf(
+				err, "failed to initialize collectors[%d] (%s)",
+				i, reflect.TypeOf(cl).Elem().Name(),
+			)
+		}
+	}
 	return clls, nil
 }
 

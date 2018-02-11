@@ -22,6 +22,10 @@ func (cl *RowMapSliceCollector) Init(conf *InitConf) (bool, error) {
 	return true, nil
 }
 
+func (cl *RowMapSliceCollector) AfterInit(conf *InitConf) error {
+	return nil
+}
+
 func (cl *RowMapSliceCollector) Next(ptrs []interface{}) {
 	for _, i := range cl.targets {
 		ptrs[i] = new(interface{})

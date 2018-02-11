@@ -75,6 +75,10 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
+func (cl *ModelUniqSliceMapCollector) AfterInit(conf *InitConf) error {
+	return nil
+}
+
 func (cl *ModelUniqSliceMapCollector) Next(ptrs []interface{}) {
 	for c, f := range cl.colToFld {
 		ptrs[c] = cl.elem.Field(f).Addr().Interface()

@@ -63,6 +63,10 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
+func (cl *ModelMapCollector) AfterInit(conf *InitConf) error {
+	return nil
+}
+
 func (cl *ModelMapCollector) Next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()

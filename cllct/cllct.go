@@ -26,6 +26,7 @@ func (c *InitConf) canTake(colIdx int) bool {
 
 type Collector interface {
 	Init(conf *InitConf) (collectable bool, err error)
+	AfterInit(conf *InitConf) error
 	Next(ptrs []interface{})
 	AfterScan(ptrs []interface{})
 }

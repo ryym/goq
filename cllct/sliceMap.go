@@ -63,6 +63,10 @@ func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
+func (cl *SliceMapCollector) AfterInit(conf *InitConf) error {
+	return nil
+}
+
 func (cl *SliceMapCollector) Next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()

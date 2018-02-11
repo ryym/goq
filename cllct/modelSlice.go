@@ -42,6 +42,10 @@ func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
+func (cl *ModelSliceCollector) AfterInit(conf *InitConf) error {
+	return nil
+}
+
 func (cl *ModelSliceCollector) Next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()

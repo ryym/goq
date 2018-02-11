@@ -38,6 +38,10 @@ func (cl *ModelElemCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
+func (cl *ModelElemCollector) AfterInit(conf *InitConf) error {
+	return nil
+}
+
 func (cl *ModelElemCollector) Next(ptrs []interface{}) {
 	for c, f := range cl.colToFld {
 		ptrs[c] = cl.elem.Field(f).Addr().Interface()
