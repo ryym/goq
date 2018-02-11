@@ -7,6 +7,8 @@ import (
 	"github.com/ryym/goq/gql"
 )
 
+const mapKeyNotSelectedErrMsg = "cannot use non collected value for `By` (or use `ByWith` instead)"
+
 // For map collectors.
 func isKeyCol(col *gql.Selection, key *gql.Selection) bool {
 	if col.Alias != "" && col.Alias == key.Alias {

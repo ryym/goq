@@ -76,6 +76,9 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 }
 
 func (cl *ModelUniqSliceMapCollector) AfterInit(conf *InitConf) error {
+	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
+		return errors.New(mapKeyNotSelectedErrMsg)
+	}
 	return nil
 }
 

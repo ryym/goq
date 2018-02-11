@@ -54,6 +54,9 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	if cl.keyIdx == -1 {
 		return false, errors.New("key not found")
 	}
+	if conf.canTake(cl.keyIdx) {
+		return false, errors.New("PK column must be collected")
+	}
 
 	mapType := cl.mp.Type()
 

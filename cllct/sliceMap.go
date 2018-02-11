@@ -64,6 +64,9 @@ func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
 }
 
 func (cl *SliceMapCollector) AfterInit(conf *InitConf) error {
+	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
+		return errors.New(mapKeyNotSelectedErrMsg)
+	}
 	return nil
 }
 

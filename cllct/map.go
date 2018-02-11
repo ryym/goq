@@ -65,6 +65,9 @@ func (cl *MapCollector) Init(conf *InitConf) (bool, error) {
 }
 
 func (cl *MapCollector) AfterInit(conf *InitConf) error {
+	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
+		return errors.New(mapKeyNotSelectedErrMsg)
+	}
 	return nil
 }
 
