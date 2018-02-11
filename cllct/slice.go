@@ -9,6 +9,7 @@ import (
 type SliceCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int
+	ptr      interface{}
 	slice    reflect.Value
 	row      reflect.Value
 }
@@ -16,7 +17,13 @@ type SliceCollector struct {
 func (cl *SliceCollector) ImplListCollector() {}
 
 func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
+		return false, err
+	}
+
+	cl.slice = reflect.ValueOf(cl.ptr).Elem()
 	cl.elemType = cl.slice.Type().Elem()
+	cl.ptr = nil
 
 	targets := map[string]int{}
 	for i := 0; i < cl.elemType.NumField(); i++ {

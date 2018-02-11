@@ -14,6 +14,7 @@ type ModelMapCollector struct {
 	colToFld map[int]int
 	keySel   *gql.Selection
 	keyIdx   int
+	ptr      interface{}
 	mp       reflect.Value
 	row      reflect.Value
 }
@@ -21,6 +22,13 @@ type ModelMapCollector struct {
 func (cl *ModelMapCollector) ImplListCollector() {}
 
 func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Map); err != nil {
+		return false, err
+	}
+
+	cl.mp = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	if cl.keySel == nil {
 		return false, errors.New("PK column required")
 	}

@@ -8,12 +8,20 @@ import (
 
 type ElemCollector struct {
 	colToFld map[int]int
+	ptr      interface{}
 	elem     reflect.Value
 }
 
 func (cl *ElemCollector) ImplSingleCollector() {}
 
 func (cl *ElemCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Struct); err != nil {
+		return false, err
+	}
+
+	cl.elem = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	targets := map[string]int{}
 	elemType := cl.elem.Type()
 	for i := 0; i < elemType.NumField(); i++ {

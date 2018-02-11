@@ -12,15 +12,15 @@ func NewMaker() *CollectorMaker {
 	return &CollectorMaker{}
 }
 
-func (cm *CollectorMaker) ToElem(elem interface{}) *ElemCollector {
+func (cm *CollectorMaker) ToElem(ptr interface{}) *ElemCollector {
 	return &ElemCollector{
-		elem: reflect.ValueOf(elem).Elem(),
+		ptr: ptr,
 	}
 }
 
-func (cm *CollectorMaker) ToSlice(slice interface{}) *SliceCollector {
+func (cm *CollectorMaker) ToSlice(ptr interface{}) *SliceCollector {
 	return &SliceCollector{
-		slice: reflect.ValueOf(slice).Elem(),
+		ptr: ptr,
 	}
 }
 
@@ -39,9 +39,9 @@ func (m *mapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *MapCollect
 	return m.collector
 }
 
-func (cm *CollectorMaker) ToMap(mp interface{}) *mapCollectorMaker {
+func (cm *CollectorMaker) ToMap(ptr interface{}) *mapCollectorMaker {
 	return &mapCollectorMaker{&MapCollector{
-		mp: reflect.ValueOf(mp).Elem(),
+		ptr: ptr,
 	}}
 }
 
@@ -60,9 +60,9 @@ func (m *sliceMapCollector) ByWith(ptr interface{}, key gql.Querier) *SliceMapCo
 	return m.collector
 }
 
-func (cm *CollectorMaker) ToSliceMap(mp interface{}) *sliceMapCollector {
+func (cm *CollectorMaker) ToSliceMap(ptr interface{}) *sliceMapCollector {
 	return &sliceMapCollector{&SliceMapCollector{
-		mp: reflect.ValueOf(mp).Elem(),
+		ptr: ptr,
 	}}
 }
 
@@ -92,23 +92,23 @@ func NewModelCollectorMaker(cols []*gql.Column, alias string) *ModelCollectorMak
 	}
 }
 
-func (cm *ModelCollectorMaker) ToElem(elem interface{}) *ModelElemCollector {
+func (cm *ModelCollectorMaker) ToElem(ptr interface{}) *ModelElemCollector {
 	return &ModelElemCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
-		elem:  reflect.ValueOf(elem).Elem(),
+		ptr:   ptr,
 		cols:  cm.cols,
 	}
 }
 
-func (cm *ModelCollectorMaker) ToSlice(slice interface{}) *ModelSliceCollector {
+func (cm *ModelCollectorMaker) ToSlice(ptr interface{}) *ModelSliceCollector {
 	return &ModelSliceCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
-		slice: reflect.ValueOf(slice).Elem(),
+		ptr:   ptr,
 		cols:  cm.cols,
 	}
 }
 
-func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCollector {
+func (cm *ModelCollectorMaker) ToUniqSlice(ptr interface{}) *ModelUniqSliceCollector {
 	pkFieldName := ""
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
 		pkFieldName = pkCol.FieldName()
@@ -116,15 +116,15 @@ func (cm *ModelCollectorMaker) ToUniqSlice(slice interface{}) *ModelUniqSliceCol
 	return &ModelUniqSliceCollector{
 		table:       tableInfo{cm.structName, cm.tableAlias},
 		pkFieldName: pkFieldName,
-		slice:       reflect.ValueOf(slice).Elem(),
+		ptr:         ptr,
 		cols:        cm.cols,
 	}
 }
 
-func (cm *ModelCollectorMaker) ToMap(mp interface{}) *ModelMapCollector {
+func (cm *ModelCollectorMaker) ToMap(ptr interface{}) *ModelMapCollector {
 	mapCllct := &ModelMapCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
-		mp:    reflect.ValueOf(mp).Elem(),
+		ptr:   ptr,
 		cols:  cm.cols,
 	}
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
@@ -165,10 +165,10 @@ func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *
 	return m.collector
 }
 
-func (cm *ModelCollectorMaker) ToSliceMap(mp interface{}) *modelSliceMapCollectorMaker {
+func (cm *ModelCollectorMaker) ToSliceMap(ptr interface{}) *modelSliceMapCollectorMaker {
 	return &modelSliceMapCollectorMaker{&ModelSliceMapCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
-		mp:    reflect.ValueOf(mp).Elem(),
+		ptr:   ptr,
 		cols:  cm.cols,
 	}}
 }
@@ -189,7 +189,7 @@ func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querie
 	return m.collector
 }
 
-func (cm *ModelCollectorMaker) ToUniqSliceMap(mp interface{}) *modelUniqSliceMapCollectorMaker {
+func (cm *ModelCollectorMaker) ToUniqSliceMap(ptr interface{}) *modelUniqSliceMapCollectorMaker {
 	pkFieldName := ""
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
 		pkFieldName = pkCol.FieldName()
@@ -197,7 +197,7 @@ func (cm *ModelCollectorMaker) ToUniqSliceMap(mp interface{}) *modelUniqSliceMap
 	return &modelUniqSliceMapCollectorMaker{&ModelUniqSliceMapCollector{
 		table:       tableInfo{cm.structName, cm.tableAlias},
 		pkFieldName: pkFieldName,
-		mp:          reflect.ValueOf(mp).Elem(),
+		ptr:         ptr,
 		cols:        cm.cols,
 	}}
 }

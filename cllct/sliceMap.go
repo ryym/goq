@@ -14,6 +14,7 @@ type SliceMapCollector struct {
 	key      gql.Querier
 	keyIdx   int
 	keyStore reflect.Value
+	ptr      interface{}
 	mp       reflect.Value
 	row      reflect.Value
 }
@@ -21,7 +22,13 @@ type SliceMapCollector struct {
 func (cl *SliceMapCollector) ImplListCollector() {}
 
 func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkSliceMapPtrKind(cl.ptr); err != nil {
+		return false, err
+	}
+
+	cl.mp = reflect.ValueOf(cl.ptr).Elem()
 	cl.elemType = cl.mp.Type().Elem().Elem()
+	cl.ptr = nil
 
 	targets := map[string]int{}
 	for i := 0; i < cl.elemType.NumField(); i++ {

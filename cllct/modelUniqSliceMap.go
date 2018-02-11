@@ -19,6 +19,7 @@ type ModelUniqSliceMapCollector struct {
 	pkFieldName string
 	pkIdx       int
 	pks         map[interface{}]bool
+	ptr         interface{}
 	mp          reflect.Value
 	elem        *reflect.Value
 }
@@ -26,6 +27,12 @@ type ModelUniqSliceMapCollector struct {
 func (cl *ModelUniqSliceMapCollector) ImplListCollector() {}
 
 func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkSliceMapPtrKind(cl.ptr); err != nil {
+		return false, err
+	}
+	cl.mp = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	cl.colToFld = map[int]int{}
 	key := cl.key.Selection()
 	cl.keyIdx = -1

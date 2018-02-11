@@ -12,6 +12,7 @@ type ModelUniqSliceCollector struct {
 	cols        []*gql.Column
 	table       tableInfo
 	colToFld    map[int]int
+	ptr         interface{}
 	slice       reflect.Value
 	pkFieldName string
 	pkIdx       int
@@ -22,6 +23,13 @@ type ModelUniqSliceCollector struct {
 func (cl *ModelUniqSliceCollector) ImplListCollector() {}
 
 func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
+		return false, err
+	}
+
+	cl.slice = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	if cl.pkFieldName == "" {
 		return false, fmt.Errorf("primary key not defined for %s", cl.table.structName)
 	}

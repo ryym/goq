@@ -11,6 +11,7 @@ type ModelSliceCollector struct {
 	cols     []*gql.Column
 	table    tableInfo
 	colToFld map[int]int
+	ptr      interface{}
 	slice    reflect.Value
 	row      reflect.Value
 }
@@ -18,6 +19,13 @@ type ModelSliceCollector struct {
 func (cl *ModelSliceCollector) ImplListCollector() {}
 
 func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
+		return false, err
+	}
+
+	cl.slice = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.Selects {
 		if conf.canTake(iC) && isSameTable(c, cl.table) {

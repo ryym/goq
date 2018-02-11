@@ -10,12 +10,20 @@ type ModelElemCollector struct {
 	cols     []*gql.Column
 	table    tableInfo
 	colToFld map[int]int
+	ptr      interface{}
 	elem     reflect.Value
 }
 
 func (cl *ModelElemCollector) ImplSingleCollector() {}
 
 func (cl *ModelElemCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Struct); err != nil {
+		return false, err
+	}
+
+	cl.elem = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.Selects {
 		if conf.canTake(iC) && isSameTable(c, cl.table) {

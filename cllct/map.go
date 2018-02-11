@@ -14,6 +14,7 @@ type MapCollector struct {
 	key      gql.Querier
 	keyIdx   int
 	keyStore reflect.Value
+	ptr      interface{}
 	mp       reflect.Value
 	row      reflect.Value
 }
@@ -21,6 +22,13 @@ type MapCollector struct {
 func (cl *MapCollector) ImplListCollector() {}
 
 func (cl *MapCollector) Init(conf *InitConf) (bool, error) {
+	if err := checkPtrKind(cl.ptr, reflect.Map); err != nil {
+		return false, err
+	}
+
+	cl.mp = reflect.ValueOf(cl.ptr).Elem()
+	cl.ptr = nil
+
 	cl.elemType = cl.mp.Type().Elem()
 
 	targets := map[string]int{}
