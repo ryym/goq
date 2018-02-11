@@ -1,0 +1,17 @@
+version: "{build}"
+build: off
+deploy: off
+clone_depth: 1
+clone_folder: c:\gopath\src\github.com\ryym\goq
+
+environment:
+  GOPATH: c:\gopath
+
+install:
+  - go version
+  - go env
+
+test_script:
+  - ps: go test -v -race $(go list ./... | Select-String -NotMatch /tests)
+
+notifications: off
