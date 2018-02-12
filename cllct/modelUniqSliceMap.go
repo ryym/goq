@@ -33,6 +33,14 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.mp = reflect.ValueOf(cl.ptr).Elem()
 	cl.ptr = nil
 
+	mapType := cl.mp.Type()
+	sliceType := mapType.Elem()
+	cl.elemType = sliceType.Elem()
+	if cl.elemType.Kind() != reflect.Struct {
+		return false, errors.New("slice elem type must be struct")
+	}
+	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), sliceType)))
+
 	cl.colToFld = map[int]int{}
 	key := cl.key.Selection()
 	cl.keyIdx = -1
@@ -62,11 +70,6 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	if cl.pkIdx == -1 {
 		return false, fmt.Errorf("primary key %s not selected", cl.pkFieldName)
 	}
-
-	mapType := cl.mp.Type()
-	sliceType := mapType.Elem()
-	cl.elemType = sliceType.Elem()
-	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), sliceType)))
 
 	elem := reflect.New(cl.elemType).Elem()
 	cl.elem = &elem

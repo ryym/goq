@@ -1,6 +1,7 @@
 package cllct
 
 import (
+	"errors"
 	"reflect"
 
 	"github.com/ryym/goq/gql"
@@ -26,6 +27,12 @@ func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
 	cl.slice = reflect.ValueOf(cl.ptr).Elem()
 	cl.ptr = nil
 
+	cl.elemType = cl.slice.Type().Elem()
+	if cl.elemType.Kind() != reflect.Struct {
+		return false, errors.New("slice elem type must be struct")
+	}
+	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
+
 	cl.colToFld = map[int]int{}
 	for iC, c := range conf.Selects {
 		if conf.canTake(iC) && isSameTable(c, cl.table) {
@@ -37,8 +44,6 @@ func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
 			}
 		}
 	}
-	cl.elemType = cl.slice.Type().Elem()
-	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
 	return len(cl.colToFld) > 0, nil
 }
 

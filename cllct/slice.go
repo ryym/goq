@@ -22,8 +22,10 @@ func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
 	}
 
 	cl.slice = reflect.ValueOf(cl.ptr).Elem()
-	cl.elemType = cl.slice.Type().Elem()
 	cl.ptr = nil
+
+	cl.elemType = cl.slice.Type().Elem()
+	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
 
 	targets := map[string]int{}
 	for i := 0; i < cl.elemType.NumField(); i++ {
@@ -39,7 +41,6 @@ func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
 			cl.colToFld[iC] = iF
 		}
 	}
-	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
 	return len(cl.colToFld) > 0, nil
 }
 

@@ -30,6 +30,9 @@ func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.elemType = cl.mp.Type().Elem().Elem()
 	cl.ptr = nil
 
+	mapType := cl.mp.Type()
+	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), mapType.Elem())))
+
 	targets := map[string]int{}
 	for i := 0; i < cl.elemType.NumField(); i++ {
 		f := cl.elemType.Field(i)
@@ -56,9 +59,6 @@ func (cl *SliceMapCollector) Init(conf *InitConf) (bool, error) {
 			cl.colToFld[iC] = iF
 		}
 	}
-
-	mapType := cl.mp.Type()
-	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), mapType.Elem())))
 
 	return len(cl.colToFld) > 0, nil
 }

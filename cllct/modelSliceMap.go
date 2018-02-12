@@ -56,6 +56,9 @@ func (cl *ModelSliceMapCollector) Init(conf *InitConf) (bool, error) {
 
 	sliceType := mapType.Elem()
 	cl.elemType = sliceType.Elem()
+	if cl.elemType.Kind() != reflect.Struct {
+		return false, errors.New("slice elem type must be struct")
+	}
 	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), sliceType)))
 
 	return len(cl.colToFld) > 0, nil

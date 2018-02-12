@@ -29,6 +29,14 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	cl.mp = reflect.ValueOf(cl.ptr).Elem()
 	cl.ptr = nil
 
+	mapType := cl.mp.Type()
+	cl.elemType = mapType.Elem()
+	if cl.elemType.Kind() != reflect.Struct {
+		return false, errors.New("map elem type must be struct")
+	}
+
+	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), cl.elemType)))
+
 	if cl.keySel == nil {
 		return false, errors.New("PK column required")
 	}
@@ -57,11 +65,6 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	if conf.canTake(cl.keyIdx) {
 		return false, errors.New("PK column must be collected")
 	}
-
-	mapType := cl.mp.Type()
-
-	cl.elemType = mapType.Elem()
-	cl.mp.Set(reflect.MakeMap(reflect.MapOf(mapType.Key(), cl.elemType)))
 
 	return len(cl.colToFld) > 0, nil
 }

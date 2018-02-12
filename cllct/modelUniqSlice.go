@@ -1,6 +1,7 @@
 package cllct
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -30,13 +31,17 @@ func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
 	cl.slice = reflect.ValueOf(cl.ptr).Elem()
 	cl.ptr = nil
 
+	cl.elemType = cl.slice.Type().Elem()
+	if cl.elemType.Kind() != reflect.Struct {
+		return false, errors.New("slice elem type must be struct")
+	}
+	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
+
 	if cl.pkFieldName == "" {
 		return false, fmt.Errorf("primary key not defined for %s", cl.table.structName)
 	}
 
 	cl.pks = map[interface{}]bool{}
-	cl.elemType = cl.slice.Type().Elem()
-	cl.slice.Set(reflect.MakeSlice(reflect.SliceOf(cl.elemType), 0, 0))
 
 	// Since `ModelUniqSliceCollector` does not need to create a struct every row,
 	// prepare only one struct passed to `Rows.Scan` as a pointer,
