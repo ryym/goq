@@ -49,7 +49,7 @@ type field struct {
 	Tag    ColumnTag
 }
 
-func GenerateTableHelpers(opts Opts) error {
+func GenerateCustomBuilders(opts Opts) error {
 	conf := loader.Config{}
 	if opts.IsTestFile {
 		conf.ImportWithTests(opts.PkgPath)

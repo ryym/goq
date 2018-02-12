@@ -52,7 +52,7 @@ func main() {
 		IsTestFile:       *IsTestFile,
 	}
 
-	err = gen.GenerateTableHelpers(opts)
+	err = gen.GenerateCustomBuilders(opts)
 	if err != nil {
 		exitErr(err)
 	}
