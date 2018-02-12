@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"go/build"
@@ -22,12 +23,12 @@ func main() {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		exitErr(err)
 	}
 
 	pkgPath, err := filepath.Rel(filepath.Join(gopath, "src"), wd)
 	if err != nil {
-		panic(err)
+		exitErr(err)
 	}
 
 	var outFile string
@@ -36,16 +37,12 @@ func main() {
 	case 0:
 		outFile = "gql.go"
 	case 1:
-		if strings.HasSuffix(args[0], ".go") {
-			if strings.ContainsRune(args[0], filepath.Separator) {
-				panic("output file must be in the same directory")
-			}
-			outFile = args[0]
-		} else {
-			panic("Invalid output file name")
+		if strings.ContainsRune(args[0], filepath.Separator) {
+			exitErr(errors.New("output file must be in the same directory"))
 		}
+		outFile = args[0]
 	default:
-		panic("Invalid arguments")
+		exitErr(errors.New("cannot specify more than 1 file"))
 	}
 
 	opts := gen.Opts{
@@ -57,7 +54,11 @@ func main() {
 
 	err = gen.GenerateTableHelpers(opts)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		exitErr(err)
 	}
+}
+
+func exitErr(err error) {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
 }
