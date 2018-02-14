@@ -19,7 +19,7 @@ func execTemplate(
 	buf := new(bytes.Buffer)
 	buf.Write([]byte(fmt.Sprintf("package %s\n\n", pkgName)))
 
-	writeImports(buf, pkgs)
+	writeImports(buf, helpers, pkgs)
 	tableT := template.Must(template.New("table").Parse(tableTmpl))
 
 	var err error
@@ -49,15 +49,17 @@ func execTemplate(
 	return src, err
 }
 
-func writeImports(buf io.Writer, pkgs map[string]bool) {
+func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
 	buf.Write([]byte("import (\n"))
 
 	paths := []string{
 		"github.com/ryym/goq",
-		"github.com/ryym/goq/cllct",
 		"github.com/ryym/goq/dialect",
-		"github.com/ryym/goq/gql",
 	}
+	if len(helpers) > 0 {
+		paths = append(paths, "github.com/ryym/goq/cllct", "github.com/ryym/goq/gql")
+	}
+
 	for path, _ := range pkgs {
 		paths = append(paths, path)
 	}
@@ -78,7 +80,7 @@ type {{.Name}} struct {
 }
 
 func New{{.Name}}(alias string) *{{.Name}} {
-	cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias)
+	{{if .Fields}}cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias){{end}}
 	t := &{{.Name}}{
 		Table: gql.NewTable("{{.TableName}}", alias),
 		{{range .Fields}}

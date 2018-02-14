@@ -73,7 +73,7 @@ func GenerateCustomBuilders(opts Opts) error {
 	}
 
 	if tables == nil {
-		return fmt.Errorf("Table definition struct %s not found", opts.TablesStructName)
+		return fmt.Errorf("Table definition struct '%s' not found", opts.TablesStructName)
 	}
 
 	tablesT, ok := tables.Type().Underlying().(*types.Struct)
@@ -85,9 +85,14 @@ func GenerateCustomBuilders(opts Opts) error {
 
 	for i := 0; i < tablesT.NumFields(); i++ {
 		fld := tablesT.Field(i)
+
 		tableName := fld.Name()
-		fldVar := fld.Type().(*types.Named)
-		fldT, ok := fldVar.Underlying().(*types.Struct)
+
+		var fldT *types.Struct
+		fldVar, ok := fld.Type().(*types.Named)
+		if ok {
+			fldT, ok = fldVar.Underlying().(*types.Struct)
+		}
 		if !ok {
 			return fmt.Errorf(
 				"%s contains non struct field %s",
