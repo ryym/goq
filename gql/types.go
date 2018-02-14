@@ -81,11 +81,6 @@ type PredExpr interface {
 	ImplPredExpr()
 }
 
-type ExprListExpr interface {
-	Querier
-	Exprs() []Expr
-}
-
 type TableLike interface {
 	ApplyTable(q *Query, ctx DBContext)
 }
@@ -97,7 +92,7 @@ type QueryTable interface {
 
 type SchemaTable interface {
 	TableLike
-	All() ExprListExpr
+	All() *ExprListExpr
 	Columns() []*Column
 }
 

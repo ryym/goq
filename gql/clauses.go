@@ -117,7 +117,7 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 func (qe *queryExpr) Selections() []Selection {
 	items := make([]Selection, 0, len(qe.exps))
 	for _, exp := range qe.exps {
-		if cl, ok := exp.(ExprListExpr); ok {
+		if cl, ok := exp.(*ExprListExpr); ok {
 			for _, e := range cl.Exprs() {
 				items = append(items, e.Selection())
 			}

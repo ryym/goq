@@ -31,7 +31,7 @@ func NewUsers(alias string) *Users {
 }
 
 func (t *Users) As(alias string) *Users { return NewUsers(alias) }
-func (t *Users) All() gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
+func (t *Users) All() *gql.ExprListExpr { return gql.AllCols(t.Columns()) }
 func (t *Users) Columns() []*gql.Column {
 	return []*gql.Column{t.ID, t.Name}
 }
@@ -57,7 +57,7 @@ func NewCountries(alias string) *Countries {
 }
 
 func (t *Countries) As(alias string) *Countries { return NewCountries(alias) }
-func (t *Countries) All() gql.ExprListExpr      { return gql.AllCols(t.Columns()) }
+func (t *Countries) All() *gql.ExprListExpr     { return gql.AllCols(t.Columns()) }
 func (t *Countries) Columns() []*gql.Column {
 	return []*gql.Column{t.ID, t.Name}
 }
@@ -85,7 +85,7 @@ func NewCities(alias string) *Cities {
 }
 
 func (t *Cities) As(alias string) *Cities { return NewCities(alias) }
-func (t *Cities) All() gql.ExprListExpr   { return gql.AllCols(t.Columns()) }
+func (t *Cities) All() *gql.ExprListExpr  { return gql.AllCols(t.Columns()) }
 func (t *Cities) Columns() []*gql.Column {
 	return []*gql.Column{t.ID, t.Name, t.CountryID}
 }
@@ -117,7 +117,7 @@ func NewAddresses(alias string) *Addresses {
 }
 
 func (t *Addresses) As(alias string) *Addresses { return NewAddresses(alias) }
-func (t *Addresses) All() gql.ExprListExpr      { return gql.AllCols(t.Columns()) }
+func (t *Addresses) All() *gql.ExprListExpr     { return gql.AllCols(t.Columns()) }
 func (t *Addresses) Columns() []*gql.Column {
 	return []*gql.Column{t.ID, t.Address1, t.Address2, t.CityID, t.PostalCode}
 }

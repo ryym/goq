@@ -146,11 +146,11 @@ func (f *funcExpr) Apply(q *Query, ctx DBContext) {
 
 func (f *funcExpr) Selection() Selection { return Selection{} }
 
-type exprListExpr struct {
+type ExprListExpr struct {
 	exps []Expr
 }
 
-func (el *exprListExpr) Apply(q *Query, ctx DBContext) {
+func (el *ExprListExpr) Apply(q *Query, ctx DBContext) {
 	if len(el.exps) == 0 {
 		return
 	}
@@ -161,11 +161,11 @@ func (el *exprListExpr) Apply(q *Query, ctx DBContext) {
 	}
 }
 
-func (el *exprListExpr) Selection() Selection {
-	panic("[INVALID] exprListExpr.Selection is called")
+func (el *ExprListExpr) Selection() Selection {
+	panic("[INVALID] ExprListExpr.Selection is called")
 }
 
-func (el *exprListExpr) Exprs() []Expr {
+func (el *ExprListExpr) Exprs() []Expr {
 	return el.exps
 }
 
