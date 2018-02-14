@@ -150,6 +150,10 @@ type ColumnListExpr struct {
 	exps []*Column
 }
 
+func NewColumnList(cols []*Column) *ColumnListExpr {
+	return &ColumnListExpr{cols}
+}
+
 func (el *ColumnListExpr) Apply(q *Query, ctx DBContext) {
 	if len(el.exps) == 0 {
 		return

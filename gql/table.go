@@ -1,9 +1,5 @@
 package gql
 
-func AllCols(cols []*Column) *ColumnListExpr {
-	return &ColumnListExpr{cols}
-}
-
 type Table struct {
 	name  string
 	alias string

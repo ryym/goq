@@ -96,7 +96,7 @@ func New{{.Name}}(alias string) *{{.Name}} {
 }
 
 func (t *{{.Name}}) As(alias string) *{{.Name}} { return New{{.Name}}(alias) }
-func (t *{{.Name}}) All() *gql.ColumnListExpr   { return gql.AllCols(t.Columns()) }
+func (t *{{.Name}}) All() *gql.ColumnListExpr   { return gql.NewColumnList(t.Columns()) }
 func (t *{{.Name}}) Columns() []*gql.Column {
 	return []*gql.Column{ {{.JoinFields "t"}} }
 }
