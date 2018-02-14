@@ -1,11 +1,7 @@
 package gql
 
-func AllCols(cols []*Column) *ExprListExpr {
-	exps := make([]Expr, len(cols))
-	for i, c := range cols {
-		exps[i] = c
-	}
-	return &ExprListExpr{exps}
+func AllCols(cols []*Column) *ColumnListExpr {
+	return &ColumnListExpr{cols}
 }
 
 type Table struct {

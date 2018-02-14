@@ -92,7 +92,7 @@ type QueryTable interface {
 
 type SchemaTable interface {
 	TableLike
-	All() *ExprListExpr
+	All() *ColumnListExpr
 	Columns() []*Column
 }
 
