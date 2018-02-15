@@ -186,6 +186,11 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "SELECT $1::int",
 			args: []interface{}{1},
 		},
+		{
+			gql:  Users.All().Except(Users.ID),
+			sql:  "`users`.`name`",
+			args: nil,
+		},
 	}
 
 	for i, test := range tests {

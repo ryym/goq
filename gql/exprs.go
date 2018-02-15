@@ -147,7 +147,7 @@ func (f *funcExpr) Apply(q *Query, ctx DBContext) {
 func (f *funcExpr) Selection() Selection { return Selection{} }
 
 type ColumnListExpr struct {
-	exps []*Column
+	cols []*Column
 }
 
 func NewColumnList(cols []*Column) *ColumnListExpr {
@@ -155,13 +155,13 @@ func NewColumnList(cols []*Column) *ColumnListExpr {
 }
 
 func (el *ColumnListExpr) Apply(q *Query, ctx DBContext) {
-	if len(el.exps) == 0 {
+	if len(el.cols) == 0 {
 		return
 	}
-	el.exps[0].Apply(q, ctx)
-	for i := 1; i < len(el.exps); i++ {
+	el.cols[0].Apply(q, ctx)
+	for i := 1; i < len(el.cols); i++ {
 		q.query = append(q.query, ", ")
-		el.exps[i].Apply(q, ctx)
+		el.cols[i].Apply(q, ctx)
 	}
 }
 
@@ -170,7 +170,28 @@ func (el *ColumnListExpr) Selection() Selection {
 }
 
 func (el *ColumnListExpr) Columns() []*Column {
-	return el.exps
+	return el.cols
+}
+
+func (el *ColumnListExpr) Except(excludes ...*Column) *ColumnListExpr {
+	if len(excludes) == 0 {
+		return el
+	}
+
+	var cols []*Column
+	for _, c := range el.cols {
+		except := false
+		for _, e := range excludes {
+			if c.tableName == e.tableName && c.name == e.name {
+				except = true
+				break
+			}
+		}
+		if !except {
+			cols = append(cols, c)
+		}
+	}
+	return NewColumnList(cols)
 }
 
 type existsExpr struct {
