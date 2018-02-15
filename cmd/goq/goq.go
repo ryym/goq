@@ -35,7 +35,7 @@ func main() {
 	args := flag.Args()
 	switch len(args) {
 	case 0:
-		outFile = "gql.go"
+		outFile = "goq.go"
 	case 1:
 		if strings.ContainsRune(args[0], filepath.Separator) {
 			exitErr(errors.New("output file must be in the same directory"))

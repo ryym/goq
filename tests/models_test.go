@@ -1,6 +1,6 @@
 package tests
 
-//go:generate goq -test gql_test.go
+//go:generate goq -test goq_test.go
 
 type Tables struct {
 	countries    Country
