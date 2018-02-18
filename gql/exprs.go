@@ -173,27 +173,6 @@ func (el *ColumnListExpr) Columns() []*Column {
 	return el.cols
 }
 
-func (el *ColumnListExpr) Except(excludes ...*Column) *ColumnListExpr {
-	if len(excludes) == 0 {
-		return el
-	}
-
-	var cols []*Column
-	for _, c := range el.cols {
-		except := false
-		for _, e := range excludes {
-			if c.tableName == e.tableName && c.name == e.name {
-				except = true
-				break
-			}
-		}
-		if !except {
-			cols = append(cols, c)
-		}
-	}
-	return NewColumnList(cols)
-}
-
 type existsExpr struct {
 	query QueryExpr
 	ops

@@ -114,6 +114,7 @@ type QueryTable interface {
 type SchemaTable interface {
 	TableLike
 	All() *ColumnListExpr
+	Except(cols ...*Column) *ColumnListExpr
 }
 
 type QueryRoot interface {

@@ -21,6 +21,27 @@ func (t *Table) All() *ColumnListExpr {
 	return NewColumnList(t.cols)
 }
 
+func (t *Table) Except(excepts ...*Column) *ColumnListExpr {
+	if len(excepts) == 0 {
+		return t.All()
+	}
+
+	var cols []*Column
+	for _, col := range t.cols {
+		isTarget := true
+		for _, ecol := range excepts {
+			if col == ecol {
+				isTarget = false
+				break
+			}
+		}
+		if isTarget {
+			cols = append(cols, col)
+		}
+	}
+	return NewColumnList(cols)
+}
+
 type DynmTable struct {
 	table Table
 }

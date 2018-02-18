@@ -189,7 +189,7 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1},
 		},
 		{
-			gql:  Users.All().Except(Users.ID),
+			gql:  Users.Except(Users.ID),
 			sql:  "`users`.`name`",
 			args: nil,
 		},
@@ -214,7 +214,7 @@ func TestBasicExprs(t *testing.T) {
 		{
 			gql: z.InsertInto(
 				Users,
-				Users.All().Except(Users.Name).Columns()...,
+				Users.Except(Users.Name).Columns()...,
 			).Values(user{1, "bob"}),
 			sql:  "INSERT INTO `users` (`users`.`id`) VALUES ($1)",
 			args: []interface{}{1},
