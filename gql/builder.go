@@ -10,7 +10,7 @@ type Builder struct {
 	ctx DBContext
 }
 
-func (b *Builder) Query(exp Querier) Query {
+func (b *Builder) Query(exp QueryApplier) Query {
 	q := Query{}
 	exp.Apply(&q, b.ctx)
 	return q

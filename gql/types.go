@@ -36,8 +36,12 @@ type DBContext interface {
 	QuoteIdent(v string) string
 }
 
-type Querier interface {
+type QueryApplier interface {
 	Apply(q *Query, ctx DBContext)
+}
+
+type Querier interface {
+	QueryApplier
 	Selection() Selection
 }
 

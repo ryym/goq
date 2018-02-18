@@ -46,7 +46,7 @@ func TestBasicExprs(t *testing.T) {
 	}
 
 	var tests = []struct {
-		gql  Querier
+		gql  QueryApplier
 		sql  string
 		args []interface{}
 	}{
