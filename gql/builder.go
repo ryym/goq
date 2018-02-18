@@ -146,5 +146,9 @@ func (b *Builder) When(when interface{}) *WhenExpr {
 // Modifier clauses
 
 func (b *Builder) InsertInto(table SchemaTable, cols ...*Column) *InsertMaker {
-	return &InsertMaker{table, cols}
+	return &InsertMaker{
+		table: table,
+		cols:  cols,
+		ctx:   b.ctx,
+	}
 }

@@ -7,20 +7,39 @@ type Values map[*Column]interface{}
 type InsertMaker struct {
 	table SchemaTable
 	cols  []*Column
+	ctx   DBContext
 }
 
 func (m *InsertMaker) Values(vals Values, valsList ...Values) *Insert {
 	vl := append([]Values{vals}, valsList...)
-	return &Insert{m.table, m.cols, vl}
+	return &Insert{
+		table:    m.table,
+		cols:     m.cols,
+		valsList: vl,
+		ctx:      m.ctx,
+	}
 }
 
 type Insert struct {
 	table    SchemaTable
 	cols     []*Column
 	valsList []Values
+	errs     []error
+	ctx      DBContext
+}
+
+func (ins *Insert) Construct() Query {
+	q := Query{}
+	ins.Apply(&q, ins.ctx)
+	return q
 }
 
 func (ins *Insert) Apply(q *Query, ctx DBContext) {
+	if len(ins.errs) > 0 {
+		q.errs = append(q.errs, ins.errs...)
+		return
+	}
+
 	q.query = append(q.query, "INSERT INTO ")
 	ins.table.ApplyTable(q, ctx)
 
