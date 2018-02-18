@@ -75,10 +75,11 @@ func (ins *Insert) Apply(q *Query, ctx DBContext) {
 
 	if len(ins.cols) > 0 {
 		q.query = append(q.query, " (")
-		ins.cols[0].Apply(q, ctx)
-		for i := 1; i < len(ins.cols); i++ {
-			q.query = append(q.query, ", ")
-			ins.cols[i].Apply(q, ctx)
+		for i, col := range ins.cols {
+			q.query = append(q.query, ctx.QuoteIdent(col.ColumnName()))
+			if i < len(ins.cols)-1 {
+				q.query = append(q.query, ", ")
+			}
 		}
 		q.query = append(q.query, ")")
 	}

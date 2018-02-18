@@ -213,7 +213,7 @@ func TestBasicExprs(t *testing.T) {
 		},
 		{
 			gql:  z.InsertInto(Users, Users.Name).Values(user{1, "bob"}),
-			sql:  "INSERT INTO `users` (`users`.`name`) VALUES ($1)",
+			sql:  "INSERT INTO `users` (`name`) VALUES ($1)",
 			args: []interface{}{"bob"},
 		},
 		{
@@ -221,7 +221,7 @@ func TestBasicExprs(t *testing.T) {
 				Users,
 				Users.Except(Users.Name).Columns()...,
 			).Values(user{1, "bob"}),
-			sql:  "INSERT INTO `users` (`users`.`id`) VALUES ($1)",
+			sql:  "INSERT INTO `users` (`id`) VALUES ($1)",
 			args: []interface{}{1},
 		},
 	}

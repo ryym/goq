@@ -727,5 +727,30 @@ func MakeTestCases(ctx testCtx) []testCase {
 				return nil
 			},
 		},
+		{
+			name: "Insert new records by specifying columns",
+			data: "",
+			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+				tech := Tech{
+					ID:   1,
+					Name: "Go",
+				}
+
+				q := z.InsertInto(z.Techs, z.Techs.ID, z.Techs.Name).Values(tech)
+				_, err := tx.Exec(q)
+				if err != nil {
+					return err
+				}
+
+				var got Tech
+				tx.Query(z.Select(z.Techs.All()).From(z.Techs)).First(
+					z.Techs.ToElem(&got),
+				)
+				if diff := deep.Equal(tech, got); diff != nil {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
+			},
+		},
 	}
 }
