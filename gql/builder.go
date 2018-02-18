@@ -24,6 +24,10 @@ func (b *Builder) VarT(v interface{}, typ string) AnonExpr {
 	return (&litExpr{val: v, typ: typ}).init()
 }
 
+func (b *Builder) Null() AnonExpr {
+	return (&nullExpr{}).init()
+}
+
 // XXX: This should be able to use everywhere.
 func (b *Builder) Raw(sql string) AnonExpr {
 	return (&rawExpr{sql: sql}).init()

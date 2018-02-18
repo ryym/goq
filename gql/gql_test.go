@@ -189,8 +189,13 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1},
 		},
 		{
-			gql:  Users.Except(Users.ID),
-			sql:  "`users`.`name`",
+			gql:  z.Select(z.Null().As("a")).From(Users).Where(z.Null().Eq(z.Null())),
+			sql:  "SELECT NULL AS `a` FROM `users` WHERE (NULL = NULL)",
+			args: nil,
+		},
+		{
+			gql:  z.Select(Users.Except(Users.ID), z.Null()).From(Users),
+			sql:  "SELECT `users`.`name`, NULL FROM `users`",
 			args: nil,
 		},
 		{

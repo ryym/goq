@@ -55,6 +55,21 @@ func (l *litExpr) Apply(q *Query, ctx DBContext) {
 
 func (l *litExpr) Selection() Selection { return Selection{} }
 
+type nullExpr struct {
+	ops
+}
+
+func (n *nullExpr) init() *nullExpr {
+	n.ops = ops{n}
+	return n
+}
+
+func (n *nullExpr) Apply(q *Query, ctx DBContext) {
+	q.query = append(q.query, "NULL")
+}
+
+func (n *nullExpr) Selection() Selection { return Selection{} }
+
 type predExpr struct {
 	AnonExpr
 }
