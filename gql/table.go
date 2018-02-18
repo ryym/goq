@@ -3,10 +3,11 @@ package gql
 type Table struct {
 	name  string
 	alias string
+	cols  []*Column
 }
 
-func NewTable(name, alias string) Table {
-	return Table{name, alias}
+func NewTable(name, alias string, cols []*Column) Table {
+	return Table{name, alias, cols}
 }
 
 func (t *Table) ApplyTable(q *Query, ctx DBContext) {
@@ -16,10 +17,22 @@ func (t *Table) ApplyTable(q *Query, ctx DBContext) {
 	}
 }
 
+func (t *Table) All() *ColumnListExpr {
+	return NewColumnList(t.cols)
+}
+
 type DynmTable struct {
-	Table
+	table Table
+}
+
+func newDynmTable(name string) *DynmTable {
+	return &DynmTable{NewTable(name, "", nil)}
+}
+
+func (t *DynmTable) ApplyTable(q *Query, ctx DBContext) {
+	t.table.ApplyTable(q, ctx)
 }
 
 func (t *DynmTable) As(alias string) *DynmTable {
-	return &DynmTable{NewTable(t.name, alias)}
+	return &DynmTable{NewTable(t.table.name, alias, nil)}
 }

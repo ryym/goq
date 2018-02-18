@@ -16,7 +16,7 @@ type InsertMaker struct {
 func (m *InsertMaker) Values(vals interface{}, valsList ...interface{}) *Insert {
 	colList := m.cols
 	if colList == nil {
-		colList = m.table.Columns()
+		colList = m.table.All().Columns()
 	}
 	cols := make(map[string]*Column, len(colList))
 	for _, col := range colList {
@@ -89,7 +89,7 @@ func (ins *Insert) Apply(q *Query, ctx DBContext) {
 		if len(vals) > 0 {
 			cols := ins.cols
 			if len(cols) == 0 {
-				cols = ins.table.Columns()
+				cols = ins.table.All().Columns()
 			}
 
 			for i, col := range cols {

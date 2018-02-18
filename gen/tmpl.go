@@ -87,19 +87,16 @@ type {{.Name}} struct {
 func New{{.Name}}(alias string) *{{.Name}} {
 	{{if .Fields}}cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias){{end}}
 	t := &{{.Name}}{
-		Table: gql.NewTable("{{.TableName}}", alias),
 		{{range .Fields}}
 		{{.Name}}: {{$.ColumnBuilder "cm" .}},{{end}}
 	}
-	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(t.Columns(), alias)
+	cols := []*gql.Column{ {{.JoinFields "t"}} }
+	t.Table = gql.NewTable("{{.TableName}}", alias, cols)
+	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(cols, alias)
 	return t
 }
 
 func (t *{{.Name}}) As(alias string) *{{.Name}} { return New{{.Name}}(alias) }
-func (t *{{.Name}}) All() *gql.ColumnListExpr   { return gql.NewColumnList(t.Columns()) }
-func (t *{{.Name}}) Columns() []*gql.Column {
-	return []*gql.Column{ {{.JoinFields "t"}} }
-}
 `
 
 const gqlStructTmpl = `

@@ -29,9 +29,6 @@ type usersTable struct {
 	Name  *Column
 }
 
-func (t *usersTable) All() *ColumnListExpr { return NewColumnList(t.Columns()) }
-func (t *usersTable) Columns() []*Column   { return []*Column{t.ID, t.Name} }
-
 func (t *usersTable) As(alias string) *usersTable { return t /* FOR NOW */ }
 
 func TestBasicExprs(t *testing.T) {
@@ -40,7 +37,7 @@ func TestBasicExprs(t *testing.T) {
 	ID := cm.Col("ID", "id").Bld()
 	Name := cm.Col("Name", "name").Bld()
 	Users := &usersTable{
-		Table: Table{"users", ""},
+		Table: Table{"users", "", []*Column{ID, Name}},
 		ID:    ID,
 		Name:  Name,
 	}
