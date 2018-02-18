@@ -45,6 +45,11 @@ func TestBasicExprs(t *testing.T) {
 		Name:  Name,
 	}
 
+	type user struct {
+		ID   int
+		Name string
+	}
+
 	var tests = []struct {
 		gql  QueryApplier
 		sql  string
@@ -192,12 +197,30 @@ func TestBasicExprs(t *testing.T) {
 			args: nil,
 		},
 		{
-			gql: z.InsertInto(Users).Values(Values{
+			gql: z.InsertInto(Users).ValuesMap(Values{
 				Users.ID:   1,
 				Users.Name: "bob",
 			}),
 			sql:  "INSERT INTO `users` VALUES ($1, $2)",
 			args: []interface{}{1, "bob"},
+		},
+		{
+			gql:  z.InsertInto(Users).Values(user{1, "bob"}),
+			sql:  "INSERT INTO `users` VALUES ($1, $2)",
+			args: []interface{}{1, "bob"},
+		},
+		{
+			gql:  z.InsertInto(Users, Users.Name).Values(user{1, "bob"}),
+			sql:  "INSERT INTO `users` (`users`.`name`) VALUES ($1)",
+			args: []interface{}{"bob"},
+		},
+		{
+			gql: z.InsertInto(
+				Users,
+				Users.All().Except(Users.Name).Columns()...,
+			).Values(user{1, "bob"}),
+			sql:  "INSERT INTO `users` (`users`.`id`) VALUES ($1)",
+			args: []interface{}{1},
 		},
 	}
 

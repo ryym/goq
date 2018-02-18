@@ -701,5 +701,31 @@ func MakeTestCases(ctx testCtx) []testCase {
 				return nil
 			},
 		},
+		{
+			name: "Insert new records",
+			data: "",
+			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+				city := City{
+					ID:        80,
+					Name:      "city-80",
+					CountryID: 33,
+				}
+
+				q := z.InsertInto(z.Cities).Values(city)
+				_, err := tx.Exec(q)
+				if err != nil {
+					return err
+				}
+
+				var got City
+				tx.Query(z.Select(z.Cities.All()).From(z.Cities)).First(
+					z.Cities.ToElem(&got),
+				)
+				if diff := deep.Equal(city, got); diff != nil {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
+			},
+		},
 	}
 }

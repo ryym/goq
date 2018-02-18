@@ -1,6 +1,9 @@
 package gql
 
-// TODO: Enable to use structs for `Values` instead of map.
+import (
+	"errors"
+	"reflect"
+)
 
 type Values map[*Column]interface{}
 
@@ -10,7 +13,34 @@ type InsertMaker struct {
 	ctx   DBContext
 }
 
-func (m *InsertMaker) Values(vals Values, valsList ...Values) *Insert {
+func (m *InsertMaker) Values(vals interface{}, valsList ...interface{}) *Insert {
+	colList := m.cols
+	if colList == nil {
+		colList = m.table.Columns()
+	}
+	cols := make(map[string]*Column, len(colList))
+	for _, col := range colList {
+		cols[col.FieldName()] = col
+	}
+
+	vl := make([]Values, len(valsList)+1)
+	for i, vals := range append([]interface{}{vals}, valsList...) {
+		valsMap, err := makeValuesMap(vals, cols)
+		if err != nil {
+			return &Insert{errs: []error{err}}
+		}
+		vl[i] = valsMap
+	}
+
+	return &Insert{
+		table:    m.table,
+		cols:     m.cols,
+		valsList: vl,
+		ctx:      m.ctx,
+	}
+}
+
+func (m *InsertMaker) ValuesMap(vals Values, valsList ...Values) *Insert {
 	vl := append([]Values{vals}, valsList...)
 	return &Insert{
 		table:    m.table,
@@ -81,4 +111,22 @@ func (ins *Insert) Apply(q *Query, ctx DBContext) {
 			q.query = append(q.query, ", ")
 		}
 	}
+}
+
+func makeValuesMap(vals interface{}, cols map[string]*Column) (Values, error) {
+	tp := reflect.TypeOf(vals)
+	if tp.Kind() != reflect.Struct {
+		return nil, errors.New("Values() requires a struct")
+	}
+
+	mp := make(Values, len(cols))
+	elem := reflect.ValueOf(vals)
+	for i := 0; i < tp.NumField(); i++ {
+		fld := tp.Field(i)
+		if col, ok := cols[fld.Name]; ok {
+			mp[col] = elem.Field(i).Interface()
+		}
+	}
+
+	return mp, nil
 }

@@ -79,9 +79,11 @@ func RunTestCase(t *testing.T, c testCase, builder *Builder, db *goq.DB) {
 		}
 	}()
 
-	_, err = tx.Tx.Exec(c.data)
-	if err != nil {
-		t.Fatal(err)
+	if c.data != "" {
+		_, err = tx.Tx.Exec(c.data)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	err = c.run(t, tx, builder)
