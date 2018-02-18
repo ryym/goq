@@ -116,7 +116,7 @@ func (ins *Insert) Apply(q *Query, ctx DBContext) {
 func makeValuesMap(vals interface{}, cols map[string]*Column) (Values, error) {
 	tp := reflect.TypeOf(vals)
 	if tp.Kind() != reflect.Struct {
-		return nil, errors.New("Values() requires a struct")
+		return nil, errors.New("[INSERT] Values() requires a struct")
 	}
 
 	mp := make(Values, len(cols))
