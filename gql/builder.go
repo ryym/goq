@@ -142,3 +142,9 @@ func (b *Builder) CaseOf(val Expr) CaseOfExpr {
 func (b *Builder) When(when interface{}) *WhenExpr {
 	return &WhenExpr{when: lift(when)}
 }
+
+// Modifier clauses
+
+func (b *Builder) InsertInto(table SchemaTable, cols ...*Column) *InsertMaker {
+	return &InsertMaker{table, cols}
+}

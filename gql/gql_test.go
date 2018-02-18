@@ -191,6 +191,14 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "`users`.`name`",
 			args: nil,
 		},
+		{
+			gql: z.InsertInto(Users).Values(Values{
+				Users.ID:   1,
+				Users.Name: "bob",
+			}),
+			sql:  "INSERT INTO `users` VALUES ($1, $2)",
+			args: []interface{}{1, "bob"},
+		},
 	}
 
 	for i, test := range tests {
