@@ -14,4 +14,7 @@ install:
 test_script:
   - ps: go test -v -race $(go list ./... | Select-String -NotMatch /tests)
 
-notifications: off
+notifications:
+  - provider: Slack
+    incoming_webhook:
+      secure: Dau2OYui+VFWWbtHe9WVSFZAS+lI4Nou2yjHZY9vvhe0P2k6b+ut4f3dE6KoMaYE4sop3nbJDIBihccL8Cd0QUk4+K1O93kpjK1VMFE1CU0=
