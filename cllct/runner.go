@@ -79,6 +79,9 @@ func NewRunner(db Queryable, query gql.QueryExpr) *Runner {
 
 func (r *Runner) Rows() (*sql.Rows, error) {
 	q := r.query.Construct()
+	if err := q.Err(); err != nil {
+		return nil, err
+	}
 	return r.db.Query(q.Query(), q.Args()...)
 }
 
@@ -102,6 +105,10 @@ func (r *Runner) Collect(collectors ...ListCollector) error {
 
 func (r *Runner) collect(query gql.QueryExpr, collectors ...Collector) error {
 	q := query.Construct()
+	if err := q.Err(); err != nil {
+		return err
+	}
+
 	rows, err := r.db.Query(q.Query(), q.Args()...)
 	if err != nil {
 		return err
