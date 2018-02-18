@@ -117,11 +117,15 @@ type SchemaTable interface {
 	Columns() []*Column
 }
 
+type QueryRoot interface {
+	Construct() Query
+}
+
 type QueryExpr interface {
 	Expr
+	QueryRoot
 	As(alias string) QueryTable
 	Selections() []Selection
-	Construct() Query
 	OrderBy(ords ...Orderer) QueryExpr
 	Limit(n int) QueryExpr
 	Offset(n int) QueryExpr

@@ -48,12 +48,28 @@ func (d *DB) Query(query gql.QueryExpr) *cllct.Runner {
 	return cllct.NewRunner(d.DB, query)
 }
 
+func (d *DB) Exec(query gql.QueryRoot) (sql.Result, error) {
+	q := query.Construct()
+	if err := q.Err(); err != nil {
+		return nil, err
+	}
+	return d.DB.Exec(q.Query(), q.Args()...)
+}
+
 type Tx struct {
 	Tx *sql.Tx
 }
 
 func (tx *Tx) Query(query gql.QueryExpr) *cllct.Runner {
 	return cllct.NewRunner(tx.Tx, query)
+}
+
+func (tx *Tx) Exec(query gql.QueryRoot) (sql.Result, error) {
+	q := query.Construct()
+	if err := q.Err(); err != nil {
+		return nil, err
+	}
+	return tx.Tx.Exec(q.Query(), q.Args()...)
 }
 
 func (tx *Tx) Commit() error   { return tx.Tx.Commit() }
