@@ -42,7 +42,7 @@ func RunIntegrationTest(t *testing.T, dbName, connStr string) {
 		t.Fatal(err)
 	}
 	if _, err = db.DB.Exec(string(sql)); err != nil {
-		t.Fatal("failed to create tables: %s", err)
+		t.Fatalf("failed to create tables: %s", err)
 	}
 
 	testCases := MakeTestCases(testCtx{dbName})
