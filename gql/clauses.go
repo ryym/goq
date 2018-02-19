@@ -9,7 +9,7 @@ type queryExpr struct {
 	exps    []Querier
 	froms   []TableLike
 	joins   []*JoinDef
-	wheres  []PredExpr
+	where   Where
 	groups  []Expr
 	havings []PredExpr
 	orders  []Orderer
@@ -64,10 +64,7 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 	}
 
 	// WHERE
-	if len(qe.wheres) > 0 {
-		q.query = append(q.query, " WHERE ")
-		(&logicalOp{op: "AND", preds: qe.wheres}).Apply(q, ctx)
-	}
+	qe.where.Apply(q, ctx)
 
 	// GROUP BY
 	if len(qe.groups) > 0 {
@@ -142,7 +139,7 @@ func (qe *queryExpr) Joins(definers ...JoinDefiner) Clauses {
 }
 
 func (qe *queryExpr) Where(preds ...PredExpr) Clauses {
-	qe.wheres = append(qe.wheres, preds...)
+	qe.where.add(preds)
 	return qe
 }
 
@@ -176,7 +173,7 @@ func (qe *queryExpr) WithLimits(limit, offset int) QueryExpr {
 		exps:    qe.exps,
 		froms:   qe.froms,
 		joins:   qe.joins,
-		wheres:  qe.wheres,
+		where:   qe.where,
 		groups:  qe.groups,
 		havings: qe.havings,
 		orders:  qe.orders,
