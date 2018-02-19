@@ -27,7 +27,7 @@ func (m *InsertMaker) Values(vals interface{}, valsList ...interface{}) *Insert 
 	for i, vals := range append([]interface{}{vals}, valsList...) {
 		valsMap, err := makeValuesMap(vals, cols)
 		if err != nil {
-			return &Insert{errs: []error{err}}
+			return &Insert{err: err}
 		}
 		vl[i] = valsMap
 	}
@@ -54,7 +54,7 @@ type Insert struct {
 	table    SchemaTable
 	cols     []*Column
 	valsList []Values
-	errs     []error
+	err      error
 	ctx      DBContext
 }
 
@@ -65,8 +65,8 @@ func (ins *Insert) Construct() Query {
 }
 
 func (ins *Insert) Apply(q *Query, ctx DBContext) {
-	if len(ins.errs) > 0 {
-		q.errs = append(q.errs, ins.errs...)
+	if ins.err != nil {
+		q.errs = append(q.errs, ins.err)
 		return
 	}
 
