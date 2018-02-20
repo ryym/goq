@@ -156,3 +156,10 @@ func (b *Builder) InsertInto(table SchemaTable, cols ...*Column) *InsertMaker {
 		ctx:   b.ctx,
 	}
 }
+
+func (b *Builder) Update(table SchemaTable) *UpdateMaker {
+	return &UpdateMaker{
+		table: table,
+		ctx:   b.ctx,
+	}
+}

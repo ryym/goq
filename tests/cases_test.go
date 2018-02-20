@@ -9,6 +9,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/cllct"
+	"github.com/ryym/goq/gql"
 )
 
 func MakeTestCases(ctx testCtx) []testCase {
@@ -747,6 +748,41 @@ func MakeTestCases(ctx testCtx) []testCase {
 					z.Techs.ToElem(&got),
 				)
 				if diff := deep.Equal(tech, got); diff != nil {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
+			},
+		},
+		{
+			name: "Update specific records",
+			data: `
+			INSERT INTO cities (country_id, id, name) VALUES (1, 1, 'a');
+			INSERT INTO cities (country_id, id, name) VALUES (1, 2, 'b');
+			INSERT INTO cities (country_id, id, name) VALUES (1, 3, 'c');
+			`,
+			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+				_, err := tx.Exec(
+					z.Update(z.Cities).Set(gql.Values{
+						z.Cities.CountryID: 50,
+						z.Cities.Name:      "x",
+					}).Where(z.Cities.ID.Lt(3)),
+				)
+				if err != nil {
+					return err
+				}
+
+				want := []City{
+					{ID: 1, CountryID: 50, Name: "x"},
+					{ID: 2, CountryID: 50, Name: "x"},
+					{ID: 3, CountryID: 1, Name: "c"},
+				}
+
+				var got []City
+				tx.Query(
+					z.Select(z.Cities.All()).From(z.Cities).OrderBy(z.Cities.ID),
+				).Collect(z.Cities.ToSlice(&got))
+
+				if diff := deep.Equal(want, got); diff != nil {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil

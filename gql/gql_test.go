@@ -224,6 +224,14 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "INSERT INTO `users` (`id`) VALUES ($1)",
 			args: []interface{}{1},
 		},
+		{
+			gql: z.Update(Users).Set(Values{
+				Users.ID:   30,
+				Users.Name: "alice",
+			}).Where(Users.ID.Eq(5)),
+			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE (`users`.`id` = $3)",
+			args: []interface{}{30, "alice", 5},
+		},
 	}
 
 	for i, test := range tests {
