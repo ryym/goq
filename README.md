@@ -3,7 +3,6 @@
 # Goq  
 
 [![circleci](https://circleci.com/gh/ryym/goq.svg?style=svg)](https://circleci.com/gh/ryym/goq)
-
 [![appveyor](https://ci.appveyor.com/api/projects/status/5yf0rg3n810cnkih?svg=true)](https://ci.appveyor.com/project/ryym/goq)
 
 SQL-based DB access library for Gophers
