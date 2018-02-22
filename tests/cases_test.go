@@ -788,5 +788,39 @@ func MakeTestCases(ctx testCtx) []testCase {
 				return nil
 			},
 		},
+		{
+			name: "Update one record using struct",
+			data: `
+			INSERT INTO cities (country_id, id, name) VALUES (1, 1, 'a');
+			INSERT INTO cities (country_id, id, name) VALUES (1, 2, 'b');
+			`,
+			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+				_, err := tx.Exec(
+					z.Update(z.Cities).Elem(City{
+						ID:        1,
+						Name:      "x",
+						CountryID: 8,
+					}),
+				)
+				if err != nil {
+					return err
+				}
+
+				want := []City{
+					{ID: 1, CountryID: 8, Name: "x"},
+					{ID: 2, CountryID: 1, Name: "b"},
+				}
+
+				var got []City
+				tx.Query(
+					z.Select(z.Cities.All()).From(z.Cities).OrderBy(z.Cities.ID),
+				).Collect(z.Cities.ToSlice(&got))
+
+				if diff := deep.Equal(want, got); diff != nil {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
+			},
+		},
 	}
 }

@@ -34,7 +34,7 @@ func (t *usersTable) As(alias string) *usersTable { return t /* FOR NOW */ }
 func TestBasicExprs(t *testing.T) {
 	z := NewBuilder(&testDialect{})
 	cm := NewColumnMaker("User", "users")
-	ID := cm.Col("ID", "id").Bld()
+	ID := cm.Col("ID", "id").PK().Bld()
 	Name := cm.Col("Name", "name").Bld()
 	Users := &usersTable{
 		Table: Table{"users", "", []*Column{ID, Name}},
@@ -232,15 +232,31 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE (`users`.`id` = $3)",
 			args: []interface{}{30, "alice", 5},
 		},
+		{
+			gql:  z.Update(Users).Elem(user{45, "john"}),
+			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE (`users`.`id` = $3)",
+			args: []interface{}{45, "john", 45},
+		},
+		{
+			gql:  z.Update(Users).Elem(user{45, "john"}, Users.Name),
+			sql:  "UPDATE `users` SET `name` = $1 WHERE (`users`.`id` = $2)",
+			args: []interface{}{"john", 45},
+		},
 	}
 
 	for i, test := range tests {
 		q := z.Query(test.gql)
-		if query := q.Query(); query != test.sql {
-			t.Errorf("[%d] Query diff\nGOT : %s\nWANT: %s", i, query, test.sql)
-		}
-		if diff := deep.Equal(q.Args(), test.args); diff != nil {
-			t.Errorf("[%d] Args diff\n%s", i, diff)
+		if len(q.errs) > 0 {
+			for _, err := range q.errs {
+				t.Error(err)
+			}
+		} else {
+			if query := q.Query(); query != test.sql {
+				t.Errorf("[%d] Query diff\nGOT : %s\nWANT: %s", i, query, test.sql)
+			}
+			if diff := deep.Equal(q.Args(), test.args); diff != nil {
+				t.Errorf("[%d] Args diff\n%s", i, diff)
+			}
 		}
 	}
 }

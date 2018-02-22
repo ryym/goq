@@ -1,8 +1,9 @@
 package gql
 
 import (
-	"errors"
 	"reflect"
+
+	"github.com/pkg/errors"
 )
 
 type Values map[*Column]interface{}
@@ -13,29 +14,22 @@ type InsertMaker struct {
 	ctx   DBContext
 }
 
-func (m *InsertMaker) Values(vals interface{}, valsList ...interface{}) *Insert {
-	colList := m.cols
-	if colList == nil {
-		colList = m.table.All().Columns()
-	}
-	cols := make(map[string]*Column, len(colList))
-	for _, col := range colList {
-		cols[col.FieldName()] = col
-	}
+func (m *InsertMaker) Values(elem interface{}, elems ...interface{}) *Insert {
+	cols := makeColsMap(m.cols, m.table)
 
-	vl := make([]Values, len(valsList)+1)
-	for i, vals := range append([]interface{}{vals}, valsList...) {
-		valsMap, err := makeValuesMap(vals, cols)
+	valsList := make([]Values, len(elems)+1)
+	for i, elem := range append([]interface{}{elem}, elems...) {
+		vals, err := makeValuesMap(elem, cols)
 		if err != nil {
-			return &Insert{err: err}
+			return &Insert{err: errors.Wrap(err, "[Insert] Values()")}
 		}
-		vl[i] = valsMap
+		valsList[i] = vals
 	}
 
 	return &Insert{
 		table:    m.table,
 		cols:     m.cols,
-		valsList: vl,
+		valsList: valsList,
 		ctx:      m.ctx,
 	}
 }
@@ -114,18 +108,30 @@ func (ins *Insert) Apply(q *Query, ctx DBContext) {
 	}
 }
 
-func makeValuesMap(vals interface{}, cols map[string]*Column) (Values, error) {
-	tp := reflect.TypeOf(vals)
+func makeColsMap(cols []*Column, table SchemaTable) map[string]*Column {
+	colList := cols
+	if colList == nil {
+		colList = table.All().Columns()
+	}
+	mp := make(map[string]*Column, len(colList))
+	for _, col := range colList {
+		mp[col.FieldName()] = col
+	}
+	return mp
+}
+
+func makeValuesMap(elem interface{}, cols map[string]*Column) (Values, error) {
+	tp := reflect.TypeOf(elem)
 	if tp.Kind() != reflect.Struct {
-		return nil, errors.New("[INSERT] Values() requires a struct")
+		return nil, errors.New("elem is not a struct")
 	}
 
 	mp := make(Values, len(cols))
-	elem := reflect.ValueOf(vals)
+	elemType := reflect.ValueOf(elem)
 	for i := 0; i < tp.NumField(); i++ {
 		fld := tp.Field(i)
 		if col, ok := cols[fld.Name]; ok {
-			mp[col] = elem.Field(i).Interface()
+			mp[col] = elemType.Field(i).Interface()
 		}
 	}
 
