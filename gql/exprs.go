@@ -1,5 +1,11 @@
 package gql
 
+import (
+	"reflect"
+
+	"github.com/pkg/errors"
+)
+
 type aliased struct {
 	exp   Expr
 	alias string
@@ -114,19 +120,34 @@ type inExpr struct {
 	val  Expr
 	exps []Expr
 	not  bool
+	err  error
 	ops
 }
 
-func (ie *inExpr) init(vals []interface{}) *inExpr {
-	ie.ops = ops{ie}
-	ie.exps = make([]Expr, len(vals))
-	for i, v := range vals {
-		ie.exps[i] = lift(v)
+func (ie *inExpr) init(in interface{}) *inExpr {
+	refl := reflect.ValueOf(in)
+	if refl.Type().Kind() == reflect.Slice {
+		ie.exps = make([]Expr, refl.Len())
+		for i := 0; i < refl.Len(); i++ {
+			val := refl.Index(i).Interface()
+			ie.exps[i] = lift(val)
+		}
+	} else if qe, ok := in.(QueryExpr); ok {
+		ie.exps = []Expr{qe}
+	} else {
+		ie.err = errors.New("In/NotIn only accept a slice or a query")
 	}
+
+	ie.ops = ops{ie}
 	return ie
 }
 
 func (ie *inExpr) Apply(q *Query, ctx DBContext) {
+	if ie.err != nil {
+		q.errs = append(q.errs, ie.err)
+		return
+	}
+
 	ie.val.Apply(q, ctx)
 	if ie.not {
 		q.query = append(q.query, " NOT")

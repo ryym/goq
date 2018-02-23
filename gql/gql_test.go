@@ -78,14 +78,19 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{0, 5},
 		},
 		{
-			gql:  ID.In(1, 2, 3),
+			gql:  ID.In([]int{1, 2, 3}),
 			sql:  "`users`.`id` IN ($1, $2, $3)",
 			args: []interface{}{1, 2, 3},
 		},
 		{
-			gql:  ID.NotIn(1, 2, 3),
+			gql:  ID.NotIn([]int{1, 2, 3}),
 			sql:  "`users`.`id` NOT IN ($1, $2, $3)",
 			args: []interface{}{1, 2, 3},
+		},
+		{
+			gql:  ID.In(z.Select(z.Var(1))),
+			sql:  "`users`.`id` IN (SELECT $1)",
+			args: []interface{}{1},
 		},
 		{
 			gql:  z.Parens(ID.Add(4).Sbt(3)).Mlt(2).Dvd(1),

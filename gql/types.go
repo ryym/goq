@@ -81,7 +81,7 @@ type Expr interface {
 	IsNull() PredExpr
 	IsNotNull() PredExpr
 
-	In(vals ...interface{}) PredExpr
+	In(valsOrQuery interface{}) PredExpr
 
 	Add(v interface{}) AnonExpr
 	Sbt(v interface{}) AnonExpr

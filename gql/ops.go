@@ -134,11 +134,11 @@ func (o *ops) Concat(v interface{}) AnonExpr {
 	}).init()
 }
 
-func (o *ops) In(vals ...interface{}) PredExpr {
+func (o *ops) In(vals interface{}) PredExpr {
 	return &predExpr{(&inExpr{val: o.expr}).init(vals)}
 }
 
-func (o *ops) NotIn(vals ...interface{}) PredExpr {
+func (o *ops) NotIn(vals interface{}) PredExpr {
 	return &predExpr{(&inExpr{val: o.expr, not: true}).init(vals)}
 }
 
