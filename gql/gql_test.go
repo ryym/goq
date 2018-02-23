@@ -242,6 +242,11 @@ func TestBasicExprs(t *testing.T) {
 			sql:  "UPDATE `users` SET `name` = $1 WHERE (`users`.`id` = $2)",
 			args: []interface{}{"john", 45},
 		},
+		{
+			gql:  z.DeleteFrom(Users),
+			sql:  "DELETE FROM `users`",
+			args: nil,
+		},
 	}
 
 	for i, test := range tests {

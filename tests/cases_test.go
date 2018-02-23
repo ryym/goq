@@ -822,5 +822,35 @@ func MakeTestCases(ctx testCtx) []testCase {
 				return nil
 			},
 		},
+		{
+			name: "Delete records",
+			data: `
+			INSERT INTO cities (country_id, id, name) VALUES (1, 1, 'a');
+			INSERT INTO cities (country_id, id, name) VALUES (2, 2, 'b');
+			INSERT INTO cities (country_id, id, name) VALUES (2, 3, 'c');
+			`,
+			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+				_, err := tx.Exec(
+					z.DeleteFrom(z.Cities).Where(z.Cities.CountryID.Eq(2)),
+				)
+				if err != nil {
+					return err
+				}
+
+				want := []City{
+					{ID: 1, CountryID: 1, Name: "a"},
+				}
+
+				var got []City
+				tx.Query(
+					z.Select(z.Cities.All()).From(z.Cities).OrderBy(z.Cities.ID),
+				).Collect(z.Cities.ToSlice(&got))
+
+				if diff := deep.Equal(want, got); diff != nil {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
+			},
+		},
 	}
 }

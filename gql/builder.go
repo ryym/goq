@@ -163,3 +163,10 @@ func (b *Builder) Update(table SchemaTable) *UpdateMaker {
 		ctx:   b.ctx,
 	}
 }
+
+func (b *Builder) DeleteFrom(table SchemaTable) *Delete {
+	return &Delete{
+		table: table,
+		ctx:   b.ctx,
+	}
+}
