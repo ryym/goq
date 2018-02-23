@@ -156,6 +156,13 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{"bob", 3, "%bob", 100},
 		},
 		{
+			gql: z.Select(ID).From(Users).Where(
+				z.Exists(z.Select(z.Var(1))),
+			),
+			sql:  "SELECT `users`.`id` FROM `users` WHERE (EXISTS (SELECT $1))",
+			args: []interface{}{1},
+		},
+		{
 			gql:  z.Select(z.Select(z.Var(1)).As("subquery")),
 			sql:  "SELECT (SELECT $1) AS `subquery`",
 			args: []interface{}{1},

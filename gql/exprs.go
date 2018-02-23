@@ -219,6 +219,7 @@ func (el *ColumnListExpr) Columns() []*Column {
 
 type existsExpr struct {
 	query QueryExpr
+	not   bool
 	ops
 }
 
@@ -228,6 +229,9 @@ func (e *existsExpr) init() *existsExpr {
 }
 
 func (e *existsExpr) Apply(q *Query, ctx DBContext) {
+	if e.not {
+		q.query = append(q.query, "NOT ")
+	}
 	q.query = append(q.query, "EXISTS (")
 	e.query.Apply(q, ctx)
 	q.query = append(q.query, ")")

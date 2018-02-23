@@ -110,6 +110,10 @@ func (b *Builder) Exists(query QueryExpr) PredExpr {
 	return &predExpr{(&existsExpr{query: query}).init()}
 }
 
+func (b *Builder) NotExists(query QueryExpr) PredExpr {
+	return &predExpr{(&existsExpr{query: query, not: true}).init()}
+}
+
 func (b *Builder) Select(exps ...Querier) SelectClause {
 	return (&queryExpr{exps: exps, ctx: b.ctx}).init()
 }
