@@ -113,16 +113,24 @@ func (p *parensExpr) Selection() Selection { return p.exp.Selection() }
 type inExpr struct {
 	val  Expr
 	exps []Expr
+	not  bool
 	ops
 }
 
-func (ie *inExpr) init() *inExpr {
+func (ie *inExpr) init(vals []interface{}) *inExpr {
 	ie.ops = ops{ie}
+	ie.exps = make([]Expr, len(vals))
+	for i, v := range vals {
+		ie.exps[i] = lift(v)
+	}
 	return ie
 }
 
 func (ie *inExpr) Apply(q *Query, ctx DBContext) {
 	ie.val.Apply(q, ctx)
+	if ie.not {
+		q.query = append(q.query, " NOT")
+	}
 	q.query = append(q.query, " IN (")
 	if len(ie.exps) > 0 {
 		ie.exps[0].Apply(q, ctx)

@@ -122,16 +122,24 @@ func makeColsMap(cols []*Column, table SchemaTable) map[string]*Column {
 
 func makeValuesMap(elem interface{}, cols map[string]*Column) (Values, error) {
 	tp := reflect.TypeOf(elem)
-	if tp.Kind() != reflect.Struct {
-		return nil, errors.New("elem is not a struct")
+	var elemRfl reflect.Value
+
+	if tp.Kind() == reflect.Ptr {
+		elemRfl = reflect.ValueOf(elem).Elem()
+		tp = elemRfl.Type()
+	} else if tp.Kind() == reflect.Struct {
+		elemRfl = reflect.ValueOf(elem)
+	}
+
+	if !elemRfl.IsValid() {
+		return nil, errors.New("elem is not a struct nor a pointer to struct")
 	}
 
 	mp := make(Values, len(cols))
-	elemType := reflect.ValueOf(elem)
 	for i := 0; i < tp.NumField(); i++ {
 		fld := tp.Field(i)
 		if col, ok := cols[fld.Name]; ok {
-			mp[col] = elemType.Field(i).Interface()
+			mp[col] = elemRfl.Field(i).Interface()
 		}
 	}
 
