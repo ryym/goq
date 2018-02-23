@@ -168,7 +168,7 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{3},
 		},
 		{
-			gql:  z.Select(z.Var(1)).From(Users).Joins(&Join{Users, Users.ID.Eq(3)}),
+			gql:  z.Select(z.Var(1)).From(Users).Joins(Join(Users).On(Users.ID.Eq(3))),
 			sql:  "SELECT $1 FROM `users` INNER JOIN `users` ON `users`.`id` = $2",
 			args: []interface{}{1, 3},
 		},

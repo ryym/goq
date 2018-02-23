@@ -8,7 +8,7 @@ import (
 type queryExpr struct {
 	exps    []Querier
 	froms   []TableLike
-	joins   []*JoinDef
+	joins   []*joinDef
 	where   Where
 	groups  []Expr
 	havings []PredExpr
@@ -57,10 +57,10 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 
 	// JOIN
 	for _, j := range qe.joins {
-		q.query = append(q.query, fmt.Sprintf(" %s JOIN ", j.Type))
-		j.Table.ApplyTable(q, ctx)
+		q.query = append(q.query, fmt.Sprintf(" %s JOIN ", j.joinType))
+		j.table.ApplyTable(q, ctx)
 		q.query = append(q.query, " ON ")
-		j.On.Apply(q, ctx)
+		j.on.Apply(q, ctx)
 	}
 
 	// WHERE

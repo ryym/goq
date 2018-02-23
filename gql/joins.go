@@ -10,13 +10,13 @@ const (
 type JoinType string
 
 type JoinDefiner interface {
-	joinDef() *JoinDef
+	joinDef() *joinDef
 }
 
-type JoinDef struct {
-	Table TableLike
-	On    PredExpr
-	Type  JoinType
+type joinDef struct {
+	table    TableLike
+	on       PredExpr
+	joinType JoinType
 }
 
 type JoinClause struct {
@@ -25,34 +25,47 @@ type JoinClause struct {
 }
 
 func (jc *JoinClause) On(pred PredExpr) *JoinOn {
-	return &JoinOn{&JoinDef{jc.table, pred, jc.joinType}}
+	return &JoinOn{&joinDef{jc.table, pred, jc.joinType}}
 }
 
 type JoinOn struct {
-	def *JoinDef
+	def *joinDef
 }
 
-func (jo *JoinOn) joinDef() *JoinDef {
+func (jo *JoinOn) joinDef() *joinDef {
 	return jo.def
 }
 
-type Join struct {
-	Table TableLike
-	On    PredExpr
+type JoinDef struct {
+	table    TableLike
+	on       PredExpr
+	joinType JoinType
 }
 
-func (j *Join) joinDef() *JoinDef {
-	return &JoinDef{j.Table, j.On, JOIN_INNER}
+func Join(table TableLike) *JoinDef {
+	return &JoinDef{table: table, joinType: JOIN_INNER}
 }
 
-func (j *Join) Left() *JoinDef {
-	return &JoinDef{j.Table, j.On, JOIN_LEFT}
+func (j *JoinDef) joinDef() *joinDef {
+	return &joinDef{j.table, j.on, JOIN_INNER}
 }
 
-func (j *Join) Right() *JoinDef {
-	return &JoinDef{j.Table, j.On, JOIN_RIGHT}
+func (j *JoinDef) On(on PredExpr) *JoinDef {
+	j.on = on
+	return j
 }
 
-func (j *Join) Full() *JoinDef {
-	return &JoinDef{j.Table, j.On, JOIN_FULL}
+func (j *JoinDef) Left() *JoinDef {
+	j.joinType = JOIN_LEFT
+	return j
+}
+
+func (j *JoinDef) Right() *JoinDef {
+	j.joinType = JOIN_RIGHT
+	return j
+}
+
+func (j *JoinDef) Full() *JoinDef {
+	j.joinType = JOIN_FULL
+	return j
 }
