@@ -25,9 +25,9 @@ func (q *Query) Err() error {
 		return nil
 	}
 
-	msgs := make([]string, len(q.errs))
-	for i, err := range q.errs {
-		msgs[i] = err.Error()
+	msgs := make([]string, 0, len(q.errs))
+	for _, err := range q.errs {
+		msgs = append(msgs, err.Error())
 	}
 	return errors.New(strings.Join(msgs, " | "))
 }

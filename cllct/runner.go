@@ -86,9 +86,9 @@ func (r *Runner) Rows() (*sql.Rows, error) {
 }
 
 func (r *Runner) First(collectors ...SingleCollector) error {
-	clls := make([]Collector, len(collectors))
-	for i, c := range collectors {
-		clls[i] = c
+	clls := make([]Collector, 0, len(collectors))
+	for _, c := range collectors {
+		clls = append(clls, c)
 	}
 
 	// Use WithLimits instead of Limit to avoid mutating the given query.
@@ -96,9 +96,9 @@ func (r *Runner) First(collectors ...SingleCollector) error {
 }
 
 func (r *Runner) Collect(collectors ...ListCollector) error {
-	clls := make([]Collector, len(collectors))
-	for i, c := range collectors {
-		clls[i] = c
+	clls := make([]Collector, 0, len(collectors))
+	for _, c := range collectors {
+		clls = append(clls, c)
 	}
 	return r.collect(r.query, clls...)
 }

@@ -17,13 +17,13 @@ type InsertMaker struct {
 func (m *InsertMaker) Values(elem interface{}, elems ...interface{}) *Insert {
 	cols := makeColsMap(m.cols, m.table)
 
-	valsList := make([]Values, len(elems)+1)
-	for i, elem := range append([]interface{}{elem}, elems...) {
+	valsList := make([]Values, 0, len(elems)+1)
+	for _, elem := range append([]interface{}{elem}, elems...) {
 		vals, err := makeValuesMap(elem, cols)
 		if err != nil {
 			return &Insert{err: errors.Wrap(err, "[Insert] Values()")}
 		}
-		valsList[i] = vals
+		valsList = append(valsList, vals)
 	}
 
 	return &Insert{

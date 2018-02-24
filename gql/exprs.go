@@ -127,10 +127,10 @@ type inExpr struct {
 func (ie *inExpr) init(in interface{}) *inExpr {
 	refl := reflect.ValueOf(in)
 	if refl.Type().Kind() == reflect.Slice {
-		ie.exps = make([]Expr, refl.Len())
+		ie.exps = make([]Expr, 0, refl.Len())
 		for i := 0; i < refl.Len(); i++ {
 			val := refl.Index(i).Interface()
-			ie.exps[i] = lift(val)
+			ie.exps = append(ie.exps, lift(val))
 		}
 	} else if qe, ok := in.(QueryExpr); ok {
 		ie.exps = []Expr{qe}

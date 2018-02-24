@@ -28,9 +28,9 @@ type helper struct {
 }
 
 func (h *helper) JoinFields(alias string) string {
-	cols := make([]string, len(h.Fields))
-	for i, f := range h.Fields {
-		cols[i] = fmt.Sprintf("%s.%s", alias, f.Name)
+	cols := make([]string, 0, len(h.Fields))
+	for _, f := range h.Fields {
+		cols = append(cols, fmt.Sprintf("%s.%s", alias, f.Name))
 	}
 	return strings.Join(cols, ", ")
 }
@@ -81,7 +81,7 @@ func GenerateCustomBuilders(opts Opts) error {
 		return errors.Wrapf(err, "%s is not struct", opts.TablesStructName)
 	}
 
-	helpers := make([]*helper, tablesT.NumFields())
+	helpers := make([]*helper, 0, tablesT.NumFields())
 
 	for i := 0; i < tablesT.NumFields(); i++ {
 		fld := tablesT.Field(i)
@@ -122,13 +122,13 @@ func GenerateCustomBuilders(opts Opts) error {
 		if err != nil {
 			return err
 		}
-		helpers[i] = &helper{
+		helpers = append(helpers, &helper{
 			Name:         helperName,
 			TableName:    tableName,
 			ModelPkgName: modelPkgName,
 			ModelName:    modelName,
 			Fields:       fields,
-		}
+		})
 
 	}
 

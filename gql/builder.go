@@ -71,9 +71,9 @@ func (b *Builder) Not(pred PredExpr) PredExpr {
 }
 
 func (b *Builder) Func(name string, args ...interface{}) AnonExpr {
-	expArgs := make([]Expr, len(args))
-	for i, a := range args {
-		expArgs[i] = lift(a)
+	expArgs := make([]Expr, 0, len(args))
+	for _, a := range args {
+		expArgs = append(expArgs, lift(a))
 	}
 	return (&funcExpr{name: name, args: expArgs}).init()
 }
