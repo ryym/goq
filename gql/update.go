@@ -39,6 +39,9 @@ func (m *UpdateMaker) Elem(elem interface{}, cols ...*Column) *Update {
 	pkVal := vals[pkCol]
 	if pkVal == nil {
 		elemRef := reflect.ValueOf(elem)
+		if elemRef.Type().Kind() == reflect.Ptr {
+			elemRef = elemRef.Elem()
+		}
 		pkVal = elemRef.FieldByName(pkCol.FieldName()).Interface()
 		if pkVal == nil {
 			return &Update{err: errors.New("[Update] PK must have a value")}
