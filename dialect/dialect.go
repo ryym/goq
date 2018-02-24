@@ -11,6 +11,8 @@ func New(driver string) Dialect {
 	switch driver {
 	case "postgres":
 		return &postgres{}
+	case "mysql":
+		return &mysql{}
 	case "sqlite3":
 		return &sqlite{}
 	}
@@ -47,6 +49,20 @@ func (dl *postgres) Placeholder(typ string, prevArgs []interface{}) string {
 
 func (dl *postgres) QuoteIdent(v string) string {
 	return fmt.Sprintf(`"%s"`, v)
+}
+
+type mysql struct{}
+
+func MySQL() *mysql {
+	return &mysql{}
+}
+
+func (dl *mysql) Placeholder(typ string, prevArgs []interface{}) string {
+	return "?"
+}
+
+func (dl *mysql) QuoteIdent(v string) string {
+	return fmt.Sprintf("`%s`", v)
 }
 
 type sqlite struct{}
