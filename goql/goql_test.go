@@ -1,4 +1,4 @@
-package gql
+package goql
 
 import (
 	"fmt"
@@ -48,62 +48,62 @@ func TestBasicExprs(t *testing.T) {
 	}
 
 	var tests = []struct {
-		gql  QueryApplier
+		goql QueryApplier
 		sql  string
 		args []interface{}
 	}{
 		{
-			gql:  z.Var(1),
+			goql: z.Var(1),
 			sql:  "$1",
 			args: []interface{}{1},
 		},
 		{
-			gql:  z.Var(1).As("one"),
+			goql: z.Var(1).As("one"),
 			sql:  "$1 AS `one`",
 			args: []interface{}{1},
 		},
 		{
-			gql:  z.Var(1).Eq(2),
+			goql: z.Var(1).Eq(2),
 			sql:  "$1 = $2",
 			args: []interface{}{1, 2},
 		},
 		{
-			gql:  z.Var(1).Eq(2).As("t"),
+			goql: z.Var(1).Eq(2).As("t"),
 			sql:  "$1 = $2 AS `t`",
 			args: []interface{}{1, 2},
 		},
 		{
-			gql:  ID.Between(0, 5),
+			goql: ID.Between(0, 5),
 			sql:  "`users`.`id` BETWEEN $1 AND $2",
 			args: []interface{}{0, 5},
 		},
 		{
-			gql:  ID.In([]int{1, 2, 3}),
+			goql: ID.In([]int{1, 2, 3}),
 			sql:  "`users`.`id` IN ($1, $2, $3)",
 			args: []interface{}{1, 2, 3},
 		},
 		{
-			gql:  ID.NotIn([]int{1, 2, 3}),
+			goql: ID.NotIn([]int{1, 2, 3}),
 			sql:  "`users`.`id` NOT IN ($1, $2, $3)",
 			args: []interface{}{1, 2, 3},
 		},
 		{
-			gql:  ID.In(z.Select(z.Var(1))),
+			goql: ID.In(z.Select(z.Var(1))),
 			sql:  "`users`.`id` IN (SELECT $1)",
 			args: []interface{}{1},
 		},
 		{
-			gql:  z.Parens(ID.Add(4).Sbt(3)).Mlt(2).Dvd(1),
+			goql: z.Parens(ID.Add(4).Sbt(3)).Mlt(2).Dvd(1),
 			sql:  "(`users`.`id` + $1 - $2) * $3 / $4",
 			args: []interface{}{4, 3, 2, 1},
 		},
 		{
-			gql:  Name.Concat("a").Concat(Name),
+			goql: Name.Concat("a").Concat(Name),
 			sql:  "`users`.`name` || $1 || `users`.`name`",
 			args: []interface{}{"a"},
 		},
 		{
-			gql: z.And(
+			goql: z.And(
 				ID.Eq(1),
 				z.Or(ID.Lte(3), z.Var(1).Gt(ID)),
 				Name.IsNotNull(),
@@ -112,17 +112,17 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1, 3, 1},
 		},
 		{
-			gql:  z.Func("foo", 1, ID, 2).Add(3),
+			goql: z.Func("foo", 1, ID, 2).Add(3),
 			sql:  "foo($1, `users`.`id`, $2) + $3",
 			args: []interface{}{1, 2, 3},
 		},
 		{
-			gql:  z.Coalesce(Name, z.Var(20)),
+			goql: z.Coalesce(Name, z.Var(20)),
 			sql:  "COALESCE(`users`.`name`, $1)",
 			args: []interface{}{20},
 		},
 		{
-			gql: z.Case(
+			goql: z.Case(
 				z.When(ID.Eq(1)).Then(-1),
 				z.When(ID.Eq(2)).Then(-3),
 			).Else(0).Add(1),
@@ -131,12 +131,12 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1, -1, 2, -3, 0, 1},
 		},
 		{
-			gql:  z.Select(ID, Name, z.Var(1).Add(ID).As("test")),
+			goql: z.Select(ID, Name, z.Var(1).Add(ID).As("test")),
 			sql:  "SELECT `users`.`id`, `users`.`name`, $1 + `users`.`id` AS `test`",
 			args: []interface{}{1},
 		},
 		{
-			gql: z.Select(Users.All()).From(Users).Joins(
+			goql: z.Select(Users.All()).From(Users).Joins(
 				z.LeftJoin(Users).On(Name.Eq("bob")),
 			).Where(
 				ID.Gte(3),
@@ -156,19 +156,19 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{"bob", 3, "%bob", 100},
 		},
 		{
-			gql: z.Select(ID).From(Users).Where(
+			goql: z.Select(ID).From(Users).Where(
 				z.Exists(z.Select(z.Var(1))),
 			),
 			sql:  "SELECT `users`.`id` FROM `users` WHERE (EXISTS (SELECT $1))",
 			args: []interface{}{1},
 		},
 		{
-			gql:  z.Select(z.Select(z.Var(1)).As("subquery")),
+			goql: z.Select(z.Select(z.Var(1)).As("subquery")),
 			sql:  "SELECT (SELECT $1) AS `subquery`",
 			args: []interface{}{1},
 		},
 		{
-			gql: z.Select(z.Var(1)).From(
+			goql: z.Select(z.Var(1)).From(
 				z.Select(z.Var(3)).As("subquery"),
 			).Joins(
 				z.RightJoin(z.Select(Users.ID).From(Users).As("u")).On(
@@ -180,7 +180,7 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1, 3, 5, 7},
 		},
 		{
-			gql: z.Select(
+			goql: z.Select(
 				z.Col("", "id"), z.Col("f", "title"), z.Col("foo", "body").As("content"),
 				z.Col("", "count").Add(3),
 			).From(
@@ -190,38 +190,38 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{3},
 		},
 		{
-			gql:  z.Select(z.Var(1)).From(Users).Joins(Join(Users).On(Users.ID.Eq(3))),
+			goql: z.Select(z.Var(1)).From(Users).Joins(Join(Users).On(Users.ID.Eq(3))),
 			sql:  "SELECT $1 FROM `users` INNER JOIN `users` ON `users`.`id` = $2",
 			args: []interface{}{1, 3},
 		},
 		{
-			gql:  z.Select(z.Var(1).As("num")).OrderBy(z.Name("num")),
+			goql: z.Select(z.Var(1).As("num")).OrderBy(z.Name("num")),
 			sql:  "SELECT $1 AS `num` ORDER BY `num`",
 			args: []interface{}{1},
 		},
 		{
-			gql:  z.Select(z.Var(1)).OrderBy(Name.Asc(), ID.Desc(), ID),
+			goql: z.Select(z.Var(1)).OrderBy(Name.Asc(), ID.Desc(), ID),
 			sql:  "SELECT $1 ORDER BY `users`.`name`, `users`.`id` DESC, `users`.`id`",
 			args: []interface{}{1},
 		},
 		{
 			// Postgres needs type information for placeholders in some cases.
-			gql:  z.Select(z.VarT(1, "int")),
+			goql: z.Select(z.VarT(1, "int")),
 			sql:  "SELECT $1::int",
 			args: []interface{}{1},
 		},
 		{
-			gql:  z.Select(z.Null().As("a")).From(Users).Where(z.Null().Eq(z.Null())),
+			goql: z.Select(z.Null().As("a")).From(Users).Where(z.Null().Eq(z.Null())),
 			sql:  "SELECT NULL AS `a` FROM `users` WHERE (NULL = NULL)",
 			args: nil,
 		},
 		{
-			gql:  z.Select(Users.Except(Users.ID), z.Null()).From(Users),
+			goql: z.Select(Users.Except(Users.ID), z.Null()).From(Users),
 			sql:  "SELECT `users`.`name`, NULL FROM `users`",
 			args: nil,
 		},
 		{
-			gql: z.InsertInto(Users).ValuesMap(Values{
+			goql: z.InsertInto(Users).ValuesMap(Values{
 				Users.ID:   1,
 				Users.Name: "bob",
 			}),
@@ -229,17 +229,17 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1, "bob"},
 		},
 		{
-			gql:  z.InsertInto(Users).Values(user{1, "bob"}),
+			goql: z.InsertInto(Users).Values(user{1, "bob"}),
 			sql:  "INSERT INTO `users` VALUES ($1, $2)",
 			args: []interface{}{1, "bob"},
 		},
 		{
-			gql:  z.InsertInto(Users, Users.Name).Values(user{1, "bob"}),
+			goql: z.InsertInto(Users, Users.Name).Values(user{1, "bob"}),
 			sql:  "INSERT INTO `users` (`name`) VALUES ($1)",
 			args: []interface{}{"bob"},
 		},
 		{
-			gql: z.InsertInto(
+			goql: z.InsertInto(
 				Users,
 				Users.Except(Users.Name).Columns()...,
 			).Values(user{1, "bob"}),
@@ -247,7 +247,7 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1},
 		},
 		{
-			gql: z.Update(Users).Set(Values{
+			goql: z.Update(Users).Set(Values{
 				Users.ID:   30,
 				Users.Name: "alice",
 			}).Where(Users.ID.Eq(5)),
@@ -255,24 +255,24 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{30, "alice", 5},
 		},
 		{
-			gql:  z.Update(Users).Elem(user{45, "john"}),
+			goql: z.Update(Users).Elem(user{45, "john"}),
 			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE (`users`.`id` = $3)",
 			args: []interface{}{45, "john", 45},
 		},
 		{
-			gql:  z.Update(Users).Elem(user{45, "john"}, Users.Name),
+			goql: z.Update(Users).Elem(user{45, "john"}, Users.Name),
 			sql:  "UPDATE `users` SET `name` = $1 WHERE (`users`.`id` = $2)",
 			args: []interface{}{"john", 45},
 		},
 		{
-			gql:  z.DeleteFrom(Users),
+			goql: z.DeleteFrom(Users),
 			sql:  "DELETE FROM `users`",
 			args: nil,
 		},
 	}
 
 	for i, test := range tests {
-		q := z.Query(test.gql)
+		q := z.Query(test.goql)
 		if len(q.errs) > 0 {
 			for _, err := range q.errs {
 				t.Error(err)

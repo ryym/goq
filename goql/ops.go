@@ -1,4 +1,4 @@
-package gql
+package goql
 
 func lift(v interface{}) Expr {
 	exp, ok := v.(Expr)

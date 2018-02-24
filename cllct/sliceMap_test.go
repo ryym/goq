@@ -6,7 +6,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func TestSliceMapCollector(t *testing.T) {
@@ -20,7 +20,7 @@ func TestSliceMapCollector(t *testing.T) {
 		{2, 7, "g"},
 	}
 
-	q := gql.NewBuilder(dialect.Generic())
+	q := goql.NewBuilder(dialect.Generic())
 	cl := cllct.NewMaker()
 	names := []string{"country_id", "id", "name"}
 

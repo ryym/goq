@@ -9,7 +9,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func MakeTestCases(ctx testCtx) []testCase {
@@ -762,7 +762,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 			`,
 			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
 				_, err := tx.Exec(
-					z.Update(z.Cities).Set(gql.Values{
+					z.Update(z.Cities).Set(goql.Values{
 						z.Cities.CountryID: 50,
 						z.Cities.Name:      "x",
 					}).Where(z.Cities.ID.Lt(3)),

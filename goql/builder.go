@@ -1,4 +1,4 @@
-package gql
+package goql
 
 import "github.com/ryym/goq/dialect"
 

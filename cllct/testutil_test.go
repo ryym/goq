@@ -4,21 +4,21 @@ import (
 	"reflect"
 
 	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
-func sel(alias, strct, field string) gql.Selection {
-	return gql.Selection{TableAlias: alias, StructName: strct, FieldName: field}
+func sel(alias, strct, field string) goql.Selection {
+	return goql.Selection{TableAlias: alias, StructName: strct, FieldName: field}
 }
 
 func execCollector(
 	cllcts []cllct.Collector,
 	rows [][]interface{},
-	selects []gql.Selection,
+	selects []goql.Selection,
 	colNames []string,
 ) error {
 	if selects == nil {
-		selects = make([]gql.Selection, len(colNames))
+		selects = make([]goql.Selection, len(colNames))
 	} else {
 		colNames = make([]string, len(selects))
 	}

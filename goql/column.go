@@ -1,4 +1,4 @@
-package gql
+package goql
 
 type ColumnMaker struct {
 	structName string

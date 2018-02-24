@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-test/deep"
 	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func TestModelElemCollector(t *testing.T) {
@@ -13,7 +13,7 @@ func TestModelElemCollector(t *testing.T) {
 		{"alice", 101},
 	}
 
-	selects := []gql.Selection{
+	selects := []goql.Selection{
 		sel("", "User", "Name"),
 		sel("", "User", "ID"),
 	}

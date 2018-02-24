@@ -3,11 +3,11 @@ package cllct
 import (
 	"reflect"
 
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 type ModelElemCollector struct {
-	cols     []*gql.Column
+	cols     []*goql.Column
 	table    tableInfo
 	colToFld map[int]int
 	ptr      interface{}

@@ -6,7 +6,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func TestMapCollector(t *testing.T) {
@@ -15,7 +15,7 @@ func TestMapCollector(t *testing.T) {
 		{4, 53, "bar"},
 	}
 
-	q := gql.NewBuilder(dialect.Generic())
+	q := goql.NewBuilder(dialect.Generic())
 	cl := cllct.NewMaker()
 	names := []string{"id", "country_id", "name"}
 
@@ -35,8 +35,8 @@ func TestMapCollector(t *testing.T) {
 
 func TestInvalidMapCollector(t *testing.T) {
 	cl := cllct.NewMaker()
-	q := gql.NewBuilder(dialect.Generic())
-	initConf := cllct.NewInitConf([]gql.Selection{}, []string{})
+	q := goql.NewBuilder(dialect.Generic())
+	initConf := cllct.NewInitConf([]goql.Selection{}, []string{})
 	var err error
 	var cllctor *cllct.MapCollector
 

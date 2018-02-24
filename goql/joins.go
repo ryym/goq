@@ -1,4 +1,4 @@
-package gql
+package goql
 
 const (
 	JOIN_INNER = "INNER"

@@ -4,12 +4,12 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 type ModelSliceCollector struct {
 	elemType reflect.Type
-	cols     []*gql.Column
+	cols     []*goql.Column
 	table    tableInfo
 	colToFld map[int]int
 	ptr      interface{}

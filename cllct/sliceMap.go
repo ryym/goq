@@ -4,14 +4,14 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 	"github.com/ryym/goq/util"
 )
 
 type SliceMapCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int
-	key      gql.Querier
+	key      goql.Querier
 	keyIdx   int
 	keyStore reflect.Value
 	ptr      interface{}

@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-test/deep"
 	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func TestModelUniqSliceCollector(t *testing.T) {
@@ -22,7 +22,7 @@ func TestModelUniqSliceCollector(t *testing.T) {
 		{2, "_", "bob"},
 	}
 
-	selects := []gql.Selection{
+	selects := []goql.Selection{
 		sel("", "User", "ID"),
 		sel("", "foo", "Unrelated"),
 		sel("", "User", "Name"),

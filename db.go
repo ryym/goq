@@ -6,7 +6,7 @@ import (
 
 	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func Open(driver, source string) (*DB, error) {
@@ -44,11 +44,11 @@ func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
 	return &Tx{tx}, nil
 }
 
-func (d *DB) Query(query gql.QueryExpr) *cllct.Runner {
+func (d *DB) Query(query goql.QueryExpr) *cllct.Runner {
 	return cllct.NewRunner(d.DB, query)
 }
 
-func (d *DB) Exec(query gql.QueryRoot) (sql.Result, error) {
+func (d *DB) Exec(query goql.QueryRoot) (sql.Result, error) {
 	q := query.Construct()
 	if err := q.Err(); err != nil {
 		return nil, err
@@ -60,11 +60,11 @@ type Tx struct {
 	Tx *sql.Tx
 }
 
-func (tx *Tx) Query(query gql.QueryExpr) *cllct.Runner {
+func (tx *Tx) Query(query goql.QueryExpr) *cllct.Runner {
 	return cllct.NewRunner(tx.Tx, query)
 }
 
-func (tx *Tx) Exec(query gql.QueryRoot) (sql.Result, error) {
+func (tx *Tx) Exec(query goql.QueryRoot) (sql.Result, error) {
 	q := query.Construct()
 	if err := q.Err(); err != nil {
 		return nil, err

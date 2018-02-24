@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-test/deep"
 	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func TestModelSliceMapCollector(t *testing.T) {
@@ -19,7 +19,7 @@ func TestModelSliceMapCollector(t *testing.T) {
 		{3, "us", 7, "houston"},
 	}
 
-	selects := []gql.Selection{
+	selects := []goql.Selection{
 		sel("", "Country", "ID"),
 		sel("", "Country", "Name"),
 		sel("", "City", "ID"),

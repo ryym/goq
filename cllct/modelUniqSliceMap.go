@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 type ModelUniqSliceMapCollector struct {
 	elemType    reflect.Type
-	cols        []*gql.Column
+	cols        []*goql.Column
 	table       tableInfo
 	colToFld    map[int]int
-	key         gql.Querier
+	key         goql.Querier
 	keyIdx      int
 	keyStore    reflect.Value
 	pkFieldName string

@@ -1,4 +1,4 @@
-package gql
+package goql
 
 type betweenOp struct {
 	val   Expr

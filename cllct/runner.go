@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 func InitCollectors(collectors []Collector, initConf *InitConf) ([]Collector, error) {
@@ -70,10 +70,10 @@ type Queryable interface {
 
 type Runner struct {
 	db    Queryable
-	query gql.QueryExpr
+	query goql.QueryExpr
 }
 
-func NewRunner(db Queryable, query gql.QueryExpr) *Runner {
+func NewRunner(db Queryable, query goql.QueryExpr) *Runner {
 	return &Runner{db, query}
 }
 
@@ -103,7 +103,7 @@ func (r *Runner) Collect(collectors ...ListCollector) error {
 	return r.collect(r.query, clls...)
 }
 
-func (r *Runner) collect(query gql.QueryExpr, collectors ...Collector) error {
+func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) error {
 	q := query.Construct()
 	if err := q.Err(); err != nil {
 		return err

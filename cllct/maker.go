@@ -3,7 +3,7 @@ package cllct
 import (
 	"reflect"
 
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 type CollectorMaker struct{}
@@ -28,12 +28,12 @@ type mapCollectorMaker struct {
 	collector *MapCollector
 }
 
-func (m *mapCollectorMaker) By(key gql.Querier) *MapCollector {
+func (m *mapCollectorMaker) By(key goql.Querier) *MapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *mapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *MapCollector {
+func (m *mapCollectorMaker) ByWith(ptr interface{}, key goql.Querier) *MapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -49,12 +49,12 @@ type sliceMapCollector struct {
 	collector *SliceMapCollector
 }
 
-func (m *sliceMapCollector) By(key gql.Querier) *SliceMapCollector {
+func (m *sliceMapCollector) By(key goql.Querier) *SliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *sliceMapCollector) ByWith(ptr interface{}, key gql.Querier) *SliceMapCollector {
+func (m *sliceMapCollector) ByWith(ptr interface{}, key goql.Querier) *SliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -77,10 +77,10 @@ func (cm *CollectorMaker) ToRowMap(mp *map[string]interface{}) *RowMapCollector 
 type ModelCollectorMaker struct {
 	structName string
 	tableAlias string
-	cols       []*gql.Column
+	cols       []*goql.Column
 }
 
-func NewModelCollectorMaker(cols []*gql.Column, alias string) *ModelCollectorMaker {
+func NewModelCollectorMaker(cols []*goql.Column, alias string) *ModelCollectorMaker {
 	var structName string
 	if len(cols) > 0 {
 		structName = cols[0].StructName()
@@ -138,7 +138,7 @@ type modelSliceMapCollectorMaker struct {
 	collector *ModelSliceMapCollector
 }
 
-func (m *modelSliceMapCollectorMaker) By(key gql.Querier) *ModelSliceMapCollector {
+func (m *modelSliceMapCollectorMaker) By(key goql.Querier) *ModelSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
@@ -159,7 +159,7 @@ func (m *modelSliceMapCollectorMaker) By(key gql.Querier) *ModelSliceMapCollecto
 //
 // pattern C (GOOD):
 //     Collect(Cities.ToSliceMap(&cities).ByWith(&countryID, Countries.ID))
-func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *ModelSliceMapCollector {
+func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Querier) *ModelSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -177,13 +177,13 @@ type modelUniqSliceMapCollectorMaker struct {
 	collector *ModelUniqSliceMapCollector
 }
 
-func (m *modelUniqSliceMapCollectorMaker) By(key gql.Querier) *ModelUniqSliceMapCollector {
+func (m *modelUniqSliceMapCollectorMaker) By(key goql.Querier) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
 // See modelSliceMapCollectorMaker.ByWith
-func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key gql.Querier) *ModelUniqSliceMapCollector {
+func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Querier) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -202,7 +202,7 @@ func (cm *ModelCollectorMaker) ToUniqSliceMap(ptr interface{}) *modelUniqSliceMa
 	}}
 }
 
-func findPKCol(cols []*gql.Column) *gql.Column {
+func findPKCol(cols []*goql.Column) *goql.Column {
 	for _, col := range cols {
 		if meta := col.Meta(); meta.PK {
 			return col

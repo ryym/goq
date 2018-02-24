@@ -4,15 +4,15 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 type ModelMapCollector struct {
 	elemType reflect.Type
-	cols     []*gql.Column
+	cols     []*goql.Column
 	table    tableInfo
 	colToFld map[int]int
-	keySel   *gql.Selection
+	keySel   *goql.Selection
 	keyIdx   int
 	ptr      interface{}
 	mp       reflect.Value

@@ -35,8 +35,8 @@ package %s
 		}
 	}
 
-	gqlStructT := template.Must(template.New("gqlStruct").Parse(gqlStructTmpl))
-	err = gqlStructT.Execute(buf, helpers)
+	builderT := template.Must(template.New("builder").Parse(builderTmpl))
+	err = builderT.Execute(buf, helpers)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to execute Builder struct template")
 	}
@@ -62,7 +62,7 @@ func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
 		"github.com/ryym/goq/dialect",
 	}
 	if len(helpers) > 0 {
-		paths = append(paths, "github.com/ryym/goq/cllct", "github.com/ryym/goq/gql")
+		paths = append(paths, "github.com/ryym/goq/cllct", "github.com/ryym/goq/goql")
 	}
 
 	for path, _ := range pkgs {
@@ -78,20 +78,20 @@ func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
 
 const tableTmpl = `
 type {{.Name}} struct {
-	gql.Table
+	goql.Table
 	*cllct.ModelCollectorMaker
 	{{range .Fields}}
-	{{.Name}} *gql.Column{{end}}
+	{{.Name}} *goql.Column{{end}}
 }
 
 func New{{.Name}}(alias string) *{{.Name}} {
-	{{if .Fields}}cm := gql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias){{end}}
+	{{if .Fields}}cm := goql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias){{end}}
 	t := &{{.Name}}{
 		{{range .Fields}}
 		{{.Name}}: {{$.ColumnBuilder "cm" .}},{{end}}
 	}
-	cols := []*gql.Column{ {{.JoinFields "t"}} }
-	t.Table = gql.NewTable("{{.TableName}}", alias, cols)
+	cols := []*goql.Column{ {{.JoinFields "t"}} }
+	t.Table = goql.NewTable("{{.TableName}}", alias, cols)
 	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(cols, alias)
 	return t
 }
@@ -99,7 +99,7 @@ func New{{.Name}}(alias string) *{{.Name}} {
 func (t *{{.Name}}) As(alias string) *{{.Name}} { return New{{.Name}}(alias) }
 `
 
-const gqlStructTmpl = `
+const builderTmpl = `
 type Builder struct {
 	*goq.Builder
 	{{range .}}

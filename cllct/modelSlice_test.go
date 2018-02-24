@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-test/deep"
 	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/gql"
+	"github.com/ryym/goq/goql"
 )
 
 // Model collectors collect results regardless of
@@ -16,7 +16,7 @@ func TestModelSliceCollector(t *testing.T) {
 		{"unrelated", "alice", 101},
 	}
 
-	selects := []gql.Selection{
+	selects := []goql.Selection{
 		sel("", "foo", "Bar"),
 		sel("", "User", "Name"),
 		sel("", "User", "ID"),

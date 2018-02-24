@@ -1,4 +1,4 @@
-package gql
+package goql
 
 type infixOp struct {
 	left  Querier

@@ -1,4 +1,4 @@
-package gql
+package goql
 
 type Where struct {
 	preds []PredExpr

@@ -1,14 +1,14 @@
 package cllct
 
-import "github.com/ryym/goq/gql"
+import "github.com/ryym/goq/goql"
 
 type InitConf struct {
-	Selects  []gql.Selection
+	Selects  []goql.Selection
 	ColNames []string
 	takens   map[int]bool
 }
 
-func NewInitConf(selects []gql.Selection, colNames []string) *InitConf {
+func NewInitConf(selects []goql.Selection, colNames []string) *InitConf {
 	return &InitConf{selects, colNames, map[int]bool{}}
 }
 

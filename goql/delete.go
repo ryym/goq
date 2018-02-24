@@ -1,4 +1,4 @@
-package gql
+package goql
 
 type Delete struct {
 	table SchemaTable
