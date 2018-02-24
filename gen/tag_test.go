@@ -7,7 +7,7 @@ import (
 )
 
 func TestParseTag(t *testing.T) {
-	type Attrs map[string]Type
+	type Attrs map[string]tagType
 	type Result map[string]interface{}
 
 	cases := []struct {
@@ -18,15 +18,15 @@ func TestParseTag(t *testing.T) {
 	}{
 		{
 			tag:   "flg",
-			attrs: Attrs{"flg": TYPE_BOOL},
+			attrs: Attrs{"flg": tagTypeBool},
 			want:  Result{"flg": true},
 		},
 		{
 			tag: "name:bob;married;age:30",
 			attrs: Attrs{
-				"name":    TYPE_STR,
-				"married": TYPE_BOOL,
-				"age":     TYPE_STR,
+				"name":    tagTypeStr,
+				"married": tagTypeBool,
+				"age":     tagTypeStr,
 			},
 			want: Result{
 				"name":    "bob",
@@ -36,25 +36,25 @@ func TestParseTag(t *testing.T) {
 		},
 		{
 			tag:   "",
-			attrs: Attrs{"s": TYPE_STR, "b": TYPE_BOOL},
+			attrs: Attrs{"s": tagTypeStr, "b": tagTypeBool},
 			want:  Result{},
 		},
 		{
 			tag:   "b:val",
-			attrs: Attrs{"b": TYPE_BOOL},
+			attrs: Attrs{"b": tagTypeBool},
 			want:  nil,
-			err:   "Type unmatch",
+			err:   "tagType unmatch",
 		},
 		{
 			tag:   "foo",
-			attrs: Attrs{"bar": TYPE_BOOL},
+			attrs: Attrs{"bar": tagTypeBool},
 			want:  nil,
 			err:   "Unknown attribute",
 		},
 	}
 
 	for _, c := range cases {
-		got, err := ParseTag(c.tag, c.attrs)
+		got, err := parseTag(c.tag, c.attrs)
 
 		if err != nil {
 			if c.err == "" {
@@ -69,8 +69,8 @@ func TestParseTag(t *testing.T) {
 }
 
 func TestParseColumnTag(t *testing.T) {
-	got, _ := ParseColumnTag("pk;name:foo_bar")
-	want := ColumnTag{
+	got, _ := parseColumnTag("pk;name:foo_bar")
+	want := columnTag{
 		IsPK:    true,
 		ColName: "foo_bar",
 	}
@@ -80,8 +80,8 @@ func TestParseColumnTag(t *testing.T) {
 }
 
 func TestParseTableTag(t *testing.T) {
-	got, _ := ParseTableTag("helper:Prefs")
-	want := TableTag{
+	got, _ := parseTableTag("helper:Prefs")
+	want := tableTag{
 		HelperName: "Prefs",
 	}
 	if diff := deep.Equal(got, want); diff != nil {

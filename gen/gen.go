@@ -46,7 +46,7 @@ func (h *helper) ColumnBuilder(maker string, f *field) string {
 type field struct {
 	Name   string
 	Column string
-	Tag    ColumnTag
+	Tag    columnTag
 }
 
 func GenerateCustomBuilders(opts Opts) error {
@@ -107,7 +107,7 @@ func GenerateCustomBuilders(opts Opts) error {
 			modelPkgName = modelPkg.Name()
 		}
 
-		tableTag, err := ParseTableTag(getTag(tablesT.Tag(i), "goq"))
+		tableTag, err := parseTableTag(getTag(tablesT.Tag(i), "goq"))
 		if err != nil {
 			return errors.Wrapf(err, "failed to parse tag of Tables.%s", tableName)
 		}
@@ -164,7 +164,7 @@ func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) 
 			continue
 		}
 
-		tag, err := ParseColumnTag(getTag(modelT.Tag(i), "goq"))
+		tag, err := parseColumnTag(getTag(modelT.Tag(i), "goq"))
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to parse tag of %s.%s", modelName, fld.Name())
 		}

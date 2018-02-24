@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	TYPE_STR  = "string"
-	TYPE_BOOL = "bool"
+	tagTypeStr  = "string"
+	tagTypeBool = "bool"
 )
 
-type Type string
+type tagType string
 
-func ParseTag(tag string, wants map[string]Type) (map[string]interface{}, error) {
+func parseTag(tag string, wants map[string]tagType) (map[string]interface{}, error) {
 	tagRgx := regexp.MustCompile(";")
 	matches := tagRgx.Split(tag, -1)
 
@@ -33,12 +33,12 @@ func ParseTag(tag string, wants map[string]Type) (map[string]interface{}, error)
 		}
 
 		if len(kv) == 1 {
-			if tp != TYPE_BOOL {
+			if tp != tagTypeBool {
 				return nil, fmt.Errorf("'%s' must be bool", name)
 			}
 			ret[name] = true
 		} else {
-			if tp != TYPE_STR {
+			if tp != tagTypeStr {
 				return nil, fmt.Errorf("'%s' must have a string value", name)
 			}
 			ret[name] = kv[1]
@@ -48,31 +48,31 @@ func ParseTag(tag string, wants map[string]Type) (map[string]interface{}, error)
 	return ret, nil
 }
 
-type ColumnTag struct {
+type columnTag struct {
 	IsPK    bool
 	ColName string
 	NotCol  bool
 }
 
-func ParseColumnTag(tagStr string) (ColumnTag, error) {
-	attrs, err := ParseTag(tagStr, map[string]Type{
-		"pk":   TYPE_BOOL,
-		"name": TYPE_STR,
-		"-":    TYPE_BOOL,
+func parseColumnTag(tagStr string) (columnTag, error) {
+	attrs, err := parseTag(tagStr, map[string]tagType{
+		"pk":   tagTypeBool,
+		"name": tagTypeStr,
+		"-":    tagTypeBool,
 	})
 	if err != nil {
-		return ColumnTag{}, err
+		return columnTag{}, err
 	}
 
 	if _, ok := attrs["-"]; ok && len(attrs) > 1 {
-		return ColumnTag{}, errors.New(`"-" cannot be used with other attributes`)
+		return columnTag{}, errors.New(`"-" cannot be used with other attributes`)
 	}
 
 	return makeModelTag(attrs), nil
 }
 
-func makeModelTag(attrs map[string]interface{}) ColumnTag {
-	tag := ColumnTag{}
+func makeModelTag(attrs map[string]interface{}) columnTag {
+	tag := columnTag{}
 	for key, val := range attrs {
 		switch key {
 		case "pk":
@@ -86,23 +86,23 @@ func makeModelTag(attrs map[string]interface{}) ColumnTag {
 	return tag
 }
 
-type TableTag struct {
+type tableTag struct {
 	HelperName string
 }
 
-func ParseTableTag(tagStr string) (TableTag, error) {
-	attrs, err := ParseTag(tagStr, map[string]Type{
-		"helper": TYPE_STR,
+func parseTableTag(tagStr string) (tableTag, error) {
+	attrs, err := parseTag(tagStr, map[string]tagType{
+		"helper": tagTypeStr,
 	})
 	if err != nil {
-		return TableTag{}, err
+		return tableTag{}, err
 	}
 
 	return makeTableTag(attrs), nil
 }
 
-func makeTableTag(attrs map[string]interface{}) TableTag {
-	tag := TableTag{}
+func makeTableTag(attrs map[string]interface{}) tableTag {
+	tag := tableTag{}
 	for key, val := range attrs {
 		switch key {
 		case "helper":
