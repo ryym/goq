@@ -1,3 +1,4 @@
+// Package gen provides a method to generate custom query builder.
 package gen
 
 import (

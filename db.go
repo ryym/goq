@@ -9,6 +9,9 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// Open opens a database.
+// The arguments are passed to the Open method of *sql.DB.
+// See https://golang.org/pkg/database/sql/#Open for details.
 func Open(driver, source string) (*DB, error) {
 	db, err := sql.Open(driver, source)
 	if err != nil {
@@ -23,6 +26,8 @@ func Open(driver, source string) (*DB, error) {
 	return &DB{db, dl}, nil
 }
 
+// DB is a database handle which wraps *sql.DB.
+// You can use Goq's query to access a DB instead of raw string SQL.
 type DB struct {
 	*sql.DB
 	dialect dialect.Dialect
@@ -56,6 +61,8 @@ func (d *DB) Exec(query goql.QueryRoot) (sql.Result, error) {
 	return d.DB.Exec(q.Query(), q.Args()...)
 }
 
+// Tx is an in-progress database transaction which wraps *sql.Tx.
+// You can use Goq's query to access a DB instead of raw string SQL.
 type Tx struct {
 	Tx *sql.Tx
 }

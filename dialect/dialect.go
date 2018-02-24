@@ -1,9 +1,14 @@
+// Package dialect defines some dialects per RDB.
+// Currently it supports Postgres, MySQL, and SQLite3.
 package dialect
 
 import "fmt"
 
 type Dialect interface {
+	// Placeholder makes a placeholder string.
 	Placeholder(typ string, prevArgs []interface{}) string
+
+	// QuoteIndent surrounds an identifier by proper quotes.
 	QuoteIdent(v string) string
 }
 

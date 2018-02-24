@@ -1,3 +1,6 @@
+// Package cllct provides various collectors.
+// A collector collects results fetched from DB as sql.Rows
+// into a specified format like a slice, map, etc.
 package cllct
 
 import "github.com/ryym/goq/goql"
