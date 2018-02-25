@@ -17,19 +17,22 @@ func (l *logicalOp) Apply(q *Query, ctx DBContext) {
 	if len(l.preds) == 0 {
 		return
 	}
-
-	pred := l.preds[0]
-	for i := 1; i < len(l.preds); i++ {
-		pred = &predExpr{(&infixOp{
-			left:  pred,
-			right: l.preds[i],
-			op:    l.op,
-		}).init()}
-	}
-
+	pred := concatPreds(l.preds, l.op)
 	q.query = append(q.query, "(")
 	pred.Apply(q, ctx)
 	q.query = append(q.query, ")")
 }
 
 func (l *logicalOp) Selection() Selection { return Selection{} }
+
+func concatPreds(preds []PredExpr, op string) PredExpr {
+	pred := preds[0]
+	for i := 1; i < len(preds); i++ {
+		pred = &predExpr{(&infixOp{
+			left:  pred,
+			right: preds[i],
+			op:    op,
+		}).init()}
+	}
+	return pred
+}

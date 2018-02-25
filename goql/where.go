@@ -11,6 +11,7 @@ func (w *Where) add(preds []PredExpr) {
 func (w *Where) Apply(q *Query, ctx DBContext) {
 	if len(w.preds) > 0 {
 		q.query = append(q.query, " WHERE ")
-		(&logicalOp{op: "AND", preds: w.preds}).Apply(q, ctx)
+		pred := concatPreds(w.preds, "AND")
+		pred.Apply(q, ctx)
 	}
 }

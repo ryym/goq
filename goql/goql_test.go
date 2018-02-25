@@ -155,7 +155,7 @@ func TestBasicExprs(t *testing.T) {
 			).OrderBy(ID).Limit(10).Offset(20),
 			sql: "SELECT `users`.`id`, `users`.`name` FROM `users` " +
 				"LEFT OUTER JOIN `users` ON `users`.`name` = $1 " +
-				"WHERE (`users`.`id` >= $2 AND `users`.`name` LIKE $3) " +
+				"WHERE `users`.`id` >= $2 AND `users`.`name` LIKE $3 " +
 				"GROUP BY `users`.`id`, `users`.`name` " +
 				"HAVING (COUNT(`users`.`id`) < $4) " +
 				"ORDER BY `users`.`id` LIMIT 10 OFFSET 20",
@@ -165,7 +165,7 @@ func TestBasicExprs(t *testing.T) {
 			goql: z.Select(ID).From(Users).Where(
 				z.Exists(z.Select(z.Var(1))),
 			),
-			sql:  "SELECT `users`.`id` FROM `users` WHERE (EXISTS (SELECT $1))",
+			sql:  "SELECT `users`.`id` FROM `users` WHERE EXISTS (SELECT $1)",
 			args: []interface{}{1},
 		},
 		{
@@ -218,7 +218,7 @@ func TestBasicExprs(t *testing.T) {
 		},
 		{
 			goql: z.Select(z.Null().As("a")).From(Users).Where(z.Null().Eq(z.Null())),
-			sql:  "SELECT NULL AS `a` FROM `users` WHERE (NULL = NULL)",
+			sql:  "SELECT NULL AS `a` FROM `users` WHERE NULL = NULL",
 			args: nil,
 		},
 		{
@@ -257,17 +257,17 @@ func TestBasicExprs(t *testing.T) {
 				Users.ID:   30,
 				Users.Name: "alice",
 			}).Where(Users.ID.Eq(5)),
-			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE (`users`.`id` = $3)",
+			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE `users`.`id` = $3",
 			args: []interface{}{30, "alice", 5},
 		},
 		{
 			goql: z.Update(Users).Elem(user{45, "john"}),
-			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE (`users`.`id` = $3)",
+			sql:  "UPDATE `users` SET `id` = $1, `name` = $2 WHERE `users`.`id` = $3",
 			args: []interface{}{45, "john", 45},
 		},
 		{
 			goql: z.Update(Users).Elem(user{45, "john"}, Users.Name),
-			sql:  "UPDATE `users` SET `name` = $1 WHERE (`users`.`id` = $2)",
+			sql:  "UPDATE `users` SET `name` = $1 WHERE `users`.`id` = $2",
 			args: []interface{}{"john", 45},
 		},
 		{
