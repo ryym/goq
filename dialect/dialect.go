@@ -72,7 +72,7 @@ func (dl *mysql) QuoteIdent(v string) string {
 
 type sqlite struct{}
 
-func Sqlite() *sqlite {
+func SQLite() *sqlite {
 	return &sqlite{}
 }
 
