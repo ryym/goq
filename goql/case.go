@@ -56,7 +56,7 @@ func (ce *CaseElseExpr) Apply(q *Query, ctx DBContext) {
 
 func (ce *CaseElseExpr) Selection() Selection { return Selection{} }
 
-// WhenExpr does not implement Querier.
+// WhenExpr does not implement Selectable.
 type WhenExpr struct {
 	when Expr
 	then Expr

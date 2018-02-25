@@ -6,7 +6,7 @@ import (
 )
 
 type queryExpr struct {
-	exps    []Querier
+	exps    []Selectable
 	froms   []TableLike
 	joins   []*joinDef
 	where   Where

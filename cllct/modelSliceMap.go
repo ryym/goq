@@ -12,7 +12,7 @@ type ModelSliceMapCollector struct {
 	cols     []*goql.Column
 	table    tableInfo
 	colToFld map[int]int
-	key      goql.Querier
+	key      goql.Selectable
 	keyIdx   int
 	keyStore reflect.Value
 	ptr      interface{}

@@ -28,12 +28,12 @@ type mapCollectorMaker struct {
 	collector *MapCollector
 }
 
-func (m *mapCollectorMaker) By(key goql.Querier) *MapCollector {
+func (m *mapCollectorMaker) By(key goql.Selectable) *MapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *mapCollectorMaker) ByWith(ptr interface{}, key goql.Querier) *MapCollector {
+func (m *mapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *MapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -49,12 +49,12 @@ type sliceMapCollector struct {
 	collector *SliceMapCollector
 }
 
-func (m *sliceMapCollector) By(key goql.Querier) *SliceMapCollector {
+func (m *sliceMapCollector) By(key goql.Selectable) *SliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *sliceMapCollector) ByWith(ptr interface{}, key goql.Querier) *SliceMapCollector {
+func (m *sliceMapCollector) ByWith(ptr interface{}, key goql.Selectable) *SliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -138,7 +138,7 @@ type modelSliceMapCollectorMaker struct {
 	collector *ModelSliceMapCollector
 }
 
-func (m *modelSliceMapCollectorMaker) By(key goql.Querier) *ModelSliceMapCollector {
+func (m *modelSliceMapCollectorMaker) By(key goql.Selectable) *ModelSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
@@ -159,7 +159,7 @@ func (m *modelSliceMapCollectorMaker) By(key goql.Querier) *ModelSliceMapCollect
 //
 // pattern C (GOOD):
 //     Collect(Cities.ToSliceMap(&cities).ByWith(&countryID, Countries.ID))
-func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Querier) *ModelSliceMapCollector {
+func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -177,13 +177,13 @@ type modelUniqSliceMapCollectorMaker struct {
 	collector *ModelUniqSliceMapCollector
 }
 
-func (m *modelUniqSliceMapCollectorMaker) By(key goql.Querier) *ModelUniqSliceMapCollector {
+func (m *modelUniqSliceMapCollectorMaker) By(key goql.Selectable) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
 // See modelSliceMapCollectorMaker.ByWith
-func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Querier) *ModelUniqSliceMapCollector {
+func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector

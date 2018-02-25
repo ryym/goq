@@ -11,7 +11,7 @@ import (
 type MapCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int
-	key      goql.Querier
+	key      goql.Selectable
 	keyIdx   int
 	keyStore reflect.Value
 	ptr      interface{}

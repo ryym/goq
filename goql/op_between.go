@@ -2,8 +2,8 @@ package goql
 
 type betweenOp struct {
 	val   Expr
-	start Querier
-	end   Querier
+	start Selectable
+	end   Selectable
 	ops
 }
 

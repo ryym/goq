@@ -1,8 +1,8 @@
 package goql
 
 type infixOp struct {
-	left  Querier
-	right Querier
+	left  Selectable
+	right Selectable
 	op    string
 	ops
 }
@@ -21,7 +21,7 @@ func (o *infixOp) Apply(q *Query, ctx DBContext) {
 func (o *infixOp) Selection() Selection { return Selection{} }
 
 type prefixOp struct {
-	val Querier
+	val Selectable
 	op  string
 	ops
 }
@@ -39,7 +39,7 @@ func (o *prefixOp) Apply(q *Query, ctx DBContext) {
 func (o *prefixOp) Selection() Selection { return Selection{} }
 
 type sufixOp struct {
-	val Querier
+	val Selectable
 	op  string
 	ops
 }

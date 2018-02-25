@@ -18,18 +18,18 @@ type QueryApplier interface {
 	Apply(q *Query, ctx DBContext)
 }
 
-type Querier interface {
+type Selectable interface {
 	QueryApplier
 	Selection() Selection
 }
 
 type Aliased interface {
-	Querier
+	Selectable
 	Alias() string
 }
 
 type Expr interface {
-	Querier
+	Selectable
 
 	Eq(v interface{}) PredExpr
 	Neq(v interface{}) PredExpr
@@ -68,7 +68,7 @@ type TableLike interface {
 }
 
 type QueryTable interface {
-	Querier
+	Selectable
 	TableLike
 }
 
