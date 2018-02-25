@@ -1,6 +1,7 @@
 package cllct
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -65,16 +66,17 @@ func ApplyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error
 }
 
 type Queryable interface {
-	Query(query string, args ...interface{}) (*sql.Rows, error)
+	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 }
 
 type Runner struct {
+	ctx   context.Context
 	db    Queryable
 	query goql.QueryExpr
 }
 
-func NewRunner(db Queryable, query goql.QueryExpr) *Runner {
-	return &Runner{db, query}
+func NewRunner(ctx context.Context, db Queryable, query goql.QueryExpr) *Runner {
+	return &Runner{ctx, db, query}
 }
 
 func (r *Runner) Rows() (*sql.Rows, error) {
@@ -82,7 +84,7 @@ func (r *Runner) Rows() (*sql.Rows, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.db.Query(q.Query(), q.Args()...)
+	return r.db.QueryContext(r.ctx, q.Query(), q.Args()...)
 }
 
 func (r *Runner) First(collectors ...SingleCollector) error {
@@ -109,7 +111,7 @@ func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) error {
 		return err
 	}
 
-	rows, err := r.db.Query(q.Query(), q.Args()...)
+	rows, err := r.db.QueryContext(r.ctx, q.Query(), q.Args()...)
 	if err != nil {
 		return err
 	}

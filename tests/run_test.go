@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -33,7 +32,7 @@ func RunIntegrationTest(t *testing.T, dbName, connStr string) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	if err = db.Ping(); err != nil {
+	if err = db.DB.Ping(); err != nil {
 		t.Fatalf("failed to ping DB: %s", err)
 	}
 
@@ -67,7 +66,7 @@ func RunTestCases(t *testing.T, db *goq.DB, testCases []testCase) {
 }
 
 func RunTestCase(t *testing.T, c testCase, builder *Builder, db *goq.DB) {
-	tx, err := db.BeginTx(context.Background(), nil)
+	tx, err := db.Begin()
 	if err != nil {
 		t.Fatal(err)
 	}

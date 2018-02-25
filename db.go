@@ -29,7 +29,7 @@ func Open(driver, source string) (*DB, error) {
 // DB is a database handle which wraps *sql.DB.
 // You can use Goq's query to access a DB instead of raw string SQL.
 type DB struct {
-	*sql.DB
+	DB      *sql.DB
 	dialect dialect.Dialect
 }
 
@@ -41,6 +41,10 @@ func (d *DB) Dialect() dialect.Dialect {
 	return d.dialect
 }
 
+func (d *DB) Begin() (*Tx, error) {
+	return d.BeginTx(context.Background(), nil)
+}
+
 func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
 	tx, err := d.DB.BeginTx(ctx, opts)
 	if err != nil {
@@ -50,15 +54,23 @@ func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
 }
 
 func (d *DB) Query(query goql.QueryExpr) *cllct.Runner {
-	return cllct.NewRunner(d.DB, query)
+	return d.QueryContext(context.Background(), query)
+}
+
+func (d *DB) QueryContext(ctx context.Context, query goql.QueryExpr) *cllct.Runner {
+	return cllct.NewRunner(ctx, d.DB, query)
 }
 
 func (d *DB) Exec(query goql.QueryRoot) (sql.Result, error) {
+	return d.ExecContext(context.Background(), query)
+}
+
+func (d *DB) ExecContext(ctx context.Context, query goql.QueryRoot) (sql.Result, error) {
 	q, err := query.Construct()
 	if err != nil {
 		return nil, err
 	}
-	return d.DB.Exec(q.Query(), q.Args()...)
+	return d.DB.ExecContext(ctx, q.Query(), q.Args()...)
 }
 
 // Tx is an in-progress database transaction which wraps *sql.Tx.
@@ -68,7 +80,7 @@ type Tx struct {
 }
 
 func (tx *Tx) Query(query goql.QueryExpr) *cllct.Runner {
-	return cllct.NewRunner(tx.Tx, query)
+	return cllct.NewRunner(context.Background(), tx.Tx, query)
 }
 
 func (tx *Tx) Exec(query goql.QueryRoot) (sql.Result, error) {
