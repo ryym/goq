@@ -103,6 +103,12 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{"a"},
 		},
 		{
+			// An alias is ignored.
+			goql: z.Var(1).Add(z.Var(3).As("foo")),
+			sql:  "$1 + $2",
+			args: []interface{}{1, 3},
+		},
+		{
 			goql: z.And(
 				ID.Eq(1),
 				z.Or(ID.Lte(3), z.Var(1).Gt(ID)),

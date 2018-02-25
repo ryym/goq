@@ -1,11 +1,14 @@
 package goql
 
 func lift(v interface{}) Expr {
-	exp, ok := v.(Expr)
-	if ok {
-		return exp
+	switch val := v.(type) {
+	case Expr:
+		return val
+	case *aliased:
+		return val.exp
+	default:
+		return (&litExpr{val: val}).init()
 	}
-	return (&litExpr{val: v}).init()
 }
 
 type ops struct {
