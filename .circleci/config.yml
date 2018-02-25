@@ -10,7 +10,7 @@ jobs:
         environment:
           POSTGRES_USER: goq
           POSTGRES_DB: goq
-      - image: circleci/mysql:8.0
+      - image: circleci/mysql:8.0.3
         environment:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: goq

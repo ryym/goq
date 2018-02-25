@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_USER=goq
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.3
     ports:
       - '3307:3306'
     environment:
