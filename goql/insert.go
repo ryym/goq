@@ -52,10 +52,10 @@ type Insert struct {
 	ctx      DBContext
 }
 
-func (ins *Insert) Construct() Query {
+func (ins *Insert) Construct() (Query, error) {
 	q := Query{}
 	ins.Apply(&q, ins.ctx)
-	return q
+	return q, q.Err()
 }
 
 func (ins *Insert) Apply(q *Query, ctx DBContext) {

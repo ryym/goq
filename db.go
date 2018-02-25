@@ -54,8 +54,8 @@ func (d *DB) Query(query goql.QueryExpr) *cllct.Runner {
 }
 
 func (d *DB) Exec(query goql.QueryRoot) (sql.Result, error) {
-	q := query.Construct()
-	if err := q.Err(); err != nil {
+	q, err := query.Construct()
+	if err != nil {
 		return nil, err
 	}
 	return d.DB.Exec(q.Query(), q.Args()...)
@@ -72,8 +72,8 @@ func (tx *Tx) Query(query goql.QueryExpr) *cllct.Runner {
 }
 
 func (tx *Tx) Exec(query goql.QueryRoot) (sql.Result, error) {
-	q := query.Construct()
-	if err := q.Err(); err != nil {
+	q, err := query.Construct()
+	if err != nil {
 		return nil, err
 	}
 	return tx.Tx.Exec(q.Query(), q.Args()...)

@@ -26,10 +26,10 @@ func (qe *queryExpr) init() *queryExpr {
 
 func (qe *queryExpr) Selection() Selection { return Selection{} }
 
-func (qe *queryExpr) Construct() Query {
+func (qe *queryExpr) Construct() (Query, error) {
 	q := Query{}
 	qe.Apply(&q, qe.ctx)
-	return q
+	return q, q.Err()
 }
 
 func (qe *queryExpr) Apply(q *Query, ctx DBContext) {

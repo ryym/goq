@@ -70,10 +70,10 @@ func (upd *Update) Where(preds ...PredExpr) *Update {
 	return upd
 }
 
-func (upd *Update) Construct() Query {
+func (upd *Update) Construct() (Query, error) {
 	q := Query{}
 	upd.Apply(&q, upd.ctx)
-	return q
+	return q, q.Err()
 }
 
 func (upd *Update) Apply(q *Query, ctx DBContext) {

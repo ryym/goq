@@ -79,7 +79,7 @@ type SchemaTable interface {
 }
 
 type QueryRoot interface {
-	Construct() Query
+	Construct() (Query, error)
 }
 
 type QueryExpr interface {

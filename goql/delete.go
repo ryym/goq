@@ -6,10 +6,10 @@ type Delete struct {
 	ctx   DBContext
 }
 
-func (dlt *Delete) Construct() Query {
+func (dlt *Delete) Construct() (Query, error) {
 	q := Query{}
 	dlt.Apply(&q, dlt.ctx)
-	return q
+	return q, q.Err()
 }
 
 func (dlt *Delete) Where(preds ...PredExpr) *Delete {
