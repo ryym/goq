@@ -26,7 +26,7 @@ func New(driver string) Dialect {
 
 type generic struct{}
 
-func Generic() *generic {
+func Generic() Dialect {
 	return &generic{}
 }
 
@@ -39,10 +39,6 @@ func (dl *generic) QuoteIdent(v string) string {
 }
 
 type postgres struct{}
-
-func Postgres() *postgres {
-	return &postgres{}
-}
 
 func (dl *postgres) Placeholder(typ string, prevArgs []interface{}) string {
 	ph := fmt.Sprintf("$%d", len(prevArgs)+1)
@@ -58,10 +54,6 @@ func (dl *postgres) QuoteIdent(v string) string {
 
 type mysql struct{}
 
-func MySQL() *mysql {
-	return &mysql{}
-}
-
 func (dl *mysql) Placeholder(typ string, prevArgs []interface{}) string {
 	return "?"
 }
@@ -71,10 +63,6 @@ func (dl *mysql) QuoteIdent(v string) string {
 }
 
 type sqlite struct{}
-
-func SQLite() *sqlite {
-	return &sqlite{}
-}
 
 func (dl *sqlite) Placeholder(typ string, prevArgs []interface{}) string {
 	return "?"
