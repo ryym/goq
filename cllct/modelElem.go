@@ -16,7 +16,7 @@ type ModelElemCollector struct {
 
 func (cl *ModelElemCollector) ImplSingleCollector() {}
 
-func (cl *ModelElemCollector) Init(conf *InitConf) (bool, error) {
+func (cl *ModelElemCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Struct); err != nil {
 		return false, err
 	}
@@ -38,7 +38,7 @@ func (cl *ModelElemCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelElemCollector) AfterInit(conf *InitConf) error {
+func (cl *ModelElemCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

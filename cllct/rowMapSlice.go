@@ -12,7 +12,7 @@ type RowMapSliceCollector struct {
 
 func (cl *RowMapSliceCollector) ImplListCollector() {}
 
-func (cl *RowMapSliceCollector) Init(conf *InitConf) (bool, error) {
+func (cl *RowMapSliceCollector) Init(conf *initConf) (bool, error) {
 	cl.colNames = conf.ColNames
 	for i, _ := range conf.ColNames {
 		if conf.take(i) {
@@ -22,7 +22,7 @@ func (cl *RowMapSliceCollector) Init(conf *InitConf) (bool, error) {
 	return true, nil
 }
 
-func (cl *RowMapSliceCollector) AfterInit(conf *InitConf) error {
+func (cl *RowMapSliceCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

@@ -19,7 +19,7 @@ type ModelSliceCollector struct {
 
 func (cl *ModelSliceCollector) ImplListCollector() {}
 
-func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
+func (cl *ModelSliceCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
 		return false, err
 	}
@@ -47,7 +47,7 @@ func (cl *ModelSliceCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelSliceCollector) AfterInit(conf *InitConf) error {
+func (cl *ModelSliceCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

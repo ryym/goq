@@ -22,7 +22,7 @@ type ModelSliceMapCollector struct {
 
 func (cl *ModelSliceMapCollector) ImplListCollector() {}
 
-func (cl *ModelSliceMapCollector) Init(conf *InitConf) (bool, error) {
+func (cl *ModelSliceMapCollector) Init(conf *initConf) (bool, error) {
 	if err := checkSliceMapPtrKind(cl.ptr); err != nil {
 		return false, err
 	}
@@ -64,7 +64,7 @@ func (cl *ModelSliceMapCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelSliceMapCollector) AfterInit(conf *InitConf) error {
+func (cl *ModelSliceMapCollector) AfterInit(conf *initConf) error {
 	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
 		return errors.New(mapKeyNotSelectedErrMsg)
 	}

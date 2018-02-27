@@ -12,7 +12,7 @@ type RowMapCollector struct {
 
 func (cl *RowMapCollector) ImplSingleCollector() {}
 
-func (cl *RowMapCollector) Init(conf *InitConf) (bool, error) {
+func (cl *RowMapCollector) Init(conf *initConf) (bool, error) {
 	cl.colNames = conf.ColNames
 	for i, _ := range conf.ColNames {
 		if conf.take(i) {
@@ -22,7 +22,7 @@ func (cl *RowMapCollector) Init(conf *InitConf) (bool, error) {
 	return true, nil
 }
 
-func (cl *RowMapCollector) AfterInit(conf *InitConf) error {
+func (cl *RowMapCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

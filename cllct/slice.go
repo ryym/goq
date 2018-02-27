@@ -16,7 +16,7 @@ type SliceCollector struct {
 
 func (cl *SliceCollector) ImplListCollector() {}
 
-func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
+func (cl *SliceCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
 		return false, err
 	}
@@ -44,7 +44,7 @@ func (cl *SliceCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *SliceCollector) AfterInit(conf *InitConf) error {
+func (cl *SliceCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

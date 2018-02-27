@@ -21,7 +21,7 @@ type MapCollector struct {
 
 func (cl *MapCollector) ImplListCollector() {}
 
-func (cl *MapCollector) Init(conf *InitConf) (bool, error) {
+func (cl *MapCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Map); err != nil {
 		return false, err
 	}
@@ -64,7 +64,7 @@ func (cl *MapCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *MapCollector) AfterInit(conf *InitConf) error {
+func (cl *MapCollector) AfterInit(conf *initConf) error {
 	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
 		return errors.New(mapKeyNotSelectedErrMsg)
 	}

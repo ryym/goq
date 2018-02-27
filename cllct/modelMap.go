@@ -21,7 +21,7 @@ type ModelMapCollector struct {
 
 func (cl *ModelMapCollector) ImplListCollector() {}
 
-func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
+func (cl *ModelMapCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Map); err != nil {
 		return false, err
 	}
@@ -69,7 +69,7 @@ func (cl *ModelMapCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelMapCollector) AfterInit(conf *InitConf) error {
+func (cl *ModelMapCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

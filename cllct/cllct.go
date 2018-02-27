@@ -5,17 +5,17 @@ package cllct
 
 import "github.com/ryym/goq/goql"
 
-type InitConf struct {
+type initConf struct {
 	Selects  []goql.Selection
 	ColNames []string
 	takens   map[int]bool
 }
 
-func NewInitConf(selects []goql.Selection, colNames []string) *InitConf {
-	return &InitConf{selects, colNames, map[int]bool{}}
+func NewInitConf(selects []goql.Selection, colNames []string) *initConf {
+	return &initConf{selects, colNames, map[int]bool{}}
 }
 
-func (c *InitConf) take(colIdx int) bool {
+func (c *initConf) take(colIdx int) bool {
 	ok := c.takens[colIdx]
 	if !ok {
 		c.takens[colIdx] = true
@@ -23,13 +23,13 @@ func (c *InitConf) take(colIdx int) bool {
 	return !ok
 }
 
-func (c *InitConf) canTake(colIdx int) bool {
+func (c *initConf) canTake(colIdx int) bool {
 	return !c.takens[colIdx]
 }
 
 type Collector interface {
-	Init(conf *InitConf) (collectable bool, err error)
-	AfterInit(conf *InitConf) error
+	Init(conf *initConf) (collectable bool, err error)
+	AfterInit(conf *initConf) error
 	Next(ptrs []interface{})
 	AfterScan(ptrs []interface{})
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
-func InitCollectors(collectors []Collector, initConf *InitConf) ([]Collector, error) {
+func InitCollectors(collectors []Collector, initConf *initConf) ([]Collector, error) {
 	clls := make([]Collector, 0, len(collectors))
 	for i, cl := range collectors {
 		ok, err := cl.Init(initConf)
@@ -37,7 +37,7 @@ func InitCollectors(collectors []Collector, initConf *InitConf) ([]Collector, er
 	return clls, nil
 }
 
-func FillUntakenCols(ptrs []interface{}, conf *InitConf) {
+func fillUntakenCols(ptrs []interface{}, conf *initConf) {
 	// Rows.Scan stops scanning when it encounters a nil pointer
 	// in the given pointers and all subsequent pointers are ignored.
 	// We need to pass a dummy pointer to prevent this.
@@ -138,7 +138,47 @@ func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) error {
 	}
 
 	ptrs := make([]interface{}, len(colNames))
-	FillUntakenCols(ptrs, initConf)
+	fillUntakenCols(ptrs, initConf)
 
 	return ApplyCollectors(rows, ptrs, clls)
+}
+
+// ExecCollectorsForTest executes given collectors for
+// given rows and selects.
+// This is used for internal tests and not intended to
+// be used for other purposes.
+func ExecCollectorsForTest(
+	cllcts []Collector,
+	rows [][]interface{},
+	selects []goql.Selection,
+	colNames []string,
+) error {
+	if selects == nil {
+		selects = make([]goql.Selection, len(colNames))
+	} else {
+		colNames = make([]string, len(selects))
+	}
+
+	initConf := NewInitConf(selects, colNames)
+	cllcts, err := InitCollectors(cllcts, initConf)
+	if err != nil {
+		return err
+	}
+
+	for _, row := range rows {
+		ptrs := make([]interface{}, len(selects))
+		for _, cl := range cllcts {
+			cl.Next(ptrs)
+		}
+		for i, p := range ptrs {
+			if p != nil {
+				reflect.ValueOf(p).Elem().Set(reflect.ValueOf(row[i]))
+			}
+		}
+		for _, cl := range cllcts {
+			cl.AfterScan(ptrs)
+		}
+	}
+
+	return nil
 }

@@ -14,7 +14,7 @@ type ElemCollector struct {
 
 func (cl *ElemCollector) ImplSingleCollector() {}
 
-func (cl *ElemCollector) Init(conf *InitConf) (bool, error) {
+func (cl *ElemCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Struct); err != nil {
 		return false, err
 	}
@@ -40,7 +40,7 @@ func (cl *ElemCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ElemCollector) AfterInit(conf *InitConf) error {
+func (cl *ElemCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 

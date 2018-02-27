@@ -23,7 +23,7 @@ type ModelUniqSliceCollector struct {
 
 func (cl *ModelUniqSliceCollector) ImplListCollector() {}
 
-func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
+func (cl *ModelUniqSliceCollector) Init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
 		return false, err
 	}
@@ -72,7 +72,7 @@ func (cl *ModelUniqSliceCollector) Init(conf *InitConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelUniqSliceCollector) AfterInit(conf *InitConf) error {
+func (cl *ModelUniqSliceCollector) AfterInit(conf *initConf) error {
 	return nil
 }
 
