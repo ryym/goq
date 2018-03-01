@@ -37,6 +37,9 @@ func (d *DB) Close() error {
 	return d.DB.Close()
 }
 
+// Dialect returns a dialect.Dialect for this DB.
+// If this DB is not supported primarily, the dialect
+// will be the generic one.
 func (d *DB) Dialect() dialect.Dialect {
 	return d.dialect
 }

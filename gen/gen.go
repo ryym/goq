@@ -50,6 +50,8 @@ type field struct {
 	Tag    columnTag
 }
 
+// GenerateCustomBuilders generates a file which declares
+// a custom query builder.
 func GenerateCustomBuilders(opts Opts) error {
 	conf := loader.Config{}
 	if opts.IsTestFile {

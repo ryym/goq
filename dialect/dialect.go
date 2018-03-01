@@ -12,6 +12,9 @@ type Dialect interface {
 	QuoteIdent(v string) string
 }
 
+// New returns a dialect for the given driver.
+// It supports "postgres", "mysql", and "sqlite3".
+// It returns nil if you pass an unknown driver name.
 func New(driver string) Dialect {
 	switch driver {
 	case "postgres":
@@ -26,6 +29,8 @@ func New(driver string) Dialect {
 
 type generic struct{}
 
+// Generic returns a generic dialect.
+// Queries constructed by this dialect should work with most databases.
 func Generic() Dialect {
 	return &generic{}
 }

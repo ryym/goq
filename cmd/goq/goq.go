@@ -1,3 +1,7 @@
+/*
+Goq generate a custom query builder containing table helpers for your models.
+See [TODO] for the usage details.
+*/
 package main
 
 import (

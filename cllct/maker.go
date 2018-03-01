@@ -6,8 +6,10 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// CollectorMaker provides methods to make generic collectors.
 type CollectorMaker struct{}
 
+// NewMaker creates a new CollectorMaker.
 func NewMaker() *CollectorMaker {
 	return &CollectorMaker{}
 }
