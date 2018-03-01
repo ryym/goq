@@ -16,7 +16,7 @@ type SliceCollector struct {
 
 func (cl *SliceCollector) ImplListCollector() {}
 
-func (cl *SliceCollector) Init(conf *initConf) (bool, error) {
+func (cl *SliceCollector) init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
 		return false, err
 	}
@@ -44,11 +44,11 @@ func (cl *SliceCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *SliceCollector) AfterInit(conf *initConf) error {
+func (cl *SliceCollector) afterinit(conf *initConf) error {
 	return nil
 }
 
-func (cl *SliceCollector) Next(ptrs []interface{}) {
+func (cl *SliceCollector) next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()
 	for c, f := range cl.colToFld {
@@ -56,6 +56,6 @@ func (cl *SliceCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *SliceCollector) AfterScan(_ptrs []interface{}) {
+func (cl *SliceCollector) afterScan(_ptrs []interface{}) {
 	cl.slice.Set(reflect.Append(cl.slice, cl.row.Elem()))
 }

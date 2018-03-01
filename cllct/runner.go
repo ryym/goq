@@ -13,7 +13,7 @@ import (
 func InitCollectors(collectors []Collector, initConf *initConf) ([]Collector, error) {
 	clls := make([]Collector, 0, len(collectors))
 	for i, cl := range collectors {
-		ok, err := cl.Init(initConf)
+		ok, err := cl.init(initConf)
 		if err != nil {
 			return nil, errors.Wrapf(
 				err, "failed to initialize collectors[%d] (%s)",
@@ -26,7 +26,7 @@ func InitCollectors(collectors []Collector, initConf *initConf) ([]Collector, er
 	}
 
 	for i, cl := range clls {
-		err := cl.AfterInit(initConf)
+		err := cl.afterinit(initConf)
 		if err != nil {
 			return nil, errors.Wrapf(
 				err, "failed to initialize collectors[%d] (%s)",
@@ -52,13 +52,13 @@ func fillUntakenCols(ptrs []interface{}, conf *initConf) {
 func ApplyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error {
 	for rows.Next() {
 		for _, cl := range clls {
-			cl.Next(ptrs)
+			cl.next(ptrs)
 		}
 
 		rows.Scan(ptrs...)
 
 		for _, cl := range clls {
-			cl.AfterScan(ptrs)
+			cl.afterScan(ptrs)
 		}
 	}
 
@@ -168,7 +168,7 @@ func ExecCollectorsForTest(
 	for _, row := range rows {
 		ptrs := make([]interface{}, len(selects))
 		for _, cl := range cllcts {
-			cl.Next(ptrs)
+			cl.next(ptrs)
 		}
 		for i, p := range ptrs {
 			if p != nil {
@@ -176,7 +176,7 @@ func ExecCollectorsForTest(
 			}
 		}
 		for _, cl := range cllcts {
-			cl.AfterScan(ptrs)
+			cl.afterScan(ptrs)
 		}
 	}
 

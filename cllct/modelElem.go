@@ -16,7 +16,7 @@ type ModelElemCollector struct {
 
 func (cl *ModelElemCollector) ImplSingleCollector() {}
 
-func (cl *ModelElemCollector) Init(conf *initConf) (bool, error) {
+func (cl *ModelElemCollector) init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Struct); err != nil {
 		return false, err
 	}
@@ -38,14 +38,14 @@ func (cl *ModelElemCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelElemCollector) AfterInit(conf *initConf) error {
+func (cl *ModelElemCollector) afterinit(conf *initConf) error {
 	return nil
 }
 
-func (cl *ModelElemCollector) Next(ptrs []interface{}) {
+func (cl *ModelElemCollector) next(ptrs []interface{}) {
 	for c, f := range cl.colToFld {
 		ptrs[c] = cl.elem.Field(f).Addr().Interface()
 	}
 }
 
-func (cl *ModelElemCollector) AfterScan(_ptrs []interface{}) {}
+func (cl *ModelElemCollector) afterScan(_ptrs []interface{}) {}

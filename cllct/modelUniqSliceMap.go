@@ -26,7 +26,7 @@ type ModelUniqSliceMapCollector struct {
 
 func (cl *ModelUniqSliceMapCollector) ImplListCollector() {}
 
-func (cl *ModelUniqSliceMapCollector) Init(conf *initConf) (bool, error) {
+func (cl *ModelUniqSliceMapCollector) init(conf *initConf) (bool, error) {
 	if err := checkSliceMapPtrKind(cl.ptr); err != nil {
 		return false, err
 	}
@@ -78,14 +78,14 @@ func (cl *ModelUniqSliceMapCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelUniqSliceMapCollector) AfterInit(conf *initConf) error {
+func (cl *ModelUniqSliceMapCollector) afterinit(conf *initConf) error {
 	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
 		return errors.New(mapKeyNotSelectedErrMsg)
 	}
 	return nil
 }
 
-func (cl *ModelUniqSliceMapCollector) Next(ptrs []interface{}) {
+func (cl *ModelUniqSliceMapCollector) next(ptrs []interface{}) {
 	for c, f := range cl.colToFld {
 		ptrs[c] = cl.elem.Field(f).Addr().Interface()
 	}
@@ -94,7 +94,7 @@ func (cl *ModelUniqSliceMapCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *ModelUniqSliceMapCollector) AfterScan(ptrs []interface{}) {
+func (cl *ModelUniqSliceMapCollector) afterScan(ptrs []interface{}) {
 	pk := reflect.ValueOf(ptrs[cl.pkIdx]).Elem().Interface()
 	if cl.pks[pk] {
 		return

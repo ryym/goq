@@ -19,7 +19,7 @@ type ModelSliceCollector struct {
 
 func (cl *ModelSliceCollector) ImplListCollector() {}
 
-func (cl *ModelSliceCollector) Init(conf *initConf) (bool, error) {
+func (cl *ModelSliceCollector) init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
 		return false, err
 	}
@@ -47,11 +47,11 @@ func (cl *ModelSliceCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelSliceCollector) AfterInit(conf *initConf) error {
+func (cl *ModelSliceCollector) afterinit(conf *initConf) error {
 	return nil
 }
 
-func (cl *ModelSliceCollector) Next(ptrs []interface{}) {
+func (cl *ModelSliceCollector) next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()
 	for c, f := range cl.colToFld {
@@ -59,6 +59,6 @@ func (cl *ModelSliceCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *ModelSliceCollector) AfterScan(_ptrs []interface{}) {
+func (cl *ModelSliceCollector) afterScan(_ptrs []interface{}) {
 	cl.slice.Set(reflect.Append(cl.slice, cl.row.Elem()))
 }

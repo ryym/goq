@@ -21,7 +21,7 @@ type SliceMapCollector struct {
 
 func (cl *SliceMapCollector) ImplListCollector() {}
 
-func (cl *SliceMapCollector) Init(conf *initConf) (bool, error) {
+func (cl *SliceMapCollector) init(conf *initConf) (bool, error) {
 	if err := checkSliceMapPtrKind(cl.ptr); err != nil {
 		return false, err
 	}
@@ -63,14 +63,14 @@ func (cl *SliceMapCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *SliceMapCollector) AfterInit(conf *initConf) error {
+func (cl *SliceMapCollector) afterinit(conf *initConf) error {
 	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
 		return errors.New(mapKeyNotSelectedErrMsg)
 	}
 	return nil
 }
 
-func (cl *SliceMapCollector) Next(ptrs []interface{}) {
+func (cl *SliceMapCollector) next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()
 	for c, f := range cl.colToFld {
@@ -81,7 +81,7 @@ func (cl *SliceMapCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *SliceMapCollector) AfterScan(ptrs []interface{}) {
+func (cl *SliceMapCollector) afterScan(ptrs []interface{}) {
 	key := reflect.ValueOf(ptrs[cl.keyIdx]).Elem()
 	slice := cl.mp.MapIndex(key)
 	if !slice.IsValid() {

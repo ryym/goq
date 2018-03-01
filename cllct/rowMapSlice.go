@@ -12,7 +12,7 @@ type RowMapSliceCollector struct {
 
 func (cl *RowMapSliceCollector) ImplListCollector() {}
 
-func (cl *RowMapSliceCollector) Init(conf *initConf) (bool, error) {
+func (cl *RowMapSliceCollector) init(conf *initConf) (bool, error) {
 	cl.colNames = conf.ColNames
 	for i, _ := range conf.ColNames {
 		if conf.take(i) {
@@ -22,17 +22,17 @@ func (cl *RowMapSliceCollector) Init(conf *initConf) (bool, error) {
 	return true, nil
 }
 
-func (cl *RowMapSliceCollector) AfterInit(conf *initConf) error {
+func (cl *RowMapSliceCollector) afterinit(conf *initConf) error {
 	return nil
 }
 
-func (cl *RowMapSliceCollector) Next(ptrs []interface{}) {
+func (cl *RowMapSliceCollector) next(ptrs []interface{}) {
 	for _, i := range cl.targets {
 		ptrs[i] = new(interface{})
 	}
 }
 
-func (cl *RowMapSliceCollector) AfterScan(ptrs []interface{}) {
+func (cl *RowMapSliceCollector) afterScan(ptrs []interface{}) {
 	row := make(map[string]interface{}, len(ptrs))
 	for _, i := range cl.targets {
 		row[cl.colNames[i]] = reflect.ValueOf(ptrs[i]).Elem().Interface()

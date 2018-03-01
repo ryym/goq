@@ -85,10 +85,10 @@ func (c *initConf) canTake(colIdx int) bool {
 }
 
 type Collector interface {
-	Init(conf *initConf) (collectable bool, err error)
-	AfterInit(conf *initConf) error
-	Next(ptrs []interface{})
-	AfterScan(ptrs []interface{})
+	next(ptrs []interface{})
+	init(conf *initConf) (collectable bool, err error)
+	afterScan(ptrs []interface{})
+	afterinit(conf *initConf) error
 }
 
 // ListCollector collects rows into a collection data.

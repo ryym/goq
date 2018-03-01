@@ -21,7 +21,7 @@ type MapCollector struct {
 
 func (cl *MapCollector) ImplListCollector() {}
 
-func (cl *MapCollector) Init(conf *initConf) (bool, error) {
+func (cl *MapCollector) init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Map); err != nil {
 		return false, err
 	}
@@ -64,14 +64,14 @@ func (cl *MapCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *MapCollector) AfterInit(conf *initConf) error {
+func (cl *MapCollector) afterinit(conf *initConf) error {
 	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
 		return errors.New(mapKeyNotSelectedErrMsg)
 	}
 	return nil
 }
 
-func (cl *MapCollector) Next(ptrs []interface{}) {
+func (cl *MapCollector) next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()
 	for c, f := range cl.colToFld {
@@ -82,7 +82,7 @@ func (cl *MapCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *MapCollector) AfterScan(ptrs []interface{}) {
+func (cl *MapCollector) afterScan(ptrs []interface{}) {
 	key := reflect.ValueOf(ptrs[cl.keyIdx]).Elem()
 	cl.mp.SetMapIndex(key, cl.row.Elem())
 }

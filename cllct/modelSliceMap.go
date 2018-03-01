@@ -22,7 +22,7 @@ type ModelSliceMapCollector struct {
 
 func (cl *ModelSliceMapCollector) ImplListCollector() {}
 
-func (cl *ModelSliceMapCollector) Init(conf *initConf) (bool, error) {
+func (cl *ModelSliceMapCollector) init(conf *initConf) (bool, error) {
 	if err := checkSliceMapPtrKind(cl.ptr); err != nil {
 		return false, err
 	}
@@ -64,14 +64,14 @@ func (cl *ModelSliceMapCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelSliceMapCollector) AfterInit(conf *initConf) error {
+func (cl *ModelSliceMapCollector) afterinit(conf *initConf) error {
 	if conf.canTake(cl.keyIdx) && !cl.keyStore.IsValid() {
 		return errors.New(mapKeyNotSelectedErrMsg)
 	}
 	return nil
 }
 
-func (cl *ModelSliceMapCollector) Next(ptrs []interface{}) {
+func (cl *ModelSliceMapCollector) next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()
 	for c, f := range cl.colToFld {
@@ -82,7 +82,7 @@ func (cl *ModelSliceMapCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *ModelSliceMapCollector) AfterScan(ptrs []interface{}) {
+func (cl *ModelSliceMapCollector) afterScan(ptrs []interface{}) {
 	key := reflect.ValueOf(ptrs[cl.keyIdx]).Elem()
 	slice := cl.mp.MapIndex(key)
 	if !slice.IsValid() {

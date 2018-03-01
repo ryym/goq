@@ -23,7 +23,7 @@ type ModelUniqSliceCollector struct {
 
 func (cl *ModelUniqSliceCollector) ImplListCollector() {}
 
-func (cl *ModelUniqSliceCollector) Init(conf *initConf) (bool, error) {
+func (cl *ModelUniqSliceCollector) init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Slice); err != nil {
 		return false, err
 	}
@@ -72,17 +72,17 @@ func (cl *ModelUniqSliceCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelUniqSliceCollector) AfterInit(conf *initConf) error {
+func (cl *ModelUniqSliceCollector) afterinit(conf *initConf) error {
 	return nil
 }
 
-func (cl *ModelUniqSliceCollector) Next(ptrs []interface{}) {
+func (cl *ModelUniqSliceCollector) next(ptrs []interface{}) {
 	for c, f := range cl.colToFld {
 		ptrs[c] = cl.elem.Field(f).Addr().Interface()
 	}
 }
 
-func (cl *ModelUniqSliceCollector) AfterScan(ptrs []interface{}) {
+func (cl *ModelUniqSliceCollector) afterScan(ptrs []interface{}) {
 	pk := reflect.ValueOf(ptrs[cl.pkIdx]).Elem().Interface()
 	if cl.pks[pk] {
 		return

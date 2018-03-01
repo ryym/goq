@@ -21,7 +21,7 @@ type ModelMapCollector struct {
 
 func (cl *ModelMapCollector) ImplListCollector() {}
 
-func (cl *ModelMapCollector) Init(conf *initConf) (bool, error) {
+func (cl *ModelMapCollector) init(conf *initConf) (bool, error) {
 	if err := checkPtrKind(cl.ptr, reflect.Map); err != nil {
 		return false, err
 	}
@@ -69,11 +69,11 @@ func (cl *ModelMapCollector) Init(conf *initConf) (bool, error) {
 	return len(cl.colToFld) > 0, nil
 }
 
-func (cl *ModelMapCollector) AfterInit(conf *initConf) error {
+func (cl *ModelMapCollector) afterinit(conf *initConf) error {
 	return nil
 }
 
-func (cl *ModelMapCollector) Next(ptrs []interface{}) {
+func (cl *ModelMapCollector) next(ptrs []interface{}) {
 	row := reflect.New(cl.elemType).Elem()
 	cl.row = row.Addr()
 	for c, f := range cl.colToFld {
@@ -81,7 +81,7 @@ func (cl *ModelMapCollector) Next(ptrs []interface{}) {
 	}
 }
 
-func (cl *ModelMapCollector) AfterScan(ptrs []interface{}) {
+func (cl *ModelMapCollector) afterScan(ptrs []interface{}) {
 	key := reflect.ValueOf(ptrs[cl.keyIdx]).Elem()
 	cl.mp.SetMapIndex(key, cl.row.Elem())
 }
