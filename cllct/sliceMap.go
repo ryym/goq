@@ -8,6 +8,19 @@ import (
 	"github.com/ryym/goq/util"
 )
 
+// SliceMapCollector collects rows into a map of slices.
+//
+// Example:
+//
+//	map[string][]IDs{
+//		"Japan": []IDs{
+//			{ CountryID: 1, CityID: 3 },
+//			{ CountryID: 1, CityID: 8 },
+//		},
+//		"Somewhere": []IDs{
+//			{ CountryID: 2, CityID: 55 },
+//		},
+//	}
 type SliceMapCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int

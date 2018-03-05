@@ -6,6 +6,7 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// ElemCollector scans a first row into a model struct.
 type ModelElemCollector struct {
 	cols     []*goql.Column
 	table    tableInfo

@@ -8,6 +8,22 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// ModelUniqSliceMapCollector collects rows into a map of slices.
+// Each slice has uniq model structs.
+// The uniqueness of a model is determined by its primary key.
+//
+// Example:
+//
+//	map[string][]City{
+//		"Japan": []City{
+//			{ ID: 12, Name: "Osaka" },
+//			{ ID: 29, Name: "Sapporo" },
+//		},
+//		"Somewhere": []City{
+//			{ ID: 242, Name: "Foo" },
+//			{ ID: 85, Name: "Bar" },
+//		},
+//	}
 type ModelUniqSliceMapCollector struct {
 	elemType    reflect.Type
 	cols        []*goql.Column

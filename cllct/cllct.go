@@ -55,6 +55,10 @@ You need to pass them to Collect and First methods, respectively.
 	db.Query(q).Collect(z.Users.ToSlice(&users))
 	db.Query(q).First(z.Users.ToElem(&user))
 
+Note that we often use 'z' as a variable name of Goq query builder in example code.
+This name has no special meanings. We use it just because
+this character rarely duplicates with other common variable names
+and is easy to identify.
 */
 package cllct
 
@@ -84,6 +88,7 @@ func (c *initConf) canTake(colIdx int) bool {
 	return !c.takens[colIdx]
 }
 
+// Collector defines methods to collect query results.
 type Collector interface {
 	next(ptrs []interface{})
 	init(conf *initConf) (collectable bool, err error)
@@ -91,13 +96,15 @@ type Collector interface {
 	afterinit(conf *initConf) error
 }
 
-// ListCollector collects rows into a collection data.
+// ListCollector interface represents a collector which
+// collects rows into a collection data.
 type ListCollector interface {
 	Collector
 	ImplListCollector()
 }
 
-// SingleCollector collects a first row.
+// SingleCollector interface represents a collector which
+// scans a first row.
 type SingleCollector interface {
 	Collector
 	ImplSingleCollector()

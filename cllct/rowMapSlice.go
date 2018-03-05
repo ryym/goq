@@ -4,6 +4,15 @@ import (
 	"reflect"
 )
 
+// RowMapSliceCollector collects rows into a slice of maps.
+//
+//	[]map[string]interface{}{
+//		{ "user_id": 30, "name": "alice" },
+//		{ "user_id": 31, "name": "bob" },
+//	}
+//
+// But be careful, this collector collects values without any conversions.
+// See https://godoc.org/github.com/ryym/goq/cllct#RowMapCollector for details.
 type RowMapSliceCollector struct {
 	slice    *[]map[string]interface{}
 	colNames []string

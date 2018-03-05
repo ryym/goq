@@ -8,6 +8,14 @@ import (
 	"github.com/ryym/goq/util"
 )
 
+// MapCollector collects rows into a map of struct.
+//
+// Example:
+//
+//	map[int]JapanName{
+//		6: JapanName{ Name: "Yamada", Kanji: "山田" },
+//		43: JapanName{ Name: "Kato", Kanji: "加藤" },
+//	}
 type MapCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int

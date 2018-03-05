@@ -6,6 +6,7 @@ import (
 	"github.com/ryym/goq/util"
 )
 
+// ElemCollector scans a first row into an arbitrary struct.
 type ElemCollector struct {
 	colToFld map[int]int
 	ptr      interface{}

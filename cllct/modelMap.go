@@ -7,6 +7,8 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// ModelMapCollector collects rows into a map of models
+// whose key is a primary key.
 type ModelMapCollector struct {
 	elemType reflect.Type
 	cols     []*goql.Column

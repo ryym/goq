@@ -6,6 +6,14 @@ import (
 	"github.com/ryym/goq/util"
 )
 
+// SliceCollector collects rows into a slice of structs.
+//
+// Example:
+//
+//	[]IDs{
+//		{ CountryID: 1, CityID: 3, AddressID: 18 },
+//		{ CountryID: 1, CityID: 5, AddressID: 224 },
+//	}
 type SliceCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int

@@ -7,6 +7,14 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// ModelSliceCollector collects rows into a slice of models.
+//
+// Example:
+//
+//	[]City{
+//		{ ID: 8, Name: "Osaka" },
+//		{ ID: 12, Name: "Kyoto" },
+//	}
 type ModelSliceCollector struct {
 	elemType reflect.Type
 	cols     []*goql.Column

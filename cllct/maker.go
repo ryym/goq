@@ -6,76 +6,146 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
-// CollectorMaker provides methods to make generic collectors.
+// CollectorMaker provides methods to create generic collectors.
 type CollectorMaker struct{}
 
-// NewMaker creates a new CollectorMaker.
 func NewMaker() *CollectorMaker {
 	return &CollectorMaker{}
 }
 
+// ToElem creates an ElemCollector.
+// It scans values into a given struct pointer.
 func (cm *CollectorMaker) ToElem(ptr interface{}) *ElemCollector {
 	return &ElemCollector{
 		ptr: ptr,
 	}
 }
 
+// ToSlice creates a SliceCollector.
+// It collects rows into a slice of structs.
+//
+//	db.Query(q).Collect(z.ToSlice(&items))
 func (cm *CollectorMaker) ToSlice(ptr interface{}) *SliceCollector {
 	return &SliceCollector{
 		ptr: ptr,
 	}
 }
 
-type mapCollectorMaker struct {
+// MapCollectorMaker creates a MapCollector with the given key column.
+//
+//	db.Query(q).Collect(z.ToMap(&mapOfStruct).By(z.Users.ID))
+//
+// Note that the key column specified by 'By' must be scanned into somewhere.
+// If you do not collect the key column, use 'ByWith' instead.
+// For example, consider this query and structs we will map results to.
+//
+//	query := z.Select(z.Users.ID, z.Users.GivenName, z.Users.FamilyName).From(z.Users)
+//
+// structs:
+//
+//	type names struct {
+//		GivenName  string
+//		FamilyName string
+//	}
+//
+//	type idAndNames struct {
+//		ID         int
+//		GivenName  string
+//		FamilyName string
+//	}
+//
+// Using 'idAndNames', you can collect results like this:
+//
+//	var mp map[int]idAndNames
+//	db.Query(query).Collect(z.ToMap(&mp).By(z.Users.ID))
+//
+// But if you use 'names' struct instead, the code below will panic.
+//
+//	var mp map[int]names
+//	db.Query(query).Collect(z.ToMap(&mp).By(z.Users.ID))
+//
+// This is because the 'z.Users.ID' does not be scanned to any field.
+// To collect results without its key field,
+// you must provide a pointer for the key by 'ByWith'.
+//
+//	var mp map[int]names
+//	var userIDStore int
+//	db.Query(query).Collect(z.ToMap(&mp).ByWith(&userIDStore, z.Users.ID))
+type MapCollectorMaker struct {
 	collector *MapCollector
 }
 
-func (m *mapCollectorMaker) By(key goql.Selectable) *MapCollector {
+func (m *MapCollectorMaker) By(key goql.Selectable) *MapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *mapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *MapCollector {
+func (m *MapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *MapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
 }
 
-func (cm *CollectorMaker) ToMap(ptr interface{}) *mapCollectorMaker {
-	return &mapCollectorMaker{&MapCollector{
+// ToMap creates a MapCollector maker.
+// To obtain a MapCollector, you need to specify a key using 'By' or 'ByWith'.
+//
+//	db.Query(q).Collect(z.ToMap(&mapOfStruct).By(z.Users.ID))
+//
+// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+func (cm *CollectorMaker) ToMap(ptr interface{}) *MapCollectorMaker {
+	return &MapCollectorMaker{&MapCollector{
 		ptr: ptr,
 	}}
 }
 
-type sliceMapCollector struct {
+// SliceMapCollectorMaker creates a SliceMapCollector with the given key column.
+// Note that the key column specified by 'By' must be scanned into somewhere.
+// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+type SliceMapCollectorMaker struct {
 	collector *SliceMapCollector
 }
 
-func (m *sliceMapCollector) By(key goql.Selectable) *SliceMapCollector {
+func (m *SliceMapCollectorMaker) By(key goql.Selectable) *SliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *sliceMapCollector) ByWith(ptr interface{}, key goql.Selectable) *SliceMapCollector {
+func (m *SliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *SliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
 }
 
-func (cm *CollectorMaker) ToSliceMap(ptr interface{}) *sliceMapCollector {
-	return &sliceMapCollector{&SliceMapCollector{
+// ToSliceMap creates a SliceMapCollectorMaker.
+// To obtain a SliceMapCollector, you need to specify a key using 'By' or 'ByWith'.
+//
+//	db.Query(q).Collect(z.ToSliceMap(&mapOfSlicesOfStruct).By(z.Users.ID))
+//
+// See https://godoc.org/github.com/ryym/goq/cllct#SliceMapCollectorMaker for details.
+func (cm *CollectorMaker) ToSliceMap(ptr interface{}) *SliceMapCollectorMaker {
+	return &SliceMapCollectorMaker{&SliceMapCollector{
 		ptr: ptr,
 	}}
 }
 
-func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMapSliceCollector {
-	return &RowMapSliceCollector{slice: slice}
-}
-
+// ToRowMap creates a RowMapCollector.
+//
+//	var row map[string]interface{}
+//	db.Query(q).Collect(z.ToRowMap(&row))
 func (cm *CollectorMaker) ToRowMap(mp *map[string]interface{}) *RowMapCollector {
 	return &RowMapCollector{mp: mp}
 }
 
+// ToRowMapSlice creates a RowMapSliceCollector.
+//
+//	var results []map[string]interface{}
+//	db.Query(q).Collect(z.ToRowMapSlice(&results))
+func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMapSliceCollector {
+	return &RowMapSliceCollector{slice: slice}
+}
+
+// ModelCollectorMaker provides methods to create model collectors.
+// All table helpers generated by Goq embeds this struct.
 type ModelCollectorMaker struct {
 	structName string
 	tableAlias string
@@ -94,6 +164,10 @@ func NewModelCollectorMaker(cols []*goql.Column, alias string) *ModelCollectorMa
 	}
 }
 
+// ToElem creates an ModelElemCollector.
+// It scans values into a given model pointer.
+//
+//	db.Query(q).First(z.Users.ToElem(&user))
 func (cm *ModelCollectorMaker) ToElem(ptr interface{}) *ModelElemCollector {
 	return &ModelElemCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
@@ -102,6 +176,10 @@ func (cm *ModelCollectorMaker) ToElem(ptr interface{}) *ModelElemCollector {
 	}
 }
 
+// ToSlice creates a ModelSliceCollector.
+// It collects rows into a slice of models.
+//
+//	db.Query(q).Collect(z.Users.ToSlice(&users))
 func (cm *ModelCollectorMaker) ToSlice(ptr interface{}) *ModelSliceCollector {
 	return &ModelSliceCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
@@ -110,6 +188,8 @@ func (cm *ModelCollectorMaker) ToSlice(ptr interface{}) *ModelSliceCollector {
 	}
 }
 
+// ToUniqSlice creates a ModelUniqSliceCollector.
+// It collects rows into a slice of models without duplication.
 func (cm *ModelCollectorMaker) ToUniqSlice(ptr interface{}) *ModelUniqSliceCollector {
 	pkFieldName := ""
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
@@ -123,6 +203,10 @@ func (cm *ModelCollectorMaker) ToUniqSlice(ptr interface{}) *ModelUniqSliceColle
 	}
 }
 
+// ToMap creates a ModelMapCollector.
+// It collects rows into a map of models whose key is a primary key.
+//
+//	db.Query(q).Collect(z.Users.ToMap(&usersMap))
 func (cm *ModelCollectorMaker) ToMap(ptr interface{}) *ModelMapCollector {
 	mapCllct := &ModelMapCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
@@ -136,67 +220,68 @@ func (cm *ModelCollectorMaker) ToMap(ptr interface{}) *ModelMapCollector {
 	return mapCllct
 }
 
-type modelSliceMapCollectorMaker struct {
+// ModelSliceMapCollectorMaker creates a ModelSliceMapCollector with the given key column.
+// Note that the key column specified by 'By' must be scanned into somewhere.
+// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+type ModelSliceMapCollectorMaker struct {
 	collector *ModelSliceMapCollector
 }
 
-func (m *modelSliceMapCollectorMaker) By(key goql.Selectable) *ModelSliceMapCollector {
+func (m *ModelSliceMapCollectorMaker) By(key goql.Selectable) *ModelSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-// Sometimes you need to provide a pointer to store each key value of the result map.
-// For example, the pattern A is OK because `Countries.ID` will be mapped to each Country model.
-// But the pattern B fails because there is no place each `Country.ID` is mapped to.
-// In this case, you need to use `ByWith` to provide a place for `Country.ID` mapping (pattern C).
-//
-// pattern A (GOOD):
-//     Collect(
-//         Countries.ToSlice(&countries),
-//         Cities.ToSliceMap(&cities).By(Countries.ID),
-//     )
-//
-// pattern B (BAD):
-//     Collect(Cities.ToSliceMap(&cities).By(Countries.ID))
-//
-// pattern C (GOOD):
-//     Collect(Cities.ToSliceMap(&cities).ByWith(&countryID, Countries.ID))
-func (m *modelSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelSliceMapCollector {
+func (m *ModelSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
 }
 
-func (cm *ModelCollectorMaker) ToSliceMap(ptr interface{}) *modelSliceMapCollectorMaker {
-	return &modelSliceMapCollectorMaker{&ModelSliceMapCollector{
+// ToSliceMap creates a ModelSliceMapCollectorMaker.
+// To obtain a ModelSliceMapCollector, you need to specify a key using 'By' or 'ByWith'.
+//
+//	db.Query(q).Collect(z.Cties.ToSliceMap(&mapOfCities).By(z.Cities.CountryID))
+//
+// See https://godoc.org/github.com/ryym/goq/cllct#ModelSliceMapCollectorMaker for details.
+func (cm *ModelCollectorMaker) ToSliceMap(ptr interface{}) *ModelSliceMapCollectorMaker {
+	return &ModelSliceMapCollectorMaker{&ModelSliceMapCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
 		ptr:   ptr,
 		cols:  cm.cols,
 	}}
 }
 
-type modelUniqSliceMapCollectorMaker struct {
+// ModelUniqSliceMapCollectorMaker creates a ModelUniqSliceMapCollector with the given key column.
+// Note that the key column specified by 'By' must be scanned into somewhere.
+// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+type ModelUniqSliceMapCollectorMaker struct {
 	collector *ModelUniqSliceMapCollector
 }
 
-func (m *modelUniqSliceMapCollectorMaker) By(key goql.Selectable) *ModelUniqSliceMapCollector {
+func (m *ModelUniqSliceMapCollectorMaker) By(key goql.Selectable) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-// See modelSliceMapCollectorMaker.ByWith
-func (m *modelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelUniqSliceMapCollector {
+func (m *ModelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
 }
 
-func (cm *ModelCollectorMaker) ToUniqSliceMap(ptr interface{}) *modelUniqSliceMapCollectorMaker {
+// ToUniqSliceMap creates a ModelUniqSliceMapCollectorMaker.
+// To obtain a ModelUniqSliceMapCollector, you need to specify a key using 'By' or 'ByWith'.
+//
+//	db.Query(q).Collect(z.Cities.ToUniqSliceMap(&mapOfUniqCities).By(z.Country.Name))
+//
+// See https://godoc.org/github.com/ryym/goq/cllct#ModelSliceMapCollectorMaker for details.
+func (cm *ModelCollectorMaker) ToUniqSliceMap(ptr interface{}) *ModelUniqSliceMapCollectorMaker {
 	pkFieldName := ""
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
 		pkFieldName = pkCol.FieldName()
 	}
-	return &modelUniqSliceMapCollectorMaker{&ModelUniqSliceMapCollector{
+	return &ModelUniqSliceMapCollectorMaker{&ModelUniqSliceMapCollector{
 		table:       tableInfo{cm.structName, cm.tableAlias},
 		pkFieldName: pkFieldName,
 		ptr:         ptr,

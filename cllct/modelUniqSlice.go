@@ -8,6 +8,17 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// ModelUniqSliceCollector collects rows into a slice of models uniquely.
+// The uniqueness of a model is determined by its primary key.
+// If the result rows contains multiple rows which have a same primary key,
+// ModelUniqSliceCollector scans the only first row.
+//
+// Example:
+//
+//	[]City{
+//		{ ID: 8, Name: "Osaka" },
+//		{ ID: 12, Name: "Kyoto" },
+//	}
 type ModelUniqSliceCollector struct {
 	elemType    reflect.Type
 	cols        []*goql.Column

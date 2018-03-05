@@ -7,6 +7,20 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// ModelSliceMapCollector collects rows into a map of slices.
+//
+// Example:
+//
+//	map[string][]City{
+//		"Japan": []City{
+//			{ ID: 12, Name: "Osaka" },
+//			{ ID: 29, Name: "Sapporo" },
+//		},
+//		"Somewhere": []City{
+//			{ ID: 242, Name: "Foo" },
+//			{ ID: 85, Name: "Bar" },
+//		},
+//	}
 type ModelSliceMapCollector struct {
 	elemType reflect.Type
 	cols     []*goql.Column

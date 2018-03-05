@@ -10,6 +10,8 @@ import (
 	"github.com/ryym/goq/goql"
 )
 
+// InitCollectors initializes collectors.
+// This is used internally.
 func InitCollectors(collectors []Collector, initConf *initConf) ([]Collector, error) {
 	clls := make([]Collector, 0, len(collectors))
 	for i, cl := range collectors {
@@ -49,7 +51,7 @@ func fillUntakenCols(ptrs []interface{}, conf *initConf) {
 	}
 }
 
-func ApplyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error {
+func applyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error {
 	for rows.Next() {
 		for _, cl := range clls {
 			cl.next(ptrs)
@@ -65,10 +67,13 @@ func ApplyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error
 	return rows.Err()
 }
 
+// Queryable represents an interface to issue an query.
+// Builtin *sql.DB implements this interface.
 type Queryable interface {
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 }
 
+// Runner runs a query with given collectors to collect result rows.
 type Runner struct {
 	ctx   context.Context
 	db    Queryable
@@ -79,6 +84,7 @@ func NewRunner(ctx context.Context, db Queryable, query goql.QueryExpr) *Runner 
 	return &Runner{ctx, db, query}
 }
 
+// Rows return *sql.Rows directly.
 func (r *Runner) Rows() (*sql.Rows, error) {
 	q, err := r.query.Construct()
 	if err != nil {
@@ -87,6 +93,7 @@ func (r *Runner) Rows() (*sql.Rows, error) {
 	return r.db.QueryContext(r.ctx, q.Query(), q.Args()...)
 }
 
+// First executes given single collectors.
 func (r *Runner) First(collectors ...SingleCollector) error {
 	clls := make([]Collector, 0, len(collectors))
 	for _, c := range collectors {
@@ -97,6 +104,7 @@ func (r *Runner) First(collectors ...SingleCollector) error {
 	return r.collect(r.query.WithLimits(1, 0), clls...)
 }
 
+// First executes given list collectors.
 func (r *Runner) Collect(collectors ...ListCollector) error {
 	clls := make([]Collector, 0, len(collectors))
 	for _, c := range collectors {
@@ -140,7 +148,7 @@ func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) error {
 	ptrs := make([]interface{}, len(colNames))
 	fillUntakenCols(ptrs, initConf)
 
-	return ApplyCollectors(rows, ptrs, clls)
+	return applyCollectors(rows, ptrs, clls)
 }
 
 // ExecCollectorsForTest executes given collectors for
