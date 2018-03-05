@@ -3,7 +3,7 @@ package cllct_test
 import (
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq/cllct"
 )
 
@@ -21,7 +21,7 @@ func TestElemCollector(t *testing.T) {
 	}, rows, nil, names)
 
 	want := City{ID: 3, Name: "foo", CountryID: 1}
-	if diff := deep.Equal(got, want); diff != nil {
+	if diff := cmp.Diff(got, want); diff != "" {
 		t.Error(diff)
 	}
 }

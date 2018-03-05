@@ -3,7 +3,7 @@ package cllct_test
 import (
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/goql"
@@ -28,7 +28,7 @@ func TestMapCollector(t *testing.T) {
 		1:  {ID: 3, Name: "foo", CountryID: 1},
 		53: {ID: 4, Name: "bar", CountryID: 53},
 	}
-	if diff := deep.Equal(got, want); diff != nil {
+	if diff := cmp.Diff(got, want); diff != "" {
 		t.Error(diff)
 	}
 }

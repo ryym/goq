@@ -3,7 +3,7 @@ package cllct_test
 import (
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq/cllct"
 )
 
@@ -25,7 +25,7 @@ func TestSliceCollector(t *testing.T) {
 		{ID: 3, Name: "foo", CountryID: 1},
 		{ID: 4, Name: "bar", CountryID: 53},
 	}
-	if diff := deep.Equal(got, want); diff != nil {
+	if diff := cmp.Diff(got, want); diff != "" {
 		t.Error(diff)
 	}
 }

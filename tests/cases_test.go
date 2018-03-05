@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/goql"
@@ -150,7 +150,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 						continue
 					}
 					got := reflect.ValueOf(c.got).Elem().Interface()
-					if diff := deep.Equal(got, c.want); diff != nil {
+					if diff := cmp.Diff(got, c.want); diff != "" {
 						t.Errorf("%s: %s", reflect.TypeOf(c.cllct), diff)
 						succeed = false
 					}
@@ -206,7 +206,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{Name: "Japan"},
 					{Name: "Nowhere"},
 				}
-				if diff := deep.Equal(countries, wantCountries); diff != nil {
+				if diff := cmp.Diff(countries, wantCountries); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("countries diff: %s", diff)
 				}
@@ -218,7 +218,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{Name: "tokyo", CountryID: 8},
 					{},
 				}
-				if diff := deep.Equal(cities, wantCities); diff != nil {
+				if diff := cmp.Diff(cities, wantCities); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("cities diff: %s", diff)
 				}
@@ -268,7 +268,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{ID: 8, Name: "Japan"},
 					{ID: 20, Name: "Somewhere"},
 				}
-				if diff := deep.Equal(countries, wantCountries); diff != nil {
+				if diff := cmp.Diff(countries, wantCountries); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("countries diff: %s", diff)
 				}
@@ -279,7 +279,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{Name: "tokyo", CountryID: 8},
 					{Name: "foo", CountryID: 20},
 				}
-				if diff := deep.Equal(cities, wantCities); diff != nil {
+				if diff := cmp.Diff(cities, wantCities); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("cities diff: %s", diff)
 				}
@@ -345,7 +345,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{1, "Japan"},
 					{2, "Somewhere"},
 				}
-				if diff := deep.Equal(countries, wantCountries); diff != nil {
+				if diff := cmp.Diff(countries, wantCountries); diff != "" {
 					return fmt.Errorf("countries diff: %s", diff)
 				}
 
@@ -359,7 +359,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 						{21, "city1", 2},
 					},
 				}
-				if diff := deep.Equal(cities, wantCities); diff != nil {
+				if diff := cmp.Diff(cities, wantCities); diff != "" {
 					return fmt.Errorf("cities diff: %s", diff)
 				}
 
@@ -382,7 +382,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 						{212, "address2", 21},
 					},
 				}
-				if diff := deep.Equal(addresses, wantAddresses); diff != nil {
+				if diff := cmp.Diff(addresses, wantAddresses); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("addresses diff: %s", diff)
 				}
@@ -445,7 +445,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					1: {1, "Japan"},
 					2: {2, "Somewhere"},
 				}
-				if diff := deep.Equal(countries, wantCountries); diff != nil {
+				if diff := cmp.Diff(countries, wantCountries); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("countries diff: %s", diff)
 				}
@@ -465,7 +465,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 						{212, "address2", 21},
 					},
 				}
-				if diff := deep.Equal(addresses, wantAddresses); diff != nil {
+				if diff := cmp.Diff(addresses, wantAddresses); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("addresses diff: %s", diff)
 				}
@@ -504,7 +504,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{Code: 12, CityName: "chicago", CountryID: 5},
 					{Code: 14, CityName: "seattle", CountryID: 5},
 				}
-				if diff := deep.Equal(cities, want); diff != nil {
+				if diff := cmp.Diff(cities, want); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("%s", diff)
 				}
@@ -544,7 +544,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 						"country_id": ctx.rawInt(5),
 					},
 				}
-				if diff := deep.Equal(cities, want); diff != nil {
+				if diff := cmp.Diff(cities, want); diff != "" {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil
@@ -594,7 +594,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{ID: 2, Name: "Brazil"},
 					{ID: 3, Name: "Nowhere"},
 				}
-				if diff := deep.Equal(countries, wantCountries); diff != nil {
+				if diff := cmp.Diff(countries, wantCountries); diff != "" {
 					return fmt.Errorf("countries diff: %s", diff)
 				}
 
@@ -606,7 +606,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{"cities_count": int64(4), "population": int64(30)},
 					{"cities_count": int64(0), "population": int64(30)},
 				}
-				if diff := deep.Equal(wantExtras, extras); diff != nil {
+				if diff := cmp.Diff(wantExtras, extras); diff != "" {
 					return fmt.Errorf("extras diff: %s", diff)
 				}
 
@@ -632,7 +632,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{2, "self-driving car", "cool!"},
 					{1, "AI", "what!?"},
 				}
-				if diff := deep.Equal(techs, wantTechs); diff != nil {
+				if diff := cmp.Diff(techs, wantTechs); diff != "" {
 					return fmt.Errorf("techs diff: %s", diff)
 				}
 				return nil
@@ -673,7 +673,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					{"MR", "MR"},
 					{"MR", "VR"},
 				}
-				if diff := deep.Equal(techs, wantTechs); diff != nil {
+				if diff := cmp.Diff(techs, wantTechs); diff != "" {
 					return fmt.Errorf("techs diff: %s", diff)
 				}
 				return nil
@@ -695,7 +695,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 				}
 
 				want := map[string]City{"foo": {ID: 2, Name: "foo"}}
-				if diff := deep.Equal(cities, want); diff != nil {
+				if diff := cmp.Diff(cities, want); diff != "" {
 					t.Log(q.Construct())
 					return fmt.Errorf("%s", diff)
 				}
@@ -722,7 +722,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 				tx.Query(z.Select(z.Cities.All()).From(z.Cities)).First(
 					z.Cities.ToElem(&got),
 				)
-				if diff := deep.Equal(city, got); diff != nil {
+				if diff := cmp.Diff(city, got); diff != "" {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil
@@ -747,7 +747,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 				tx.Query(z.Select(z.Techs.All()).From(z.Techs)).First(
 					z.Techs.ToElem(&got),
 				)
-				if diff := deep.Equal(tech, got); diff != nil {
+				if diff := cmp.Diff(tech, got); diff != "" {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil
@@ -782,7 +782,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					z.Select(z.Cities.All()).From(z.Cities).OrderBy(z.Cities.ID),
 				).Collect(z.Cities.ToSlice(&got))
 
-				if diff := deep.Equal(want, got); diff != nil {
+				if diff := cmp.Diff(want, got); diff != "" {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil
@@ -816,7 +816,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					z.Select(z.Cities.All()).From(z.Cities).OrderBy(z.Cities.ID),
 				).Collect(z.Cities.ToSlice(&got))
 
-				if diff := deep.Equal(want, got); diff != nil {
+				if diff := cmp.Diff(want, got); diff != "" {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil
@@ -846,7 +846,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 					z.Select(z.Cities.All()).From(z.Cities).OrderBy(z.Cities.ID),
 				).Collect(z.Cities.ToSlice(&got))
 
-				if diff := deep.Equal(want, got); diff != nil {
+				if diff := cmp.Diff(want, got); diff != "" {
 					return fmt.Errorf("%s", diff)
 				}
 				return nil

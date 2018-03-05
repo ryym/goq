@@ -3,7 +3,7 @@ package gen
 import (
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestParseTag(t *testing.T) {
@@ -62,7 +62,7 @@ func TestParseTag(t *testing.T) {
 			}
 		} else if c.err != "" {
 			t.Errorf("Expected error did not occur\n%s", c.err)
-		} else if diff := deep.Equal(Result(got), c.want); diff != nil {
+		} else if diff := cmp.Diff(Result(got), c.want); diff != "" {
 			t.Errorf("Unexpected result\n%s", diff)
 		}
 	}
@@ -74,7 +74,7 @@ func TestParseColumnTag(t *testing.T) {
 		IsPK:    true,
 		ColName: "foo_bar",
 	}
-	if diff := deep.Equal(got, want); diff != nil {
+	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("Unexpected model tag\n%s", diff)
 	}
 }
@@ -84,7 +84,7 @@ func TestParseTableTag(t *testing.T) {
 	want := tableTag{
 		HelperName: "Prefs",
 	}
-	if diff := deep.Equal(got, want); diff != nil {
+	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("Unexpected table tag\n%s", diff)
 	}
 }

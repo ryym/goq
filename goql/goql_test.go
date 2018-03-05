@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 )
 
 type testDialect struct{}
@@ -287,7 +287,7 @@ func TestBasicExprs(t *testing.T) {
 			if query := q.Query(); query != test.sql {
 				t.Errorf("[%d] Query diff\nGOT : %s\nWANT: %s", i, query, test.sql)
 			}
-			if diff := deep.Equal(q.Args(), test.args); diff != nil {
+			if diff := cmp.Diff(q.Args(), test.args); diff != "" {
 				t.Errorf("[%d] Args diff\n%s", i, diff)
 			}
 		}
