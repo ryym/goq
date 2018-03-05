@@ -8,10 +8,15 @@
   version = "v1.3"
 
 [[projects]]
-  name = "github.com/go-test/deep"
-  packages = ["."]
-  revision = "6592d9cc0a499ad2d5f574fde80a2b5c5cc3b4f5"
-  version = "v1.0.1"
+  name = "github.com/google/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value"
+  ]
+  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
@@ -41,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "50878f215604b532785b0623a1bd01502860f4a6b502fc5f00078c50a4f1fee0"
+  inputs-digest = "e89b4b5432183b438d857d3d84d1e713bcfc539775dd4bd93c5ce783d89c7bec"
   solver-name = "gps-cdcl"
   solver-version = 1
