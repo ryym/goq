@@ -137,6 +137,15 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1, -1, 2, -3, 0, 1},
 		},
 		{
+			goql: z.CaseOf(ID,
+				z.When(1).Then(-1),
+				z.When(2).Then(-3),
+			).Else(0).Add(1),
+			sql: "CASE `users`.`id` WHEN $1 THEN $2 WHEN $3 THEN $4" +
+				" ELSE $5 END + $6",
+			args: []interface{}{1, -1, 2, -3, 0, 1},
+		},
+		{
 			goql: z.Select(ID, Name, z.Var(1).Add(ID).As("test")),
 			sql:  "SELECT `users`.`id`, `users`.`name`, $1 + `users`.`id` AS `test`",
 			args: []interface{}{1},
