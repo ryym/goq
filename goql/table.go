@@ -17,11 +17,11 @@ func (t *Table) ApplyTable(q *Query, ctx DBContext) {
 	}
 }
 
-func (t *Table) All() *ColumnListExpr {
+func (t *Table) All() *ColumnList {
 	return NewColumnList(t.cols)
 }
 
-func (t *Table) Except(excepts ...*Column) *ColumnListExpr {
+func (t *Table) Except(excepts ...*Column) *ColumnList {
 	if len(excepts) == 0 {
 		return t.All()
 	}

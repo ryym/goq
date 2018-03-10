@@ -192,15 +192,23 @@ func (f *funcExpr) Apply(q *Query, ctx DBContext) {
 
 func (f *funcExpr) Selection() Selection { return Selection{} }
 
-type ColumnListExpr struct {
+// ColumnList is a special expression that holds multiple columns.
+// You can pass this to Builder.Select method.
+// All columns held by this struct will be selected.
+type ColumnList struct {
 	cols []*Column
 }
 
-func NewColumnList(cols []*Column) *ColumnListExpr {
-	return &ColumnListExpr{cols}
+func NewColumnList(cols []*Column) *ColumnList {
+	return &ColumnList{cols}
 }
 
-func (el *ColumnListExpr) Apply(q *Query, ctx DBContext) {
+// Columns returns the columns as a slice.
+func (el *ColumnList) Columns() []*Column {
+	return el.cols
+}
+
+func (el *ColumnList) Apply(q *Query, ctx DBContext) {
 	if len(el.cols) == 0 {
 		return
 	}
@@ -211,12 +219,8 @@ func (el *ColumnListExpr) Apply(q *Query, ctx DBContext) {
 	}
 }
 
-func (el *ColumnListExpr) Selection() Selection {
-	panic("[INVALID] ColumnListExpr.Selection is called")
-}
-
-func (el *ColumnListExpr) Columns() []*Column {
-	return el.cols
+func (el *ColumnList) Selection() Selection {
+	panic("[INVALID] ColumnList.Selection is called")
 }
 
 type existsExpr struct {

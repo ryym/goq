@@ -3,7 +3,7 @@ package goql
 // CaseExpr represents a 'CASE' expression without 'ELSE' clause.
 type CaseExpr struct {
 	val   Expr
-	cases []*WhenExpr
+	cases []*WhenClause
 	ops
 }
 
@@ -58,18 +58,18 @@ func (ce *CaseElseExpr) Apply(q *Query, ctx DBContext) {
 
 func (ce *CaseElseExpr) Selection() Selection { return Selection{} }
 
-// WhenExpr does not implement Selectable.
-type WhenExpr struct {
+// WhenClause constructs a 'WHEN' clause used for case expressions.
+type WhenClause struct {
 	when Expr
 	then Expr
 }
 
-func (w *WhenExpr) Then(then interface{}) *WhenExpr {
+func (w *WhenClause) Then(then interface{}) *WhenClause {
 	w.then = lift(then)
 	return w
 }
 
-func (w *WhenExpr) apply(q *Query, ctx DBContext) {
+func (w *WhenClause) apply(q *Query, ctx DBContext) {
 	q.query = append(q.query, " WHEN ")
 	w.when.Apply(q, ctx)
 	q.query = append(q.query, " THEN ")

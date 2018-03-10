@@ -179,7 +179,7 @@ func (b *Builder) FullJoin(table TableLike) *JoinClause {
 //	  WHEN users.age > 40 THEN 'under40'
 //	  ELSE 'above40'
 //	END
-func (b *Builder) Case(cases ...*WhenExpr) *CaseExpr {
+func (b *Builder) Case(cases ...*WhenClause) *CaseExpr {
 	return (&CaseExpr{cases: cases}).init()
 }
 
@@ -199,13 +199,13 @@ func (b *Builder) Case(cases ...*WhenExpr) *CaseExpr {
 //	  WHEN 2 THEN 'two'
 //	  ELSE 'other'
 //	END
-func (b *Builder) CaseOf(val Expr, cases ...*WhenExpr) *CaseExpr {
+func (b *Builder) CaseOf(val Expr, cases ...*WhenClause) *CaseExpr {
 	return (&CaseExpr{val: val, cases: cases}).init()
 }
 
 // When is a 'WHEN' clause for a 'CASE' expression.
-func (b *Builder) When(when interface{}) *WhenExpr {
-	return &WhenExpr{when: lift(when)}
+func (b *Builder) When(when interface{}) *WhenClause {
+	return &WhenClause{when: lift(when)}
 }
 
 // Modifier clauses

@@ -127,10 +127,10 @@ type SchemaTable interface {
 	TableLike
 
 	// All constructs the column list expression that has all columns.
-	All() *ColumnListExpr
+	All() *ColumnList
 
 	// Except constructs the column list expression that has all columns except columns you specify.
-	Except(cols ...*Column) *ColumnListExpr
+	Except(cols ...*Column) *ColumnList
 }
 
 // QueryRoot is the interface of query statements
