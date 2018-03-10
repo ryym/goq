@@ -8,12 +8,14 @@ import (
 
 type Values map[*Column]interface{}
 
+// InsertMaker constructs Insert struct.
 type InsertMaker struct {
 	table SchemaTable
 	cols  []*Column
 	ctx   DBContext
 }
 
+// Values accepts one or more model structs to be inserted.
 func (m *InsertMaker) Values(elem interface{}, elems ...interface{}) *Insert {
 	cols := makeColsMap(m.cols, m.table)
 
@@ -34,6 +36,9 @@ func (m *InsertMaker) Values(elem interface{}, elems ...interface{}) *Insert {
 	}
 }
 
+// ValuesMap accepts one or more value maps to be inserted.
+// If the target columns are specified by Builder.InsertInto,
+// values of non-target columns are ignored.
 func (m *InsertMaker) ValuesMap(vals Values, valsList ...Values) *Insert {
 	vl := append([]Values{vals}, valsList...)
 	return &Insert{
@@ -44,6 +49,7 @@ func (m *InsertMaker) ValuesMap(vals Values, valsList ...Values) *Insert {
 	}
 }
 
+// Insert constructs an 'INSERT' statement.
 type Insert struct {
 	table    SchemaTable
 	cols     []*Column

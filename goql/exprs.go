@@ -24,6 +24,7 @@ func (a *aliased) Selection() Selection {
 	return sel
 }
 
+// XXX: This should be used only in ORDER BY?
 type nameExpr struct {
 	name string
 	ops
@@ -82,6 +83,7 @@ type predExpr struct {
 
 func (p *predExpr) ImplPredExpr() {}
 
+// XXX: This should be able to use everywhere.
 type rawExpr struct {
 	sql string
 	ops

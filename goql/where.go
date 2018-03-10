@@ -1,5 +1,6 @@
 package goql
 
+// Where constructs a 'WHERE' clause.
 type Where struct {
 	preds []PredExpr
 }

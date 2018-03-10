@@ -1,5 +1,6 @@
 package goql
 
+// ColumnMaker is a utility to make several columns of the same table easily.
 type ColumnMaker struct {
 	structName string
 	tableName  string
@@ -31,6 +32,7 @@ type ColumnBuilder struct {
 	col *Column
 }
 
+// PK specifies the column is a primary key.
 func (cb *ColumnBuilder) PK() *ColumnBuilder {
 	cb.col.meta.PK = true
 	return cb
@@ -40,10 +42,13 @@ func (cb *ColumnBuilder) Bld() *Column {
 	return cb.col
 }
 
+// ColumnMeta is a meta information about a column.
 type ColumnMeta struct {
+	// PK indicates this column is a primary key or not.
 	PK bool
 }
 
+// Column has data about the column and its table.
 type Column struct {
 	tableName  string
 	tableAlias string

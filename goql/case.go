@@ -1,5 +1,6 @@
 package goql
 
+// CaseExpr represents a 'CASE' expression without 'ELSE' clause.
 type CaseExpr struct {
 	val   Expr
 	cases []*WhenExpr
@@ -36,6 +37,7 @@ func (c *CaseExpr) Else(v interface{}) *CaseElseExpr {
 	}).init()
 }
 
+// CaseEelseExpr represents a 'CASE' expression with 'ELSE' clause.
 type CaseElseExpr struct {
 	caseExpr *CaseExpr
 	elseVal  Expr

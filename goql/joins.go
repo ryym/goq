@@ -1,5 +1,6 @@
 package goql
 
+// Join types.
 const (
 	JOIN_INNER = "INNER"
 	JOIN_LEFT  = "LEFT OUTER"
@@ -36,6 +37,8 @@ func (jo *JoinOn) joinDef() *joinDef {
 	return jo.def
 }
 
+// JoinDef defines how to join a table.
+// This uses 'INNER JOIN' by default.
 type JoinDef struct {
 	table    TableLike
 	on       PredExpr
@@ -50,6 +53,7 @@ func (j *JoinDef) joinDef() *joinDef {
 	return &joinDef{j.table, j.on, JOIN_INNER}
 }
 
+// On specifies a condition to join.
 func (j *JoinDef) On(on PredExpr) *JoinDef {
 	j.on = on
 	return j

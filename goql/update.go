@@ -6,11 +6,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// UpdateMaker constructs Update struct.
 type UpdateMaker struct {
 	table SchemaTable
 	ctx   DBContext
 }
 
+// Set accepts values map.
 func (m *UpdateMaker) Set(vals Values) *Update {
 	return &Update{
 		table: m.table,
@@ -19,6 +21,9 @@ func (m *UpdateMaker) Set(vals Values) *Update {
 	}
 }
 
+// Elem accepts an model.
+// If the 'cols' are specified,
+// only the fields corresponding to these columns are updated.
 func (m *UpdateMaker) Elem(elem interface{}, cols ...*Column) *Update {
 	var pkCol *Column
 	for _, col := range m.table.All().Columns() {
@@ -57,6 +62,7 @@ func (m *UpdateMaker) Elem(elem interface{}, cols ...*Column) *Update {
 	return upd
 }
 
+// Update constructs an 'UPDATE' statement.
 type Update struct {
 	table SchemaTable
 	vals  Values
@@ -65,6 +71,7 @@ type Update struct {
 	ctx   DBContext
 }
 
+// Where appends conditions of the update target rows.
 func (upd *Update) Where(preds ...PredExpr) *Update {
 	upd.where.add(preds)
 	return upd
