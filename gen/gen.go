@@ -176,25 +176,22 @@ func listColumnFields(modelName string, modelT *types.Struct) ([]*field, error) 
 			continue
 		}
 
-		if fld.Anonymous() { // Embedded struct
-			if ebdT, ok := fld.Type().Underlying().(*types.Struct); ok {
-				ebdFields, err := listColumnFields(modelName, ebdT)
-				if err != nil {
-					return nil, err
-				}
-				fields = append(fields, ebdFields...)
+		// Embeddings
+		if fld.Anonymous() {
+			if _, ok := fld.Type().Underlying().(*types.Struct); ok {
+				return nil, errors.New("[goq] struct embedding in model is not supported")
 			}
-		} else {
-			colName := tag.ColName
-			if colName == "" {
-				colName = util.FldToCol(fld.Name())
-			}
-			fields = append(fields, &field{
-				Name:   fld.Name(),
-				Column: colName,
-				Tag:    tag,
-			})
 		}
+
+		colName := tag.ColName
+		if colName == "" {
+			colName = util.FldToCol(fld.Name())
+		}
+		fields = append(fields, &field{
+			Name:   fld.Name(),
+			Column: colName,
+			Tag:    tag,
+		})
 	}
 
 	return fields, nil
