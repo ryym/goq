@@ -42,8 +42,8 @@ func (b *Builder) Null() AnonExpr {
 
 // Raw constructs a raw expression.
 // The given string will be embedded to the query without any filterings.
-func (b *Builder) Raw(sql string) AnonExpr {
-	return (&rawExpr{sql: sql}).init()
+func (b *Builder) Raw(sql string) *RawExpr {
+	return (&RawExpr{sql: sql}).init()
 }
 
 // Parens surrounds the given expression by parentheses.

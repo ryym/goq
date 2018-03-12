@@ -83,22 +83,25 @@ type predExpr struct {
 
 func (p *predExpr) ImplPredExpr() {}
 
-// XXX: This should be able to use everywhere.
-type rawExpr struct {
+// RawExpr is a raw string expression.
+type RawExpr struct {
 	sql string
 	ops
 }
 
-func (r *rawExpr) init() *rawExpr {
+// Allow to use it as a predicate.
+func (r *RawExpr) ImplPredExpr() {}
+
+func (r *RawExpr) init() *RawExpr {
 	r.ops = ops{r}
 	return r
 }
 
-func (r *rawExpr) Apply(q *Query, ctx DBContext) {
+func (r *RawExpr) Apply(q *Query, ctx DBContext) {
 	q.query = append(q.query, r.sql)
 }
 
-func (r *rawExpr) Selection() Selection { return Selection{} }
+func (r *RawExpr) Selection() Selection { return Selection{} }
 
 type parensExpr struct {
 	exp Expr

@@ -236,6 +236,13 @@ func TestBasicExprs(t *testing.T) {
 			args: nil,
 		},
 		{
+			goql: z.Select(z.Raw("selected")).From(Users).Where(
+				ID.Eq(1), z.Raw("some-predicate"),
+			),
+			sql:  "SELECT selected FROM `users` WHERE `users`.`id` = $1 AND some-predicate",
+			args: []interface{}{1},
+		},
+		{
 			goql: z.InsertInto(Users).ValuesMap(Values{
 				Users.ID:   1,
 				Users.Name: "bob",
