@@ -1,4 +1,4 @@
-🚧  UNDER DEVELOPMENT
+🌱 Beta version
 
 # Goq  
 
@@ -78,10 +78,6 @@ func main() {
 }
 ```
 
-## API
-
-<https://godoc.org/github.com/ryym/goq>
-
 ## Out of Scope Features
 
 Goq is not a DB management framework so does not support any of these:
@@ -89,6 +85,12 @@ Goq is not a DB management framework so does not support any of these:
 - schema migration
 - schema generation from Go code
 - model generation from schema
+
+## Resources
+
+- [Getting Started](https://github.com/ryym/goq/wiki/Getting-Started)
+- [API document (GoDoc)](https://godoc.org/github.com/ryym/goq)
+- [Sample application](https://github.com/ryym/goq-bookmark)
 
 ## Inspiration
 
