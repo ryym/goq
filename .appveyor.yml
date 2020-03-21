@@ -10,6 +10,12 @@ environment:
 install:
   - go version
   - go env
+  - go mod download
+
+before_test:
+  # https://github.com/appveyor/ci/issues/2613
+  - set PATH=C:\msys64\mingw64\bin;%PATH%
+  - where gcc.exe
 
 test_script:
   - ps: go test -v -race $(go list ./... | Select-String -NotMatch /tests)

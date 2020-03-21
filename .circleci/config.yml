@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.14
         environment:
           POSTGRES_PORT: 5432
           MYSQL_PORT: 3306
@@ -14,9 +14,11 @@ jobs:
         environment:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: goq
-    working_directory: /go/src/github.com/ryym/goq
+
+    # working_directory: /go/src/github.com/ryym/goq
     steps:
       - checkout
+      - run: go mod download
       - run: go test -v -race `go list ./... | grep -v /tests`
       - run:
           name: wait databases setup
