@@ -16,11 +16,15 @@ type InsertMaker struct {
 }
 
 // Values accepts one or more model structs to be inserted.
-func (m *InsertMaker) Values(elem interface{}, elems ...interface{}) *Insert {
+func (m *InsertMaker) Values(elems ...interface{}) *Insert {
+	if len(elems) == 0 {
+		panic("[goql] elems slice is empty")
+	}
+
 	cols := makeColsMap(m.cols, m.table)
 
-	valsList := make([]Values, 0, len(elems)+1)
-	for _, elem := range append([]interface{}{elem}, elems...) {
+	valsList := make([]Values, 0, len(elems))
+	for _, elem := range elems {
 		vals, err := makeValuesMap(elem, cols)
 		if err != nil {
 			return &Insert{err: errors.Wrap(err, "[Insert] Values()")}
@@ -39,12 +43,14 @@ func (m *InsertMaker) Values(elem interface{}, elems ...interface{}) *Insert {
 // ValuesMap accepts one or more value maps to be inserted.
 // If the target columns are specified by Builder.InsertInto,
 // values of non-target columns are ignored.
-func (m *InsertMaker) ValuesMap(vals Values, valsList ...Values) *Insert {
-	vl := append([]Values{vals}, valsList...)
+func (m *InsertMaker) ValuesMap(valsList ...Values) *Insert {
+	if len(valsList) == 0 {
+		panic("[goql] values slice is empty")
+	}
 	return &Insert{
 		table:    m.table,
 		cols:     m.cols,
-		valsList: vl,
+		valsList: valsList,
 		ctx:      m.ctx,
 	}
 }
