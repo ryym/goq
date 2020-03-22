@@ -1,5 +1,5 @@
 // Package dialect defines some dialects per RDB.
-// Currently it supports Postgres, MySQL, and SQLite3.
+// Currently it supports Postgres and MySQL.
 package dialect
 
 import "fmt"
@@ -13,7 +13,7 @@ type Dialect interface {
 }
 
 // New returns a dialect for the given driver.
-// It supports "postgres", "mysql", and "sqlite3".
+// It supports "postgres", "mysql".
 // It returns nil if you pass an unknown driver name.
 func New(driver string) Dialect {
 	switch driver {
@@ -21,8 +21,6 @@ func New(driver string) Dialect {
 		return &postgres{}
 	case "mysql":
 		return &mysql{}
-	case "sqlite3":
-		return &sqlite{}
 	}
 	return nil
 }

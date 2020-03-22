@@ -5,7 +5,6 @@ import "strconv"
 const (
 	DB_POSTGRES = "postgres"
 	DB_MYSQL    = "mysql"
-	DB_SQLITE3  = "sqlite3"
 )
 
 type testCtx struct {

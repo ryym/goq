@@ -25,7 +25,4 @@ jobs:
           command: dockerize -wait tcp://localhost:5432 -wait tcp://localhost:3306 -timeout 1m
       - run:
           name: Integration test
-          # FIXME: Building `mattn/go-sqlite3` without `go install`ing it takes some time.
-          # So skip SQLite3 tests on CI for now.
-          # (https://groups.google.com/forum/#!topic/golang-nuts/KexEyiy6PvA)
-          command: go test -v -race `ls ./tests/*.go | grep -v sqlite3_test.go`
+          command: go test -v -race ./...
