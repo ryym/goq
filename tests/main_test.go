@@ -12,7 +12,7 @@ import (
 func TestPostgres(t *testing.T) {
 	port := os.Getenv("POSTGRES_PORT")
 	if port == "" {
-		port = "5433"
+		port = "5434"
 	}
 	conn := fmt.Sprintf("port=%s user=goq sslmode=disable", port)
 	RunIntegrationTest(t, DB_POSTGRES, conn)

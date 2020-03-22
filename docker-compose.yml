@@ -3,9 +3,11 @@ services:
   pg:
     image: postgres:9.6
     ports:
-      - '5433:5432'
+      - '5434:5432'
     environment:
       - POSTGRES_USER=goq
+        # Skip password authentication.
+      - POSTGRES_HOST_AUTH_METHOD=trust
   mysql:
     image: mysql:8.0.3
     ports:
