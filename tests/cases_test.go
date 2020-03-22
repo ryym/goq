@@ -639,6 +639,22 @@ func MakeTestCases(ctx testCtx) []testCase {
 			},
 		},
 		{
+			name: "return ErrNoRows for empty result when First is used",
+			data: ``,
+			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
+				q := z.Select(z.Cities.All()).From(z.Cities)
+				var city City
+				err := tx.Query(q).First(z.Cities.ToElem(&city))
+				if err == nil {
+					return errors.New("no error returned")
+				}
+				if !errors.Is(err, cllct.ErrNoRows) {
+					return fmt.Errorf("unknown error returned: %v", err)
+				}
+				return nil
+			},
+		},
+		{
 			name: "use self-join by specifying different aliases",
 			data: `
 			INSERT INTO technologies VALUES (1, 'VR', '');

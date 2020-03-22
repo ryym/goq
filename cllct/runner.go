@@ -51,20 +51,23 @@ func fillUntakenCols(ptrs []interface{}, conf *initConf) {
 	}
 }
 
-func applyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) error {
+func applyCollectors(rows *sql.Rows, ptrs []interface{}, clls []Collector) (nScans int, err error) {
+	nScans = 0
 	for rows.Next() {
 		for _, cl := range clls {
 			cl.next(ptrs)
 		}
 
-		rows.Scan(ptrs...)
+		// TODO: Should not ignore scan errors.
+		_ = rows.Scan(ptrs...)
+		nScans += 1
 
 		for _, cl := range clls {
 			cl.afterScan(ptrs)
 		}
 	}
 
-	return rows.Err()
+	return nScans, nil
 }
 
 // Queryable represents an interface to issue an query.
@@ -101,7 +104,14 @@ func (r *Runner) First(collectors ...SingleCollector) error {
 	}
 
 	// Use WithLimits instead of Limit to avoid mutating the given query.
-	return r.collect(r.query.WithLimits(1, 0), clls...)
+	nScans, err := r.collect(r.query.WithLimits(1, 0), clls...)
+	if err != nil {
+		return err
+	}
+	if nScans == 0 {
+		return ErrNoRows
+	}
+	return nil
 }
 
 // First executes given list collectors.
@@ -110,29 +120,30 @@ func (r *Runner) Collect(collectors ...ListCollector) error {
 	for _, c := range collectors {
 		clls = append(clls, c)
 	}
-	return r.collect(r.query, clls...)
+	_, err := r.collect(r.query, clls...)
+	return err
 }
 
-func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) error {
+func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) (nScans int, err error) {
 	q, err := query.Construct()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	rows, err := r.db.QueryContext(r.ctx, q.Query(), q.Args()...)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer rows.Close()
 
 	selects := query.Selections()
 	colNames, err := rows.Columns()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	if len(colNames) != len(selects) {
-		return fmt.Errorf(
+		return 0, fmt.Errorf(
 			"[goq] selections mismatch: colNames: %d, selects: %d",
 			len(colNames),
 			len(selects),
@@ -142,7 +153,7 @@ func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) error {
 	initConf := NewInitConf(selects, colNames)
 	clls, err := InitCollectors(collectors, initConf)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ptrs := make([]interface{}, len(colNames))
