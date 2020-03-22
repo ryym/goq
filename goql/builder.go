@@ -143,6 +143,11 @@ func (b *Builder) Select(exps ...Selectable) SelectClause {
 	return (&queryExpr{exps: exps, ctx: b.ctx}).init()
 }
 
+// SelectDistinct constructs a 'SELECT' clause with 'DISTINCT'.
+func (b *Builder) SelectDistinct(exps ...Selectable) SelectClause {
+	return (&queryExpr{exps: exps, ctx: b.ctx, distinct: true}).init()
+}
+
 // InnerJoin constructs an 'INNER JOIN' clause.
 func (b *Builder) InnerJoin(table TableLike) *JoinClause {
 	return &JoinClause{JOIN_INNER, table}

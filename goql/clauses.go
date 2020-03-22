@@ -6,16 +6,17 @@ import (
 )
 
 type queryExpr struct {
-	exps    []Selectable
-	froms   []TableLike
-	joins   []*joinDef
-	where   Where
-	groups  []Expr
-	havings []PredExpr
-	orders  []Orderer
-	limit   int
-	offset  int
-	ctx     DBContext
+	exps     []Selectable
+	distinct bool
+	froms    []TableLike
+	joins    []*joinDef
+	where    Where
+	groups   []Expr
+	havings  []PredExpr
+	orders   []Orderer
+	limit    int
+	offset   int
+	ctx      DBContext
 	ops
 }
 
@@ -36,6 +37,9 @@ func (qe *queryExpr) Apply(q *Query, ctx DBContext) {
 	q.query = append(q.query, "SELECT ")
 	if len(qe.exps) == 0 {
 		return // XXX: Should return an error?
+	}
+	if qe.distinct {
+		q.query = append(q.query, "DISTINCT ")
 	}
 	qe.exps[0].Apply(q, ctx)
 	for i := 1; i < len(qe.exps); i++ {

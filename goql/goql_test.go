@@ -151,6 +151,11 @@ func TestBasicExprs(t *testing.T) {
 			args: []interface{}{1},
 		},
 		{
+			goql: z.SelectDistinct(ID),
+			sql:  "SELECT DISTINCT `users`.`id`",
+			args: nil,
+		},
+		{
 			goql: z.Select(Users.All()).From(Users).Joins(
 				z.LeftJoin(Users).On(Name.Eq("bob")),
 			).Where(
