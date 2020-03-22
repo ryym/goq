@@ -135,6 +135,11 @@ func (qe *queryExpr) From(table TableLike, tables ...TableLike) Clauses {
 	return qe
 }
 
+func (qe *queryExpr) Select(exps ...Selectable) Clauses {
+	qe.exps = exps
+	return qe
+}
+
 func (qe *queryExpr) Joins(definers ...JoinDefiner) Clauses {
 	for _, def := range definers {
 		qe.joins = append(qe.joins, def.joinDef())

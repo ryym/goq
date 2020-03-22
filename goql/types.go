@@ -145,6 +145,9 @@ type QueryExpr interface {
 	Expr
 	QueryRoot
 
+	// Select overrides the selections.
+	Select(exps ...Selectable) Clauses
+
 	// As gives an alias to the query.
 	As(alias string) QueryTable
 

@@ -156,6 +156,12 @@ func TestBasicExprs(t *testing.T) {
 			args: nil,
 		},
 		{
+			// Allow to override SELECT.
+			goql: z.Select(Name).From(Users).Select(z.Count(ID)),
+			sql:  "SELECT COUNT(`users`.`id`) FROM `users`",
+			args: nil,
+		},
+		{
 			goql: z.Select(Users.All()).From(Users).Joins(
 				z.LeftJoin(Users).On(Name.Eq("bob")),
 			).Where(
