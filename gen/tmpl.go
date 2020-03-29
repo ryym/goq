@@ -24,7 +24,7 @@ func execTemplate(
 package %s
 `, pkgName)))
 
-	writeImports(buf, helpers, pkgs)
+	writeImports(buf, pkgs)
 	tableT := template.Must(template.New("table").Parse(tableTmpl))
 
 	var err error
@@ -54,15 +54,12 @@ package %s
 	return src, err
 }
 
-func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
+func writeImports(buf io.Writer, pkgs map[string]bool) {
 	buf.Write([]byte("import (\n"))
 
 	paths := []string{
 		"github.com/ryym/goq",
 		"github.com/ryym/goq/dialect",
-	}
-	if len(helpers) > 0 {
-		paths = append(paths, "github.com/ryym/goq/goql")
 	}
 
 	for path, _ := range pkgs {
@@ -78,20 +75,20 @@ func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
 
 const tableTmpl = `
 type {{.Name}} struct {
-	goql.Table
+	goq.Table
 	*goq.ModelCollectorMaker
 	{{range .Fields}}
-	{{.Name}} *goql.Column{{end}}
+	{{.Name}} *goq.Column{{end}}
 }
 
 func New{{.Name}}(alias string) *{{.Name}} {
-	{{if .Fields}}cm := goql.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias){{end}}
+	{{if .Fields}}cm := goq.NewColumnMaker("{{.ModelName}}", "{{.TableName}}").As(alias){{end}}
 	t := &{{.Name}}{
 		{{range .Fields}}
 		{{.Name}}: {{$.ColumnBuilder "cm" .}},{{end}}
 	}
-	cols := []*goql.Column{ {{.JoinFields "t"}} }
-	t.Table = goql.NewTable("{{.TableName}}", alias, cols)
+	cols := []*goq.Column{ {{.JoinFields "t"}} }
+	t.Table = goq.NewTable("{{.TableName}}", alias, cols)
 	t.ModelCollectorMaker = goq.NewModelCollectorMaker(cols, alias)
 	return t
 }
