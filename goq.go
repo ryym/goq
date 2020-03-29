@@ -1,5 +1,12 @@
 // Package goq provides a type-safe and fluent query builder.
 //
+// Query Construction
+//
+// You can construct various queries using Goq.
+// All expression structs and interfaces are named as 'XxxExpr' and the Column struct
+// implements basic operators like 'Add', 'Like', 'Between', etc.
+// See the Expr interface for the documentation about these operators.
+//
 // Collecting Data
 //
 // A collector collects *sql.Rows fetched from DB
