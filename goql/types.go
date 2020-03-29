@@ -23,7 +23,7 @@ type QueryApplier interface {
 }
 
 // Selectable represents a selectable expression.
-// Builder.Select accepts values that implement this interface.
+// QueryBuilder.Select accepts values that implement this interface.
 type Selectable interface {
 	QueryApplier
 	Selection() Selection

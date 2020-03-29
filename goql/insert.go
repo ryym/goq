@@ -41,7 +41,7 @@ func (m *InsertMaker) Values(elems ...interface{}) *Insert {
 }
 
 // ValuesMap accepts one or more value maps to be inserted.
-// If the target columns are specified by Builder.InsertInto,
+// If the target columns are specified by QueryBuilder.InsertInto,
 // values of non-target columns are ignored.
 func (m *InsertMaker) ValuesMap(valsList ...Values) *Insert {
 	if len(valsList) == 0 {

@@ -32,7 +32,7 @@ type usersTable struct {
 func (t *usersTable) As(alias string) *usersTable { return t /* FOR NOW */ }
 
 func TestBasicExprs(t *testing.T) {
-	z := NewBuilder(&testDialect{})
+	z := NewQueryBuilder(&testDialect{})
 	cm := NewColumnMaker("User", "users")
 	ID := cm.Col("ID", "id").PK().Bld()
 	Name := cm.Col("Name", "name").Bld()

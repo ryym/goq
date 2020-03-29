@@ -196,7 +196,7 @@ func (f *funcExpr) Apply(q *Query, ctx DBContext) {
 func (f *funcExpr) Selection() Selection { return Selection{} }
 
 // ColumnList is a special expression that holds multiple columns.
-// You can pass this to Builder.Select method.
+// You can pass this to QueryBuilder.Select method.
 // All columns held by this struct will be selected.
 type ColumnList struct {
 	cols []*Column

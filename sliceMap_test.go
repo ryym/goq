@@ -20,7 +20,7 @@ func TestSliceMapCollector(t *testing.T) {
 		{2, 7, "g"},
 	}
 
-	q := goql.NewBuilder(dialect.Generic())
+	q := goql.NewQueryBuilder(dialect.Generic())
 	cl := goq.NewMaker()
 	names := []string{"country_id", "id", "name"}
 

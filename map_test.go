@@ -15,7 +15,7 @@ func TestMapCollector(t *testing.T) {
 		{4, 53, "bar"},
 	}
 
-	q := goql.NewBuilder(dialect.Generic())
+	q := goql.NewQueryBuilder(dialect.Generic())
 	cl := goq.NewMaker()
 	names := []string{"id", "country_id", "name"}
 
@@ -35,7 +35,7 @@ func TestMapCollector(t *testing.T) {
 
 func TestInvalidMapCollector(t *testing.T) {
 	cl := goq.NewMaker()
-	q := goql.NewBuilder(dialect.Generic())
+	q := goql.NewQueryBuilder(dialect.Generic())
 	initConf := goq.NewInitConf([]goql.Selection{}, []string{})
 	var err error
 	var cllctor *goq.MapCollector

@@ -7,13 +7,13 @@ import (
 
 // Builder provides query builder methods and result collector methods.
 type Builder struct {
-	*goql.Builder
+	*goql.QueryBuilder
 	*CollectorMaker
 }
 
 func NewBuilder(dl dialect.Dialect) *Builder {
 	return &Builder{
-		Builder:        goql.NewBuilder(dl),
+		QueryBuilder:   goql.NewQueryBuilder(dl),
 		CollectorMaker: NewMaker(),
 	}
 }
