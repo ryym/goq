@@ -62,7 +62,7 @@ func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
 		"github.com/ryym/goq/dialect",
 	}
 	if len(helpers) > 0 {
-		paths = append(paths, "github.com/ryym/goq/cllct", "github.com/ryym/goq/goql")
+		paths = append(paths, "github.com/ryym/goq/goql")
 	}
 
 	for path, _ := range pkgs {
@@ -79,7 +79,7 @@ func writeImports(buf io.Writer, helpers []*helper, pkgs map[string]bool) {
 const tableTmpl = `
 type {{.Name}} struct {
 	goql.Table
-	*cllct.ModelCollectorMaker
+	*goq.ModelCollectorMaker
 	{{range .Fields}}
 	{{.Name}} *goql.Column{{end}}
 }
@@ -92,7 +92,7 @@ func New{{.Name}}(alias string) *{{.Name}} {
 	}
 	cols := []*goql.Column{ {{.JoinFields "t"}} }
 	t.Table = goql.NewTable("{{.TableName}}", alias, cols)
-	t.ModelCollectorMaker = cllct.NewModelCollectorMaker(cols, alias)
+	t.ModelCollectorMaker = goq.NewModelCollectorMaker(cols, alias)
 	return t
 }
 

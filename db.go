@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/ryym/goq/cllct"
 	"github.com/ryym/goq/dialect"
 	"github.com/ryym/goq/goql"
 )
@@ -56,12 +55,12 @@ func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
 	return &Tx{tx}, nil
 }
 
-func (d *DB) Query(query goql.QueryExpr) *cllct.Runner {
+func (d *DB) Query(query goql.QueryExpr) *Runner {
 	return d.QueryContext(context.Background(), query)
 }
 
-func (d *DB) QueryContext(ctx context.Context, query goql.QueryExpr) *cllct.Runner {
-	return cllct.NewRunner(ctx, d.DB, query)
+func (d *DB) QueryContext(ctx context.Context, query goql.QueryExpr) *Runner {
+	return NewRunner(ctx, d.DB, query)
 }
 
 func (d *DB) Exec(query goql.QueryRoot) (sql.Result, error) {
@@ -82,8 +81,8 @@ type Tx struct {
 	Tx *sql.Tx
 }
 
-func (tx *Tx) Query(query goql.QueryExpr) *cllct.Runner {
-	return cllct.NewRunner(context.Background(), tx.Tx, query)
+func (tx *Tx) Query(query goql.QueryExpr) *Runner {
+	return NewRunner(context.Background(), tx.Tx, query)
 }
 
 func (tx *Tx) Exec(query goql.QueryRoot) (sql.Result, error) {
