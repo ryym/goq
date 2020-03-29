@@ -8,8 +8,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
-	"github.com/ryym/goq/cllct"
-	"github.com/ryym/goq/goql"
 )
 
 func MakeTestCases(ctx testCtx) []testCase {
@@ -49,7 +47,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 				var keyStore int
 
 				cases := []struct {
-					cllct cllct.Collector
+					cllct goq.Collector
 					got   interface{}
 					want  interface{}
 				}{
@@ -139,9 +137,9 @@ func MakeTestCases(ctx testCtx) []testCase {
 				for _, c := range cases {
 					var err error
 					switch cl := c.cllct.(type) {
-					case cllct.ListCollector:
+					case goq.ListCollector:
 						err = tx.Query(q).Collect(cl)
-					case cllct.SingleCollector:
+					case goq.SingleCollector:
 						err = tx.Query(q).First(cl)
 					}
 					if err != nil {
@@ -648,7 +646,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 				if err == nil {
 					return errors.New("no error returned")
 				}
-				if !errors.Is(err, cllct.ErrNoRows) {
+				if !errors.Is(err, goq.ErrNoRows) {
 					return fmt.Errorf("unknown error returned: %v", err)
 				}
 				return nil
@@ -778,7 +776,7 @@ func MakeTestCases(ctx testCtx) []testCase {
 			`,
 			run: func(t *testing.T, tx *goq.Tx, z *Builder) error {
 				_, err := tx.Exec(
-					z.Update(z.Cities).Set(goql.Values{
+					z.Update(z.Cities).Set(goq.Values{
 						z.Cities.CountryID: 50,
 						z.Cities.Name:      "x",
 					}).Where(z.Cities.ID.Lt(3)),
