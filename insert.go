@@ -18,7 +18,7 @@ type InsertMaker struct {
 // Values accepts one or more model structs to be inserted.
 func (m *InsertMaker) Values(elems ...interface{}) *Insert {
 	if len(elems) == 0 {
-		panic("[goql] elems slice is empty")
+		panic("[goq] elems slice is empty")
 	}
 
 	cols := makeColsMap(m.cols, m.table)
@@ -45,7 +45,7 @@ func (m *InsertMaker) Values(elems ...interface{}) *Insert {
 // values of non-target columns are ignored.
 func (m *InsertMaker) ValuesMap(valsList ...Values) *Insert {
 	if len(valsList) == 0 {
-		panic("[goql] values slice is empty")
+		panic("[goq] values slice is empty")
 	}
 	return &Insert{
 		table:    m.table,

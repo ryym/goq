@@ -14,7 +14,7 @@ func NewQueryBuilder(dl dialect.Dialect) *QueryBuilder {
 
 // Query constructs a Query from the given expression.
 //
-//	z := goql.NewQueryBuilder(dialect.Generic())
+//	z := goq.NewQueryBuilder(dialect.Generic())
 //	q := z.Query(z.Var(1).Add(z.Var(40)))
 //	fmt.Println(q.String())
 func (b *QueryBuilder) Query(exp QueryApplier) Query {
@@ -170,7 +170,7 @@ func (b *QueryBuilder) FullJoin(table TableLike) *JoinClause {
 
 // Case constructs a 'CASE' expression.
 //
-//	z := goql.NewQueryBuilder(dialect.Generic())
+//	z := goq.NewQueryBuilder(dialect.Generic())
 //	age := z.Col("users", "age")
 //	q := z.Case(
 //		z.When(age.Lt(20)).Then("under20"),
@@ -190,7 +190,7 @@ func (b *QueryBuilder) Case(cases ...*WhenClause) *CaseExpr {
 
 // CaseOf constructs a 'CASE' expression for the value.
 //
-//	z := goql.NewQueryBuilder(dialect.Generic())
+//	z := goq.NewQueryBuilder(dialect.Generic())
 //	id := z.Col("users", "id")
 //	q := z.CaseOf(id,
 //		z.When(1).Then("one"),
