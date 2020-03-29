@@ -12,7 +12,7 @@ import (
 //	}
 //
 // But be careful, this collector collects values without any conversions.
-// See https://godoc.org/github.com/ryym/goq/cllct#RowMapCollector for details.
+// See https://godoc.org/github.com/ryym/goq#RowMapCollector for details.
 type RowMapSliceCollector struct {
 	slice    *[]map[string]interface{}
 	colNames []string

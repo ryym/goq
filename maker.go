@@ -89,7 +89,7 @@ func (m *MapCollectorMaker) ByWith(ptr interface{}, key Selectable) *MapCollecto
 //
 //	db.Query(q).Collect(z.ToMap(&mapOfStruct).By(z.Users.ID))
 //
-// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#MapCollectorMaker for details.
 func (cm *CollectorMaker) ToMap(ptr interface{}) *MapCollectorMaker {
 	return &MapCollectorMaker{&MapCollector{
 		ptr: ptr,
@@ -98,7 +98,7 @@ func (cm *CollectorMaker) ToMap(ptr interface{}) *MapCollectorMaker {
 
 // SliceMapCollectorMaker creates a SliceMapCollector with the given key column.
 // Note that the key column specified by 'By' must be scanned into somewhere.
-// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#MapCollectorMaker for details.
 type SliceMapCollectorMaker struct {
 	collector *SliceMapCollector
 }
@@ -119,7 +119,7 @@ func (m *SliceMapCollectorMaker) ByWith(ptr interface{}, key Selectable) *SliceM
 //
 //	db.Query(q).Collect(z.ToSliceMap(&mapOfSlicesOfStruct).By(z.Users.ID))
 //
-// See https://godoc.org/github.com/ryym/goq/cllct#SliceMapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#SliceMapCollectorMaker for details.
 func (cm *CollectorMaker) ToSliceMap(ptr interface{}) *SliceMapCollectorMaker {
 	return &SliceMapCollectorMaker{&SliceMapCollector{
 		ptr: ptr,
@@ -220,7 +220,7 @@ func (cm *ModelCollectorMaker) ToMap(ptr interface{}) *ModelMapCollector {
 
 // ModelSliceMapCollectorMaker creates a ModelSliceMapCollector with the given key column.
 // Note that the key column specified by 'By' must be scanned into somewhere.
-// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#MapCollectorMaker for details.
 type ModelSliceMapCollectorMaker struct {
 	collector *ModelSliceMapCollector
 }
@@ -241,7 +241,7 @@ func (m *ModelSliceMapCollectorMaker) ByWith(ptr interface{}, key Selectable) *M
 //
 //	db.Query(q).Collect(z.Cties.ToSliceMap(&mapOfCities).By(z.Cities.CountryID))
 //
-// See https://godoc.org/github.com/ryym/goq/cllct#ModelSliceMapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#ModelSliceMapCollectorMaker for details.
 func (cm *ModelCollectorMaker) ToSliceMap(ptr interface{}) *ModelSliceMapCollectorMaker {
 	return &ModelSliceMapCollectorMaker{&ModelSliceMapCollector{
 		table: tableInfo{cm.structName, cm.tableAlias},
@@ -252,7 +252,7 @@ func (cm *ModelCollectorMaker) ToSliceMap(ptr interface{}) *ModelSliceMapCollect
 
 // ModelUniqSliceMapCollectorMaker creates a ModelUniqSliceMapCollector with the given key column.
 // Note that the key column specified by 'By' must be scanned into somewhere.
-// See https://godoc.org/github.com/ryym/goq/cllct#MapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#MapCollectorMaker for details.
 type ModelUniqSliceMapCollectorMaker struct {
 	collector *ModelUniqSliceMapCollector
 }
@@ -273,7 +273,7 @@ func (m *ModelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key Selectable
 //
 //	db.Query(q).Collect(z.Cities.ToUniqSliceMap(&mapOfUniqCities).By(z.Country.Name))
 //
-// See https://godoc.org/github.com/ryym/goq/cllct#ModelSliceMapCollectorMaker for details.
+// See https://godoc.org/github.com/ryym/goq#ModelSliceMapCollectorMaker for details.
 func (cm *ModelCollectorMaker) ToUniqSliceMap(ptr interface{}) *ModelUniqSliceMapCollectorMaker {
 	pkFieldName := ""
 	if pkCol := findPKCol(cm.cols); pkCol != nil {
