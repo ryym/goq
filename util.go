@@ -3,14 +3,12 @@ package goq
 import (
 	"fmt"
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 const mapKeyNotSelectedErrMsg = "cannot use non collected value for `By` (or use `ByWith` instead)"
 
 // For map collectors.
-func isKeyCol(col *goql.Selection, key *goql.Selection) bool {
+func isKeyCol(col *Selection, key *Selection) bool {
 	if col.Alias != "" && col.Alias == key.Alias {
 		return true
 	}
@@ -18,7 +16,7 @@ func isKeyCol(col *goql.Selection, key *goql.Selection) bool {
 		col.TableAlias == key.TableAlias && col.FieldName == key.FieldName
 }
 
-func isSameTable(col goql.Selection, tbl tableInfo) bool {
+func isSameTable(col Selection, tbl tableInfo) bool {
 	return col.TableAlias == tbl.tableAlias && col.StructName == tbl.structName
 }
 

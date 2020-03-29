@@ -1,4 +1,4 @@
-package goql
+package goq
 
 // ColumnMaker is a utility to make several columns of the same table easily.
 type ColumnMaker struct {

@@ -6,26 +6,25 @@ package tests
 import (
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/goql"
 )
 
 type Countries struct {
-	goql.Table
+	goq.Table
 	*goq.ModelCollectorMaker
 
-	ID   *goql.Column
-	Name *goql.Column
+	ID   *goq.Column
+	Name *goq.Column
 }
 
 func NewCountries(alias string) *Countries {
-	cm := goql.NewColumnMaker("Country", "countries").As(alias)
+	cm := goq.NewColumnMaker("Country", "countries").As(alias)
 	t := &Countries{
 
 		ID:   cm.Col("ID", "id").PK().Bld(),
 		Name: cm.Col("Name", "name").Bld(),
 	}
-	cols := []*goql.Column{t.ID, t.Name}
-	t.Table = goql.NewTable("countries", alias, cols)
+	cols := []*goq.Column{t.ID, t.Name}
+	t.Table = goq.NewTable("countries", alias, cols)
 	t.ModelCollectorMaker = goq.NewModelCollectorMaker(cols, alias)
 	return t
 }
@@ -33,24 +32,24 @@ func NewCountries(alias string) *Countries {
 func (t *Countries) As(alias string) *Countries { return NewCountries(alias) }
 
 type Cities struct {
-	goql.Table
+	goq.Table
 	*goq.ModelCollectorMaker
 
-	ID        *goql.Column
-	Name      *goql.Column
-	CountryID *goql.Column
+	ID        *goq.Column
+	Name      *goq.Column
+	CountryID *goq.Column
 }
 
 func NewCities(alias string) *Cities {
-	cm := goql.NewColumnMaker("City", "cities").As(alias)
+	cm := goq.NewColumnMaker("City", "cities").As(alias)
 	t := &Cities{
 
 		ID:        cm.Col("ID", "id").PK().Bld(),
 		Name:      cm.Col("Name", "name").Bld(),
 		CountryID: cm.Col("CountryID", "country_id").Bld(),
 	}
-	cols := []*goql.Column{t.ID, t.Name, t.CountryID}
-	t.Table = goql.NewTable("cities", alias, cols)
+	cols := []*goq.Column{t.ID, t.Name, t.CountryID}
+	t.Table = goq.NewTable("cities", alias, cols)
 	t.ModelCollectorMaker = goq.NewModelCollectorMaker(cols, alias)
 	return t
 }
@@ -58,24 +57,24 @@ func NewCities(alias string) *Cities {
 func (t *Cities) As(alias string) *Cities { return NewCities(alias) }
 
 type Addresses struct {
-	goql.Table
+	goq.Table
 	*goq.ModelCollectorMaker
 
-	ID     *goql.Column
-	Name   *goql.Column
-	CityID *goql.Column
+	ID     *goq.Column
+	Name   *goq.Column
+	CityID *goq.Column
 }
 
 func NewAddresses(alias string) *Addresses {
-	cm := goql.NewColumnMaker("Address", "addresses").As(alias)
+	cm := goq.NewColumnMaker("Address", "addresses").As(alias)
 	t := &Addresses{
 
 		ID:     cm.Col("ID", "id").PK().Bld(),
 		Name:   cm.Col("Name", "name").Bld(),
 		CityID: cm.Col("CityID", "city_id").Bld(),
 	}
-	cols := []*goql.Column{t.ID, t.Name, t.CityID}
-	t.Table = goql.NewTable("addresses", alias, cols)
+	cols := []*goq.Column{t.ID, t.Name, t.CityID}
+	t.Table = goq.NewTable("addresses", alias, cols)
 	t.ModelCollectorMaker = goq.NewModelCollectorMaker(cols, alias)
 	return t
 }
@@ -83,24 +82,24 @@ func NewAddresses(alias string) *Addresses {
 func (t *Addresses) As(alias string) *Addresses { return NewAddresses(alias) }
 
 type Techs struct {
-	goql.Table
+	goq.Table
 	*goq.ModelCollectorMaker
 
-	ID   *goql.Column
-	Name *goql.Column
-	Desc *goql.Column
+	ID   *goq.Column
+	Name *goq.Column
+	Desc *goq.Column
 }
 
 func NewTechs(alias string) *Techs {
-	cm := goql.NewColumnMaker("Tech", "technologies").As(alias)
+	cm := goq.NewColumnMaker("Tech", "technologies").As(alias)
 	t := &Techs{
 
 		ID:   cm.Col("ID", "id").PK().Bld(),
 		Name: cm.Col("Name", "name").Bld(),
 		Desc: cm.Col("Desc", "description").Bld(),
 	}
-	cols := []*goql.Column{t.ID, t.Name, t.Desc}
-	t.Table = goql.NewTable("technologies", alias, cols)
+	cols := []*goq.Column{t.ID, t.Name, t.Desc}
+	t.Table = goq.NewTable("technologies", alias, cols)
 	t.ModelCollectorMaker = goq.NewModelCollectorMaker(cols, alias)
 	return t
 }

@@ -2,13 +2,11 @@ package goq
 
 import (
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // ElemCollector scans a first row into a model struct.
 type ModelElemCollector struct {
-	cols     []*goql.Column
+	cols     []*Column
 	table    tableInfo
 	colToFld map[int]int
 	ptr      interface{}

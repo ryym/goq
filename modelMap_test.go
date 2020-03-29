@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
-	"github.com/ryym/goq/goql"
 )
 
 func TestModelMapCollector(t *testing.T) {
@@ -15,7 +14,7 @@ func TestModelMapCollector(t *testing.T) {
 		{"_", "carol", 18},
 	}
 
-	selects := []goql.Selection{
+	selects := []goq.Selection{
 		sel("", "foo", "Bar"),
 		sel("", "User", "Name"),
 		sel("", "User", "ID"),

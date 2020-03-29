@@ -6,7 +6,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/goql"
 )
 
 func TestSliceMapCollector(t *testing.T) {
@@ -20,7 +19,7 @@ func TestSliceMapCollector(t *testing.T) {
 		{2, 7, "g"},
 	}
 
-	q := goql.NewQueryBuilder(dialect.Generic())
+	q := goq.NewQueryBuilder(dialect.Generic())
 	cl := goq.NewMaker()
 	names := []string{"country_id", "id", "name"}
 

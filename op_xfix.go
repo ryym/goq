@@ -1,4 +1,4 @@
-package goql
+package goq
 
 type infixOp struct {
 	left  Selectable

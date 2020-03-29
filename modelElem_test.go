@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
-	"github.com/ryym/goq/goql"
 )
 
 func TestModelElemCollector(t *testing.T) {
@@ -13,7 +12,7 @@ func TestModelElemCollector(t *testing.T) {
 		{"alice", 101},
 	}
 
-	selects := []goql.Selection{
+	selects := []goq.Selection{
 		sel("", "User", "Name"),
 		sel("", "User", "ID"),
 	}

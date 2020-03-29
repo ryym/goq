@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
-	"github.com/ryym/goq/goql"
 )
 
 func TestModelUniqSliceMapCollector(t *testing.T) {
@@ -28,7 +27,7 @@ func TestModelUniqSliceMapCollector(t *testing.T) {
 		{3, "us", 7, "houston"},
 	}
 
-	selects := []goql.Selection{
+	selects := []goq.Selection{
 		sel("", "Country", "ID"),
 		sel("", "Country", "Name"),
 		sel("", "City", "ID"),

@@ -7,7 +7,6 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
-	"github.com/ryym/goq/goql"
 )
 
 // InitCollectors initializes collectors.
@@ -80,10 +79,10 @@ type Queryable interface {
 type Runner struct {
 	ctx   context.Context
 	db    Queryable
-	query goql.QueryExpr
+	query QueryExpr
 }
 
-func NewRunner(ctx context.Context, db Queryable, query goql.QueryExpr) *Runner {
+func NewRunner(ctx context.Context, db Queryable, query QueryExpr) *Runner {
 	return &Runner{ctx, db, query}
 }
 
@@ -124,7 +123,7 @@ func (r *Runner) Collect(collectors ...ListCollector) error {
 	return err
 }
 
-func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) (nScans int, err error) {
+func (r *Runner) collect(query QueryExpr, collectors ...Collector) (nScans int, err error) {
 	q, err := query.Construct()
 	if err != nil {
 		return 0, err
@@ -169,11 +168,11 @@ func (r *Runner) collect(query goql.QueryExpr, collectors ...Collector) (nScans 
 func ExecCollectorsForTest(
 	cllcts []Collector,
 	rows [][]interface{},
-	selects []goql.Selection,
+	selects []Selection,
 	colNames []string,
 ) error {
 	if selects == nil {
-		selects = make([]goql.Selection, len(colNames))
+		selects = make([]Selection, len(colNames))
 	} else {
 		colNames = make([]string, len(selects))
 	}

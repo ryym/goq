@@ -3,8 +3,6 @@ package goq
 import (
 	"errors"
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // ModelSliceCollector collects rows into a slice of models.
@@ -17,7 +15,7 @@ import (
 //	}
 type ModelSliceCollector struct {
 	elemType reflect.Type
-	cols     []*goql.Column
+	cols     []*Column
 	table    tableInfo
 	colToFld map[int]int
 	ptr      interface{}

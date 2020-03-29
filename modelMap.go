@@ -3,18 +3,16 @@ package goq
 import (
 	"errors"
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // ModelMapCollector collects rows into a map of models
 // whose key is a primary key.
 type ModelMapCollector struct {
 	elemType reflect.Type
-	cols     []*goql.Column
+	cols     []*Column
 	table    tableInfo
 	colToFld map[int]int
-	keySel   *goql.Selection
+	keySel   *Selection
 	keyIdx   int
 	ptr      interface{}
 	mp       reflect.Value

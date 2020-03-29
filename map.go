@@ -4,7 +4,6 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/ryym/goq/goql"
 	"github.com/ryym/goq/util"
 )
 
@@ -19,7 +18,7 @@ import (
 type MapCollector struct {
 	elemType reflect.Type
 	colToFld map[int]int
-	key      goql.Selectable
+	key      Selectable
 	keyIdx   int
 	keyStore reflect.Value
 	ptr      interface{}

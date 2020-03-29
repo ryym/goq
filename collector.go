@@ -1,16 +1,14 @@
 package goq
 
-import "github.com/ryym/goq/goql"
-
 type initConf struct {
-	Selects  []goql.Selection
+	Selects  []Selection
 	ColNames []string
 	takens   map[int]bool
 }
 
 // NewInitConf creates a initConf for collectors.
 // This is used internally.
-func NewInitConf(selects []goql.Selection, colNames []string) *initConf {
+func NewInitConf(selects []Selection, colNames []string) *initConf {
 	return &initConf{selects, colNames, map[int]bool{}}
 }
 

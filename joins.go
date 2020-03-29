@@ -1,4 +1,4 @@
-package goql
+package goq
 
 // Join types.
 const (

@@ -3,8 +3,6 @@ package goq
 import (
 	"errors"
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // ModelSliceMapCollector collects rows into a map of slices.
@@ -23,10 +21,10 @@ import (
 //	}
 type ModelSliceMapCollector struct {
 	elemType reflect.Type
-	cols     []*goql.Column
+	cols     []*Column
 	table    tableInfo
 	colToFld map[int]int
-	key      goql.Selectable
+	key      Selectable
 	keyIdx   int
 	keyStore reflect.Value
 	ptr      interface{}

@@ -1,4 +1,4 @@
-package goql
+package goq
 
 type Table struct {
 	name  string

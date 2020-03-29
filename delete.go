@@ -1,4 +1,4 @@
-package goql
+package goq
 
 // Delete constructs a 'DELETE' statement.
 type Delete struct {

@@ -1,4 +1,4 @@
-package goql
+package goq
 
 func lift(v interface{}) Expr {
 	switch val := v.(type) {

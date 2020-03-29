@@ -1,4 +1,4 @@
-package goql
+package goq
 
 // CaseExpr represents a 'CASE' expression without 'ELSE' clause.
 type CaseExpr struct {

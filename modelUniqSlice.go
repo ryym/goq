@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // ModelUniqSliceCollector collects rows into a slice of models uniquely.
@@ -21,7 +19,7 @@ import (
 //	}
 type ModelUniqSliceCollector struct {
 	elemType    reflect.Type
-	cols        []*goql.Column
+	cols        []*Column
 	table       tableInfo
 	colToFld    map[int]int
 	ptr         interface{}

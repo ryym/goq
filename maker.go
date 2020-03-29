@@ -2,8 +2,6 @@ package goq
 
 import (
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // CollectorMaker provides methods to create generic collectors.
@@ -75,12 +73,12 @@ type MapCollectorMaker struct {
 	collector *MapCollector
 }
 
-func (m *MapCollectorMaker) By(key goql.Selectable) *MapCollector {
+func (m *MapCollectorMaker) By(key Selectable) *MapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *MapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *MapCollector {
+func (m *MapCollectorMaker) ByWith(ptr interface{}, key Selectable) *MapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -105,12 +103,12 @@ type SliceMapCollectorMaker struct {
 	collector *SliceMapCollector
 }
 
-func (m *SliceMapCollectorMaker) By(key goql.Selectable) *SliceMapCollector {
+func (m *SliceMapCollectorMaker) By(key Selectable) *SliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *SliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *SliceMapCollector {
+func (m *SliceMapCollectorMaker) ByWith(ptr interface{}, key Selectable) *SliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -149,10 +147,10 @@ func (cm *CollectorMaker) ToRowMapSlice(slice *[]map[string]interface{}) *RowMap
 type ModelCollectorMaker struct {
 	structName string
 	tableAlias string
-	cols       []*goql.Column
+	cols       []*Column
 }
 
-func NewModelCollectorMaker(cols []*goql.Column, alias string) *ModelCollectorMaker {
+func NewModelCollectorMaker(cols []*Column, alias string) *ModelCollectorMaker {
 	var structName string
 	if len(cols) > 0 {
 		structName = cols[0].StructName()
@@ -227,12 +225,12 @@ type ModelSliceMapCollectorMaker struct {
 	collector *ModelSliceMapCollector
 }
 
-func (m *ModelSliceMapCollectorMaker) By(key goql.Selectable) *ModelSliceMapCollector {
+func (m *ModelSliceMapCollectorMaker) By(key Selectable) *ModelSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *ModelSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelSliceMapCollector {
+func (m *ModelSliceMapCollectorMaker) ByWith(ptr interface{}, key Selectable) *ModelSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -259,12 +257,12 @@ type ModelUniqSliceMapCollectorMaker struct {
 	collector *ModelUniqSliceMapCollector
 }
 
-func (m *ModelUniqSliceMapCollectorMaker) By(key goql.Selectable) *ModelUniqSliceMapCollector {
+func (m *ModelUniqSliceMapCollectorMaker) By(key Selectable) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	return m.collector
 }
 
-func (m *ModelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key goql.Selectable) *ModelUniqSliceMapCollector {
+func (m *ModelUniqSliceMapCollectorMaker) ByWith(ptr interface{}, key Selectable) *ModelUniqSliceMapCollector {
 	m.collector.key = key
 	m.collector.keyStore = reflect.ValueOf(ptr).Elem()
 	return m.collector
@@ -289,7 +287,7 @@ func (cm *ModelCollectorMaker) ToUniqSliceMap(ptr interface{}) *ModelUniqSliceMa
 	}}
 }
 
-func findPKCol(cols []*goql.Column) *goql.Column {
+func findPKCol(cols []*Column) *Column {
 	for _, col := range cols {
 		if meta := col.Meta(); meta.PK {
 			return col

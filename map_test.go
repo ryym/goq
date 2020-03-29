@@ -6,7 +6,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/ryym/goq"
 	"github.com/ryym/goq/dialect"
-	"github.com/ryym/goq/goql"
 )
 
 func TestMapCollector(t *testing.T) {
@@ -15,7 +14,7 @@ func TestMapCollector(t *testing.T) {
 		{4, 53, "bar"},
 	}
 
-	q := goql.NewQueryBuilder(dialect.Generic())
+	q := goq.NewQueryBuilder(dialect.Generic())
 	cl := goq.NewMaker()
 	names := []string{"id", "country_id", "name"}
 
@@ -35,8 +34,8 @@ func TestMapCollector(t *testing.T) {
 
 func TestInvalidMapCollector(t *testing.T) {
 	cl := goq.NewMaker()
-	q := goql.NewQueryBuilder(dialect.Generic())
-	initConf := goq.NewInitConf([]goql.Selection{}, []string{})
+	q := goq.NewQueryBuilder(dialect.Generic())
+	initConf := goq.NewInitConf([]goq.Selection{}, []string{})
 	var err error
 	var cllctor *goq.MapCollector
 

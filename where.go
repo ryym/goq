@@ -1,4 +1,4 @@
-package goql
+package goq
 
 // Where constructs a 'WHERE' clause.
 type Where struct {

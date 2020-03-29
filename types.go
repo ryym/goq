@@ -1,4 +1,4 @@
-package goql
+package goq
 
 // Selection provides information about a selected expression.
 type Selection struct {

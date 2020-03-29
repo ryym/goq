@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-
-	"github.com/ryym/goq/goql"
 )
 
 // ModelUniqSliceMapCollector collects rows into a map of slices.
@@ -26,10 +24,10 @@ import (
 //	}
 type ModelUniqSliceMapCollector struct {
 	elemType    reflect.Type
-	cols        []*goql.Column
+	cols        []*Column
 	table       tableInfo
 	colToFld    map[int]int
-	key         goql.Selectable
+	key         Selectable
 	keyIdx      int
 	keyStore    reflect.Value
 	pkFieldName string
